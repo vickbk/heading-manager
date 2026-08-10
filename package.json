@@ -23,7 +23,9 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm typecheck && pnpm build"
+    "prepublishOnly": "pnpm typecheck && pnpm build",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "keywords": [
     "a11y",

@@ -1,5 +1,5 @@
 import { RegionMapping } from "../types";
-import { parseHeadingLevel } from "./parse-heading-lever";
+import { parseHeadingLevel } from "./parse-heading-level";
 
 /**
  * Recursively validates that heading levels in a region tree follow semantic HTML rules.

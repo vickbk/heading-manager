@@ -1,5 +1,5 @@
 import { RegionMapping } from "../types";
-import { parseHeadingLevel } from "./parse-heading-lever";
+import { parseHeadingLevel } from "./parse-heading-level";
 
 /**
  * Resolves heading details prioritizing `detailedHeadings` over `headings`.

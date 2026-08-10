@@ -1,3 +1,4 @@
+export { createRegion } from "./components/create-region";
 export { Heading } from "./components/heading";
 export * from "./components/landmarks";
 export { Main } from "./components/main";
