@@ -15,55 +15,66 @@ export function checkHeadingOrderReport(
     return { isValid: errors.length === 0, errors };
   }
 
-  let resolvedLevel = currentLevel;
-  const headingInfo = resolveHeadingDetail(region);
+  let runningLevel = currentLevel;
 
-  if (headingInfo) {
+  const totalHeadings = Math.max(
+    region.detailedHeadings?.length ?? 0,
+    region.headings?.length ?? 0,
+  );
+
+  for (let i = 0; i < totalHeadings; i++) {
+    const headingInfo = resolveHeadingDetail(region, i);
+    if (!headingInfo) continue;
+
     const { rawHeading, parsedLevel, text, element } = headingInfo;
     const textLabel = text ? ` ("${text}")` : "";
+    const headingPath = totalHeadings > 1 ? `${path} [heading ${i + 1}]` : path;
 
     const common = {
-      path,
+      path: headingPath,
       tagName: region.tagName,
       heading: rawHeading,
       text,
       element,
     };
+
     if (parsedLevel === null) {
       errors.push({
         ...common,
         actualLevel: -1,
-        expectedMaxLevel: Math.min(currentLevel + 1, 6),
-        message: `Unparseable heading "${rawHeading}"${textLabel} at ${path}. Must contain a valid heading level (1-6).`,
+        expectedMaxLevel: Math.min(runningLevel + 1, 6),
+        message: `Unparseable heading "${rawHeading}"${textLabel} at ${headingPath}. Must contain a valid heading level (1-6).`,
       });
     } else if (parsedLevel < 1 || parsedLevel > 6) {
       errors.push({
         ...common,
         actualLevel: parsedLevel,
         expectedMaxLevel: 6,
-        message: `Invalid HTML heading level H${parsedLevel}${textLabel} at ${path}. Heading level must be between H1 and H6.`,
+        message: `Invalid HTML heading level H${parsedLevel}${textLabel} at ${headingPath}. Heading level must be between H1 and H6.`,
       });
     } else {
-      const diff = parsedLevel - currentLevel;
+      const diff = parsedLevel - runningLevel;
 
       if (diff > 1) {
-        const expectedMax = Math.min(currentLevel + 1, 6);
+        const expectedMax = Math.min(runningLevel + 1, 6);
         errors.push({
           ...common,
           actualLevel: parsedLevel,
           expectedMaxLevel: expectedMax,
-          message: `Heading level skipped at ${path}${textLabel}: context level is H${currentLevel}, expected maximum H${expectedMax}, but found H${parsedLevel}.`,
+          message: `Heading level skipped at ${headingPath}${textLabel}: context level is H${runningLevel}, expected maximum H${expectedMax}, but found H${parsedLevel}.`,
         });
       }
 
-      resolvedLevel = parsedLevel;
+      // Update running level for subsequent headings or child regions
+      runningLevel = parsedLevel;
     }
   }
 
+  // Pass updated runningLevel to child regions
   if (region.children && region.children.length > 0) {
     region.children.forEach((child, index) => {
       const childPath = `${path} > ${child.tagName}[${index}]`;
-      checkHeadingOrderReport(child, resolvedLevel, childPath, errors);
+      checkHeadingOrderReport(child, runningLevel, childPath, errors);
     });
   }
 
