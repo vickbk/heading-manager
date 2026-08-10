@@ -1,10 +1,21 @@
 import { HeadingLevel } from "../types";
 
 /**
- * Calculates the next 0-based heading level index (0 to 5).
+ * Calculates the next 0-based heading level index (0 to 5), enforcing maximum depth clamping at 5 (H6).
  *
- * @param currentLevel 0-based index (0='h1', 1='h2', 2='h3', 3='h4', 4='h5', 5='h6')
- * @param hasH1 Whether the current section contains an H1 heading
+ * @description Given the current context level index (where `0` = H1, `1` = H2, ..., `5` = H6), computes the next sequential level.
+ * If `hasH1` is `false` and `currentLevel` is `0`, returns `0` (H1). Otherwise increments the level, clamping at `5`.
+ *
+ * @param currentLevel - Current 0-based `HeadingLevel` index (`0` through `5`).
+ * @param hasH1 - Whether an H1 heading already exists in the current section or page.
+ * @returns The computed next 0-based `HeadingLevel` index.
+ *
+ * @example
+ * ```ts
+ * const next = calculateNextHeadingLevel(0, true); // 1 (H2)
+ * ```
+ *
+ * @a11y Guarantees sequential heading level stepping and prevents invalid levels beyond H6 (WCAG 2.1 SC 1.3.1).
  */
 export function calculateNextHeadingLevel(
   currentLevel: HeadingLevel,
