@@ -45,8 +45,8 @@
 
 ### 4. Divide utility into their own subpath
 
-- [ ] **Isolate Audit Utilities into Subpath Export (`./utils`)**
-- **Status**: 🧑‍💻 Doing
+- [x] **Isolate Audit Utilities into Subpath Export (`./utils`)**
+- **Status**: ✅ Done
 - **Target**: 2026-08-10
 - **Description**: Extract DOM auditing and hierarchy validation utilities from the primary package entrypoint into a dedicated `react-heading-manager/utils` subpath to keep the core React runtime bundle lightweight.
 - **Steps**:
@@ -54,7 +54,7 @@
   - [x] Remove auditing utility re-exports from `src/index.ts` so `.` only exports React components and hooks.
   - [x] Update `tsdown.config.ts` entry object to include `"utils/index": "src/utils/index.ts"`.
   - [x] Configure `./utils` subpath export in `package.json` with explicit `import`, `require`, and type definitions (`.d.mts` / `.d.cts`).
-  - [ ] Update internal test suites and example code to import audit helpers from `react-heading-manager/utils`.
+  - [x] Update internal test suites and example code to import audit helpers from `react-heading-manager/utils`.
 
 ### 5. Package Hygiene & Documentation
 

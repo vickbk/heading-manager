@@ -1,5 +1,4 @@
-import { checkHeadingOrderReport } from "@/src/utils/check-heading-order-report";
-import { drawRegion } from "@/src/utils/draw-region";
+import { checkHeadingOrderReport, drawRegion } from "@/src/utils";
 import { Locator, Page } from "@playwright/test";
 import { Window } from "happy-dom";
 
@@ -49,7 +48,8 @@ export async function toHaveValidHeadingHierarchy(
     };
 
   const content = parser.parseFromString(html, "text/html");
-  const regionTree = drawRegion(content.body as unknown as Element);
+  const rootElement = content.body.firstElementChild || content.body;
+  const regionTree = drawRegion(rootElement as unknown as Element);
 
   const report = checkHeadingOrderReport(regionTree, initialLevel);
 

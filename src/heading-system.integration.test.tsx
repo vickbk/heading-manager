@@ -11,9 +11,11 @@ import { HeadingFragment } from "./components/heading-fragment";
 import { Main } from "./components/main";
 
 // Verification Helpers
-import { checkHeadingOrder } from "./utils/check-heading-order";
-import { checkHeadingOrderReport } from "./utils/check-heading-order-report";
-import { drawRegion } from "./utils/draw-region";
+import {
+  checkHeadingOrder,
+  checkHeadingOrderReport,
+  drawRegion,
+} from "./utils";
 
 // Landmark regions created via createRegion factory
 const Section = createRegion<HTMLElement>("section");
