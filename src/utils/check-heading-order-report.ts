@@ -19,7 +19,7 @@ export function checkHeadingOrderReport(
 
   const totalHeadings = Math.max(
     region.detailedHeadings?.length ?? 0,
-    region.headings?.length ?? 0,
+    region.headings.length,
   );
 
   for (let i = 0; i < totalHeadings; i++) {
