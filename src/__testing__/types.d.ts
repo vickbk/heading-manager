@@ -9,7 +9,7 @@ declare global {
        *
        * @param initialLevel - Optional starting heading level context (default: 1).
        */
-      toHaveValidHeadingHierarchy(intialLevel = 1): Promise<R>;
+      toHaveValidHeadingHierarchy(intialLevel?: number): Promise<R>;
     }
   }
 }
