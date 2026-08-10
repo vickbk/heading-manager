@@ -4,18 +4,27 @@
   "description": "Accessible automatic heading hierarchy and ARIA region landmark manager for React",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": {
+        "import": "./dist/index.d.mts",
+        "require": "./dist/index.d.cts"
+      },
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
     "./testing": {
-      "types": "./dist/testing.d.ts",
+      "types": {
+        "import": "./dist/testing.d.mts",
+        "require": "./dist/testing.d.cts"
+      },
       "import": "./dist/testing.mjs",
       "require": "./dist/testing.cjs"
     }
