@@ -3,7 +3,8 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: {
     index: "src/index.ts",
-    testing: "src/__testing__/index.ts",
+    "testing/index": "src/__testing__/index.ts",
+    "utils/index": "src/utils/index.ts",
   },
   format: ["cjs", "esm"],
   dts: true, // Generates .d.ts bundling

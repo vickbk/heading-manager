@@ -43,18 +43,31 @@
   - [x] Add `aria-label` text fallback when `textContent` is empty or whitespace.
   - [x] Add unit tests verifying custom ARIA heading extraction in `drawRegion.test.ts`.
 
-### 4. Package Hygiene & Documentation
+### 4. Divide utility into their own subpath
+
+- [ ] **Isolate Audit Utilities into Subpath Export (`./utils`)**
+- **Status**: 🧑‍💻 Doing
+- **Target**: 2026-08-10
+- **Description**: Extract DOM auditing and hierarchy validation utilities from the primary package entrypoint into a dedicated `react-heading-manager/utils` subpath to keep the core React runtime bundle lightweight.
+- **Steps**:
+  - [x] Create `src/utils/index.ts` to re-export `drawRegion`, `checkHeadingOrder`, `checkHeadingOrderReport`, `parseHeadingLevel`, and `resolveHeadingDetail`.
+  - [x] Remove auditing utility re-exports from `src/index.ts` so `.` only exports React components and hooks.
+  - [x] Update `tsdown.config.ts` entry object to include `"utils/index": "src/utils/index.ts"`.
+  - [x] Configure `./utils` subpath export in `package.json` with explicit `import`, `require`, and type definitions (`.d.mts` / `.d.cts`).
+  - [ ] Update internal test suites and example code to import audit helpers from `react-heading-manager/utils`.
+
+### 5. Package Hygiene & Documentation
 
 - [ ] **Create Root Documentation, Legal, and Release Files**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-12
+- **Status**: 🧑‍💻 Doing
+- **Target**: 2026-08-10
 - **Description**: Add required root documentation files to meet open-source legal requirements and npm package standards.
 - **Steps**:
-  - [ ] Create root `LICENSE` file containing standard MIT license text.
+  - [x] Create root `LICENSE` file containing standard MIT license text.
   - [ ] Create `README.md` with package overview, installation instructions, usage examples, and API reference.
   - [ ] Create `CHANGELOG.md` documenting initial `1.0.0` release features.
 
-### 5. Release Verification & Quality Assurance
+### 6. Release Verification & Quality Assurance
 
 - [ ] **Execute Pre-Publication Verification and Pack Dry-Run**
 - **Status**: ⏳ Todo

@@ -1,5 +1,5 @@
 {
-  "name": "@react-a11y/heading-manager",
+  "name": "react-heading-manager",
   "version": "1.0.0",
   "description": "Accessible automatic heading hierarchy and ARIA region landmark manager for React",
   "main": "./dist/index.cjs",
@@ -20,13 +20,21 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./utils": {
+      "types": {
+        "import": "./dist/utils/index.d.mts",
+        "require": "./dist/utils/index.d.cts"
+      },
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.cjs"
+    },
     "./testing": {
       "types": {
-        "import": "./dist/testing.d.mts",
-        "require": "./dist/testing.d.cts"
+        "import": "./dist/testing/index.d.mts",
+        "require": "./dist/testing/index.d.cts"
       },
-      "import": "./dist/testing.mjs",
-      "require": "./dist/testing.cjs"
+      "import": "./dist/testing/index.mjs",
+      "require": "./dist/testing/index.cjs"
     }
   },
   "scripts": {
