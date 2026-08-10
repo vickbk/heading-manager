@@ -58,23 +58,23 @@
 
 ### 5. Package Hygiene & Documentation
 
-- [ ] **Create Root Documentation, Legal, and Release Files**
-- **Status**: 🧑‍💻 Doing
+- [x] **Create Root Documentation, Legal, and Release Files**
+- **Status**: ✅ Done
 - **Target**: 2026-08-10
 - **Description**: Add required root documentation files to meet open-source legal requirements and npm package standards.
 - **Steps**:
   - [x] Create root `LICENSE` file containing standard MIT license text.
-  - [ ] Create `README.md` with package overview, installation instructions, usage examples, and API reference.
-  - [ ] Create `CHANGELOG.md` documenting initial `1.0.0` release features.
+  - [x] Create `README.md` with package overview, installation instructions, usage examples, and API reference.
+  - [x] Create `CHANGELOG.md` documenting initial `1.0.0` release features.
 
 ### 6. Release Verification & Quality Assurance
 
 - [ ] **Execute Pre-Publication Verification and Pack Dry-Run**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-12
+- **Status**: 🧑‍💻 Doing
+- **Target**: 2026-08-10
 - **Description**: Perform a full build, typecheck, test execution, and npm pack dry-run to ensure the published tarball is ready for distribution.
 - **Steps**:
-  - [ ] Run `pnpm clean && pnpm run typecheck` to verify zero TypeScript errors.
-  - [ ] Run `pnpm run test:run` to verify all Vitest unit and integration suites pass.
-  - [ ] Run `pnpm run build` to generate distribution bundles in `/dist`.
+  - [x] Run `pnpm clean && pnpm run typecheck` to verify zero TypeScript errors.
+  - [x] Run `pnpm run test:run` to verify all Vitest unit and integration suites pass.
+  - [x] Run `pnpm run build` to generate distribution bundles in `/dist`.
   - [ ] Run `pnpm pack --dry-run` to inspect tarball output and verify file inclusions.

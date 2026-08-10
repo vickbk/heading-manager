@@ -76,15 +76,15 @@ describe("Main Landmark Component", () => {
   // 3. HEADING CONTEXT & pageHasH1 PROP BEHAVIOR
   // ==========================================
   describe("HeadingCtx calculation and pageHasH1 prop handling", () => {
-    it("defaults pageHasH1 to true when omitted, providing level 1 (H2) at root context", () => {
+    it("defaults pageHasH1 to false when omitted, providing level 0 (H1) at root context", () => {
       render(
         <Main>
           <LevelConsumer />
         </Main>,
       );
 
-      // Root level 0 + pageHasH1 (true) -> calculates level 1
-      expect(screen.getByTestId("resolved-level")).toHaveTextContent("1");
+      // Root level 0 + pageHasH1 (false) -> retains level 0 (H1)
+      expect(screen.getByTestId("resolved-level")).toHaveTextContent("0");
     });
 
     it("provides level 1 (H2) when pageHasH1 is explicitly set to true at root context", () => {
@@ -126,33 +126,33 @@ describe("Main Landmark Component", () => {
   // 4. INTEGRATION WITH Heading AND Section
   // ==========================================
   describe("integration with Heading and nested landmark regions", () => {
-    it("renders <Heading> as <h2> inside default <Main> (pageHasH1 = true)", () => {
+    it("renders <Heading> as <h1> inside default <Main> (pageHasH1 = false)", () => {
       render(
         <Main>
           <Heading>Section Heading</Heading>
         </Main>,
       );
 
-      const heading = screen.getByRole("heading", { level: 2 });
-      expect(heading.tagName.toLowerCase()).toBe("h2");
+      const heading = screen.getByRole("heading", { level: 1 });
+      expect(heading.tagName.toLowerCase()).toBe("h1");
       expect(heading).toHaveTextContent("Section Heading");
     });
 
-    it("renders <Heading> as <h1> inside <Main pageHasH1={false}>", () => {
+    it("renders <Heading> as <h2> inside <Main pageHasH1={true}>", () => {
       render(
-        <Main pageHasH1={false}>
+        <Main pageHasH1={true}>
           <Heading>Main Document Title</Heading>
         </Main>,
       );
 
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading.tagName.toLowerCase()).toBe("h1");
+      const heading = screen.getByRole("heading", { level: 2 });
+      expect(heading.tagName.toLowerCase()).toBe("h2");
       expect(heading).toHaveTextContent("Main Document Title");
     });
 
     it("cascades heading levels through nested <Section> containers", () => {
       render(
-        <Main pageHasH1={false}>
+        <Main>
           {/* Level 0 -> renders <h1> */}
           <Heading>Main Title</Heading>
 

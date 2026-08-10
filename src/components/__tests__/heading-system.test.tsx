@@ -14,7 +14,7 @@ const Article = createRegion<HTMLElement>("article");
 describe("Heading System Component Integration", () => {
   it("renders a full sequential heading hierarchy from H1 through H4 across Main, Section, Article, and HeadingFragment", () => {
     render(
-      <Main pageHasH1={false} data-testid="app-root">
+      <Main data-testid="app-root">
         <Heading>H1 Application Title</Heading>
 
         <Section data-testid="section-level">

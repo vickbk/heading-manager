@@ -30,7 +30,7 @@ describe("Heading System Integration Test Suite", () => {
   describe("Happy Path & Full Pipeline Validation", () => {
     it("renders a valid sequential hierarchy and passes checkHeadingOrderReport", () => {
       const { container } = render(
-        <Main pageHasH1={false} data-testid="root-main">
+        <Main data-testid="root-main">
           <Heading>Main Application Title</Heading>
 
           <Section data-testid="section-1">
@@ -65,7 +65,7 @@ describe("Heading System Integration Test Suite", () => {
 
     it("integrates HeadingFragment seamlessly without breaking drawRegion tree structure", () => {
       const { container } = render(
-        <Main pageHasH1={false} data-testid="root-main">
+        <Main data-testid="root-main">
           <Heading>Document Header</Heading>
 
           {/* HeadingFragment steps down heading level without adding a DOM node */}
@@ -97,12 +97,12 @@ describe("Heading System Integration Test Suite", () => {
   // =========================================================================
   describe("System Flow Flaws & Architectural Edge Cases", () => {
     /**
-     * FLAW 1: Main Component Default (pageHasH1 = true)
-     * In main.tsx, pageHasH1 defaults to true. Calling useHeading(true) causes
-     * calculateNextHeadingLevel(0, true) to return 1 (H2) instead of 0 (H1).
-     * This forces the top-level <Heading> inside <Main> to render as <h2>!
+     * DEFAULT BEHAVIOUR (pageHasH1 = false)
+     * With pageHasH1 defaulting to false, calling useHeading(false) causes
+     * calculateNextHeadingLevel(0, false) to return 0 (H1). The top-level
+     * <Heading> inside <Main> correctly renders as <h1> without any explicit prop.
      */
-    it("FLAW 1: Demonstrates that default <Main> omits <h1> and starts at <h2>", () => {
+    it("Default <Main> (no props) renders first <Heading> as <h1> — correct WCAG behaviour", () => {
       render(
         <Main data-testid="default-main">
           <Heading>Page Title</Heading>
@@ -115,14 +115,33 @@ describe("Heading System Integration Test Suite", () => {
       const mainEl = screen.getByTestId("default-main");
       const mapping = drawRegion(mainEl);
 
-      // Main rendered <h2> instead of <h1>
-      expect(mapping.headings).toEqual(["h2"]);
-      expect(mapping.children[0].headings).toEqual(["h3"]);
+      // Main correctly renders <h1> and Section renders <h2>
+      expect(mapping.headings).toEqual(["h1"]);
+      expect(mapping.children[0].headings).toEqual(["h2"]);
 
-      // Querying by role confirms no H1 exists in the document
+      // H1 exists in the document as expected
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        "Page Title",
+      );
+      expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
+        "Section Title",
+      );
+    });
+
+    /**
+     * EXPLICIT pageHasH1={true}: starts at H2
+     * Use this only when a global <h1> exists outside the <Main> landmark.
+     */
+    it("<Main pageHasH1={true}> starts at <h2> when a global H1 exists outside the landmark", () => {
+      render(
+        <Main pageHasH1={true} data-testid="external-h1-main">
+          <Heading>Section Heading</Heading>
+        </Main>,
+      );
+
       expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
       expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
-        "Page Title",
+        "Section Heading",
       );
     });
 
@@ -133,7 +152,7 @@ describe("Heading System Integration Test Suite", () => {
      */
     it("FLAW 2: Detects level skipping via HeadingFragment override and generates detailed errors", () => {
       render(
-        <Main pageHasH1={false} data-testid="root-main">
+        <Main data-testid="root-main">
           <Heading>Root H1</Heading>
 
           {/* Jump directly to level 3 (H4) */}
@@ -203,7 +222,7 @@ describe("Heading System Integration Test Suite", () => {
   describe("Detailed Heading Metadata", () => {
     it("extracts text content and live DOM node references into report errors", () => {
       render(
-        <Main pageHasH1={false} data-testid="root-main">
+        <Main data-testid="root-main">
           <Heading>Valid Root Title</Heading>
           <HeadingFragment level={4}>
             <Section>
@@ -233,7 +252,7 @@ describe("Heading System Integration Test Suite", () => {
   describe("Edge Cases & Complex Trees", () => {
     it("handles maximum depth clamping at H6 without throwing invalid hierarchy errors", () => {
       render(
-        <Main pageHasH1={false} data-testid="root-main">
+        <Main data-testid="root-main">
           <Heading>Level 1 (H1)</Heading>
           <Section>
             <Heading>Level 2 (H2)</Heading>
@@ -268,7 +287,7 @@ describe("Heading System Integration Test Suite", () => {
 
     it("isolates context levels between sibling landmark branches", () => {
       render(
-        <Main pageHasH1={false} data-testid="root-main">
+        <Main data-testid="root-main">
           <Heading>App Root</Heading>
 
           {/* Branch A: Nest 2 levels down (H1 -> H2 -> H3) */}
@@ -298,7 +317,7 @@ describe("Heading System Integration Test Suite", () => {
 
     it("validates sequential heading progression (H1 -> H2 -> H3 -> H3 -> H4) across mixed main-flow elements and nested section landmarks", () => {
       render(
-        <Main pageHasH1={false} data-testid="root-element">
+        <Main data-testid="root-element">
           <Heading>Main heading</Heading>
           <HeadingFragment>
             <Heading>H2 heading</Heading>
