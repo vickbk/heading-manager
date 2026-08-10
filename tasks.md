@@ -33,15 +33,15 @@
 
 ### 3. WCAG & Accessibility Enhancements
 
-- [ ] **Enhance `drawRegion` Utility for WCAG ARIA Headings**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-12
+- [x] **Enhance `drawRegion` Utility for WCAG ARIA Headings**
+- **Status**: ✅ Done
+- **Target**: 2026-08-10
 - **Description**: Update `drawRegion` to support `[role="heading"]` elements, parse `aria-level`, and fall back to `aria-label` text content.
 - **Steps**:
-  - [ ] Update `HEADING_SELECTOR` in `src/utils/draw-region.ts` to include `[role="heading"]`.
-  - [ ] Add `aria-level` inspection logic when constructing `detailedHeadings`.
-  - [ ] Add `aria-label` text fallback when `textContent` is empty or whitespace.
-  - [ ] Add unit tests verifying custom ARIA heading extraction in `drawRegion.test.ts`.
+  - [x] Update `HEADING_SELECTOR` in `src/utils/draw-region.ts` to include `[role="heading"]`.
+  - [x] Add `aria-level` inspection logic when constructing `detailedHeadings`.
+  - [x] Add `aria-label` text fallback when `textContent` is empty or whitespace.
+  - [x] Add unit tests verifying custom ARIA heading extraction in `drawRegion.test.ts`.
 
 ### 4. Package Hygiene & Documentation
 

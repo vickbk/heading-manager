@@ -419,4 +419,190 @@ describe("drawRegion", () => {
       ]);
     });
   });
+
+  describe("drawRegion - Custom ARIA Headings & Text Resolution", () => {
+    let container: HTMLElement;
+
+    beforeEach(() => {
+      container = document.createElement("div");
+      document.body.appendChild(container);
+      return () => {
+        document.body.removeChild(container);
+      };
+    });
+
+    describe("Custom ARIA Headings ([role='heading'])", () => {
+      it("extracts a div with role='heading' and explicit aria-level", () => {
+        container.innerHTML = `
+        <main>
+          <div role="heading" aria-level="2">Custom ARIA Heading</div>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        expect(region.headings).toEqual(["h2"]);
+        expect(region.detailedHeadings).toHaveLength(1);
+        expect(region.detailedHeadings![0]).toEqual({
+          level: "h2",
+          text: "Custom ARIA Heading",
+          element: mainEl.querySelector('[role="heading"]'),
+        });
+      });
+
+      it("falls back to native tagName when role='heading' lacks an aria-level attribute", () => {
+        container.innerHTML = `
+        <main>
+          <div role="heading">Unlevelled Heading</div>
+          <span role="heading">Span Heading</span>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        expect(region.headings).toEqual(["div", "span"]);
+        expect(region.detailedHeadings![0].level).toBe("div");
+        expect(region.detailedHeadings![1].level).toBe("span");
+      });
+
+      it("allows aria-level to override native heading HTML tags", () => {
+        container.innerHTML = `
+        <main>
+          <h3 aria-level="1">Visually H3 but Semantically H1</h3>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        expect(region.headings).toEqual(["h1"]);
+        expect(region.detailedHeadings![0].level).toBe("h1");
+      });
+
+      it("preserves correct document order across mixed native and ARIA headings", () => {
+        container.innerHTML = `
+        <main>
+          <h1>Native H1</h1>
+          <div role="heading" aria-level="2">Custom H2</div>
+          <h3>Native H3</h3>
+          <p role="heading" aria-level="4">Custom H4</p>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        expect(region.headings).toEqual(["h1", "h2", "h3", "h4"]);
+        expect(region.detailedHeadings!.map((h) => h.text)).toEqual([
+          "Native H1",
+          "Custom H2",
+          "Native H3",
+          "Custom H4",
+        ]);
+      });
+    });
+
+    describe("Accessible Text Resolution (textContent vs aria-label)", () => {
+      it("uses textContent when present and ignores aria-label", () => {
+        container.innerHTML = `
+        <main>
+          <div role="heading" aria-level="2" aria-label="Label Text">Visible DOM Text</div>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        expect(region.detailedHeadings![0].text).toBe("Visible DOM Text");
+      });
+
+      it("falls back to aria-label when textContent is empty", () => {
+        container.innerHTML = `
+        <main>
+          <div role="heading" aria-level="2" aria-label="Accessible Heading Label"></div>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        expect(region.detailedHeadings![0].text).toBe(
+          "Accessible Heading Label",
+        );
+      });
+
+      it("falls back to aria-label when textContent contains only whitespace", () => {
+        container.innerHTML = `
+        <main>
+          <div role="heading" aria-level="3" aria-label="Whitespace Fallback">
+            
+          </div>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        expect(region.detailedHeadings![0].text).toBe("Whitespace Fallback");
+      });
+
+      it("returns an empty string when both textContent and aria-label are missing", () => {
+        container.innerHTML = `
+        <main>
+          <div role="heading" aria-level="2"></div>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        expect(region.detailedHeadings![0].text).toBe("");
+      });
+
+      it("properly trims leading and trailing whitespace from both sources", () => {
+        container.innerHTML = `
+        <main>
+          <h1 aria-label="  Padded Label  ">  Padded Text  </h1>
+          <div role="heading" aria-level="2" aria-label="  Padded Label Fallback  ">   </div>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        expect(region.detailedHeadings![0].text).toBe("Padded Text");
+        expect(region.detailedHeadings![1].text).toBe("Padded Label Fallback");
+      });
+    });
+
+    describe("Landmark Scope Isolation for Custom Headings", () => {
+      it("does not associate nested landmark ARIA headings with parent landmark regions", () => {
+        container.innerHTML = `
+        <main>
+          <div role="heading" aria-level="1">Main Title</div>
+          <section>
+            <div role="heading" aria-level="2">Section Subtitle</div>
+          </section>
+        </main>
+      `;
+
+        const mainEl = container.querySelector("main")!;
+        const region = drawRegion(mainEl);
+
+        // Main direct headings only
+        expect(region.headings).toEqual(["h1"]);
+        expect(region.detailedHeadings).toHaveLength(1);
+        expect(region.detailedHeadings![0].text).toBe("Main Title");
+
+        // Child section headings
+        expect(region.children).toHaveLength(1);
+        expect(region.children[0].headings).toEqual(["h2"]);
+        expect(region.children[0].detailedHeadings![0].text).toBe(
+          "Section Subtitle",
+        );
+      });
+    });
+  });
 });
