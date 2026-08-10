@@ -3,8 +3,7 @@ import { createRef, useState } from "react";
 import { describe, expect, it, test, vi } from "vitest";
 import { HeadingCtx } from "../hooks/use-heading";
 import { HeadingLevel } from "../types";
-import { checkHeadingOrder } from "../utils/check-heading-order-report";
-import { drawRegion } from "../utils/draw-region";
+import { checkHeadingOrder, drawRegion } from "../utils";
 import { Heading } from "./heading";
 import { Article, Header, Legend, Section } from "./landmarks";
 import { Main } from "./main";
@@ -22,7 +21,7 @@ describe("Heading Level Manager", () => {
 
   test("renders correct heading levels for nested sections", async () => {
     render(
-      <Main pageHasH1={false}>
+      <Main>
         <Heading>Main Title</Heading>
         <Section>
           <Heading>Section 1</Heading>
@@ -98,7 +97,7 @@ describe("Heading Level Manager", () => {
 
   test("should detect a skipped heading level", async () => {
     render(
-      <Main pageHasH1={false}>
+      <Main>
         <Heading>Heading 1</Heading>
         <Section>
           <Heading>Heading 2</Heading>

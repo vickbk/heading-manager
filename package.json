@@ -1,29 +1,50 @@
 {
-  "name": "@react-a11y/heading-manager",
-  "version": "1.0.0",
+  "name": "react-heading-manager",
+  "version": "0.1.0",
   "description": "Accessible automatic heading hierarchy and ARIA region landmark manager for React",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": {
+        "import": "./dist/index.d.mts",
+        "require": "./dist/index.d.cts"
+      },
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./utils": {
+      "types": {
+        "import": "./dist/utils/index.d.mts",
+        "require": "./dist/utils/index.d.cts"
+      },
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.cjs"
+    },
     "./testing": {
-      "types": "./dist/testing.d.ts",
-      "import": "./dist/testing.mjs",
-      "require": "./dist/testing.cjs"
+      "types": {
+        "import": "./dist/testing/index.d.mts",
+        "require": "./dist/testing/index.d.cts"
+      },
+      "import": "./dist/testing/index.mjs",
+      "require": "./dist/testing/index.cjs"
     }
   },
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm typecheck && pnpm build"
+    "prepublishOnly": "pnpm typecheck && pnpm build",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
   },
   "keywords": [
     "a11y",
@@ -54,15 +75,17 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.4",
     "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^9.39.5",
     "tsdown": "^0.22.14",
-    "typescript": "^7.0.2",
+    "typescript": "^6",
+    "typescript-eslint": "^8.66.0",
     "vitest": "^4.1.10"
   },
   "peerDependencies": {
-    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
-    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "@playwright/test": "^1.30.0",
-    "happy-dom": "^20.11.1"
+    "happy-dom": "^20.11.1",
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "@playwright/test": {

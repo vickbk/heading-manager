@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseHeadingLevel } from "./parse-heading-lever";
+import { parseHeadingLevel } from "./parse-heading-level";
 
 describe("parseHeadingLevel", () => {
   // ==========================================

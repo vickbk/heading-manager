@@ -1,5 +1,6 @@
+export { createRegion } from "./components/create-region";
 export { Heading } from "./components/heading";
+export { HeadingFragment } from "./components/heading-fragment";
 export * from "./components/landmarks";
 export { Main } from "./components/main";
-export { HeadingCtx } from "./hooks/use-heading";
-export { drawRegion } from "./utils/draw-region";
+export { HeadingCtx, useHeading } from "./hooks/use-heading";

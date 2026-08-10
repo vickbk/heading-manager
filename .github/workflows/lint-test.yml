@@ -1,0 +1,102 @@
+name: Vitest Tests & Linting
+permissions:
+  contents: read
+  pull-requests: write
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  TOTAL_PCT: 0
+
+jobs:
+  test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/setup@v1
+        with:
+          version: 11
+          cache: true
+          runtime: node@24
+          cache-dependency-path: "pnpm-lock.yaml"
+          package-json-file: "package.json"
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Run type checking
+        run: pnpm typecheck
+
+      - name: Run Vitest with coverage
+        run: pnpm test:run --coverage
+
+      - name: Run build
+        run: pnpm build
+
+      - name: Generate Coverage Report Summary
+        if: ${{ !cancelled() }}
+        id: coverage
+        run: |
+          SUMMARY_FILE="coverage/coverage-summary.json"
+
+          if [ ! -f "$SUMMARY_FILE" ]; then
+            SUMMARY_FILE="./coverage/coverage-summary.json"
+          fi
+
+          if [ -f "$SUMMARY_FILE" ]; then
+            echo "Found coverage file at $SUMMARY_FILE"
+            
+            SUMMARY=$(node -e '
+              const s = (await import(path.resolve(import.meta.dirname, "'"$SUMMARY_FILE"'"), { with: { type: "json" } })).default.total;
+              console.log(`| Statements | ${s.statements.pct}% (${s.statements.covered}/${s.statements.total}) |`);
+              console.log(`| Branches | ${s.branches.pct}% (${s.branches.covered}/${s.branches.total}) |`);
+              console.log(`| Functions | ${s.functions.pct}% (${s.functions.covered}/${s.functions.total}) |`);
+              console.log(`| Lines | ${s.lines.pct}% (${s.lines.covered}/${s.lines.total}) |`);
+              console.log("TOTAL_PCT=" + s.statements.pct + "%");
+            ')
+            
+            TOTAL_PCT=$(echo "$SUMMARY" | grep "TOTAL_PCT=" | cut -d'=' -f2)
+            TABLE=$(echo "$SUMMARY" | grep -v "TOTAL_PCT=")
+
+            echo "TOTAL_PCT=${TOTAL_PCT}" >> $GITHUB_ENV
+
+            echo "## 🧪 Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+            echo "### Total Statement Coverage: \`${TOTAL_PCT}\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Coverage |" >> $GITHUB_STEP_SUMMARY
+            echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+            echo "$TABLE" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No coverage summary file found." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Post Coverage Comment on PR
+        if: github.event_name == 'pull_request' && !cancelled()
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: coverage-report
+          message: |
+            ## 🧪 Test Coverage Report
+            **Overall Statement Coverage:** `${{ env.TOTAL_PCT }}`
+
+            > View full breakdown in [Actions Step Summary](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+      - name: Upload HTML Coverage Artifact
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
