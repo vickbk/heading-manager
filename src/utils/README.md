@@ -5,38 +5,41 @@ Low-level DOM parsing and WCAG heading hierarchy validation utilities. These fun
 Accessible via the `utils` subpath export:
 
 ```ts
-import { drawRegion, checkHeadingOrderReport } from 'heading-manager/utils';
+import {
+  drawRegion,
+  checkHeadingOrderReport,
+} from "react-heading-manager/utils";
 ```
 
 ---
 
 ## Exports
 
-| Export | Description |
-|---|---|
-| `drawRegion` | Recursively parses a DOM subtree into a structured `RegionMapping` tree |
-| `checkHeadingOrderReport` | Validates a `RegionMapping` tree and returns a detailed violation report |
-| `checkHeadingOrder` | Boolean shorthand — returns `true` if the hierarchy is valid |
-| `getRegionIdentifier` | Resolves a human-readable label for a landmark region element |
-| `calculateNextHeadingLevel` | Increments a 0-based `HeadingLevel` index (clamped to H6) |
-| `parseHeadingLevel` | Parses an `<h*>` tag name string into a numeric level (1–6) |
-| `resolveHeadingDetail` | Extracts heading text and element selector from a DOM element |
+| Export                      | Description                                                              |
+| --------------------------- | ------------------------------------------------------------------------ |
+| `drawRegion`                | Recursively parses a DOM subtree into a structured `RegionMapping` tree  |
+| `checkHeadingOrderReport`   | Validates a `RegionMapping` tree and returns a detailed violation report |
+| `checkHeadingOrder`         | Boolean shorthand — returns `true` if the hierarchy is valid             |
+| `getRegionIdentifier`       | Resolves a human-readable label for a landmark region element            |
+| `calculateNextHeadingLevel` | Increments a 0-based `HeadingLevel` index (clamped to H6)                |
+| `parseHeadingLevel`         | Parses an `<h*>` tag name string into a numeric level (1–6)              |
+| `resolveHeadingDetail`      | Extracts heading text and element selector from a DOM element            |
 
 ---
 
 ## `drawRegion(root)`
 
 ```ts
-function drawRegion(root: Element): RegionMapping
+function drawRegion(root: Element): RegionMapping;
 ```
 
 Performs a recursive depth-first walk of `root` and builds a `RegionMapping` tree. Landmark elements (`<main>`, `<section>`, `<article>`, `<aside>`, `<nav>`, `<header>`, `<footer>`, and elements with explicit `role="region"` etc.) become child nodes in the tree.
 
 ### Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `root` | `Element` | The root DOM element to traverse |
+| Parameter | Type      | Description                      |
+| --------- | --------- | -------------------------------- |
+| `root`    | `Element` | The root DOM element to traverse |
 
 ### Returns
 
@@ -45,9 +48,9 @@ Performs a recursive depth-first walk of `root` and builds a `RegionMapping` tre
 ### Example
 
 ```ts
-import { drawRegion } from 'heading-manager/utils';
+import { drawRegion } from "react-heading-manager/utils";
 
-const container = document.querySelector('main')!;
+const container = document.querySelector("main")!;
 const regionTree = drawRegion(container);
 // { label: 'main', headings: ['h1', 'h2'], children: [...] }
 ```
@@ -59,18 +62,18 @@ const regionTree = drawRegion(container);
 ```ts
 function checkHeadingOrderReport(
   region: RegionMapping,
-  initialLevel?: number
-): HeadingOrderReport
+  initialLevel?: number,
+): HeadingOrderReport;
 ```
 
 Traverses a `RegionMapping` tree and collects all WCAG heading hierarchy violations — specifically **skipped heading levels** (e.g., H1 → H3 without an intermediate H2).
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `region` | `RegionMapping` | — | Root region mapping from `drawRegion` |
-| `initialLevel` | `number` | `1` | Starting heading level context (useful for auditing sub-components) |
+| Parameter      | Type            | Default | Description                                                         |
+| -------------- | --------------- | ------- | ------------------------------------------------------------------- |
+| `region`       | `RegionMapping` | —       | Root region mapping from `drawRegion`                               |
+| `initialLevel` | `number`        | `1`     | Starting heading level context (useful for auditing sub-components) |
 
 ### Returns
 
@@ -85,23 +88,26 @@ Traverses a `RegionMapping` tree and collects all WCAG heading hierarchy violati
 
 Each `HeadingOrderError` contains:
 
-| Field | Type | Description |
-|---|---|---|
-| `path` | `string` | Breadcrumb path to the violating region (e.g., `"root > section"`) |
-| `message` | `string` | Human-readable description of the violation |
-| `text` | `string \| undefined` | Heading text content (if available) |
-| `element` | `string \| undefined` | CSS selector of the violating element |
+| Field     | Type                  | Description                                                        |
+| --------- | --------------------- | ------------------------------------------------------------------ |
+| `path`    | `string`              | Breadcrumb path to the violating region (e.g., `"root > section"`) |
+| `message` | `string`              | Human-readable description of the violation                        |
+| `text`    | `string \| undefined` | Heading text content (if available)                                |
+| `element` | `string \| undefined` | CSS selector of the violating element                              |
 
 ### Example
 
 ```ts
-import { drawRegion, checkHeadingOrderReport } from 'heading-manager/utils';
+import {
+  drawRegion,
+  checkHeadingOrderReport,
+} from "react-heading-manager/utils";
 
 const regionTree = drawRegion(document.body);
 const report = checkHeadingOrderReport(regionTree);
 
 if (!report.isValid) {
-  report.errors.forEach(err => console.warn(err.message));
+  report.errors.forEach((err) => console.warn(err.message));
 }
 ```
 
@@ -110,7 +116,10 @@ if (!report.isValid) {
 ## `checkHeadingOrder(region, currentLevel?)`
 
 ```ts
-function checkHeadingOrder(region: RegionMapping, currentLevel?: number): boolean
+function checkHeadingOrder(
+  region: RegionMapping,
+  currentLevel?: number,
+): boolean;
 ```
 
 Boolean shorthand of `checkHeadingOrderReport`. Returns `true` if the entire heading hierarchy is valid, `false` otherwise. Prefer `checkHeadingOrderReport` when you need error details.
@@ -120,7 +129,7 @@ Boolean shorthand of `checkHeadingOrderReport`. Returns `true` if the entire hea
 ## `getRegionIdentifier(element)`
 
 ```ts
-function getRegionIdentifier(element: Element): string
+function getRegionIdentifier(element: Element): string;
 ```
 
 Resolves a human-readable label for a landmark element by checking, in priority order:
@@ -132,9 +141,11 @@ Resolves a human-readable label for a landmark element by checking, in priority 
 ### Example
 
 ```ts
-import { getRegionIdentifier } from 'heading-manager/utils';
+import { getRegionIdentifier } from "react-heading-manager/utils";
 
-const label = getRegionIdentifier(document.querySelector('section[aria-label="Blog"]')!);
+const label = getRegionIdentifier(
+  document.querySelector('section[aria-label="Blog"]')!,
+);
 // → "Blog"
 ```
 
@@ -143,7 +154,10 @@ const label = getRegionIdentifier(document.querySelector('section[aria-label="Bl
 ## `calculateNextHeadingLevel(current, hasH1?)`
 
 ```ts
-function calculateNextHeadingLevel(current: HeadingLevel, hasH1?: boolean): HeadingLevel
+function calculateNextHeadingLevel(
+  current: HeadingLevel,
+  hasH1?: boolean,
+): HeadingLevel;
 ```
 
 Increments a 0-based `HeadingLevel` index by 1, clamped to `5` (H6). Used internally by `useHeading`.
@@ -153,7 +167,7 @@ Increments a 0-based `HeadingLevel` index by 1, clamped to `5` (H6). Used intern
 ## `parseHeadingLevel(tagName)`
 
 ```ts
-function parseHeadingLevel(tagName: string): number | null
+function parseHeadingLevel(tagName: string): number | null;
 ```
 
 Parses an HTML heading tag string (`"h1"`–`"h6"`, case-insensitive) into a numeric level. Returns `null` for non-heading tags.
@@ -163,16 +177,16 @@ Parses an HTML heading tag string (`"h1"`–`"h6"`, case-insensitive) into a num
 ## `resolveHeadingDetail(element)`
 
 ```ts
-function resolveHeadingDetail(element: Element): HeadingDetail
+function resolveHeadingDetail(element: Element): HeadingDetail;
 ```
 
 Extracts structured metadata from a heading DOM element:
 
-| Field | Type | Description |
-|---|---|---|
-| `tag` | `string` | HTML tag name (e.g., `"h2"`) |
-| `text` | `string` | Text content of the heading element |
-| `element` | `string` | CSS selector for the element |
+| Field     | Type     | Description                         |
+| --------- | -------- | ----------------------------------- |
+| `tag`     | `string` | HTML tag name (e.g., `"h2"`)        |
+| `text`    | `string` | Text content of the heading element |
+| `element` | `string` | CSS selector for the element        |
 
 ---
 

@@ -1,0 +1,83 @@
+name: Publish package to npm
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # Fetches full history so GitHub can generate release notes
+
+      - name: Install pnpm
+        uses: pnpm/setup@v1
+        with:
+          version: 11
+          cache: true
+
+      - name: Install Nodejs
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Run type checking
+        run: pnpm typecheck
+
+      - name: Run Vitest
+        run: pnpm test:run
+
+      - name: Build distribution artifacts
+        run: pnpm build
+
+      - name: Publish package
+        run: pnpm publish --access public --provenance --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Extract Release Notes from CHANGELOG.md
+        run: |
+          node -e "
+            const fs = require('fs');
+            // Remove 'v' prefix if present (e.g., v0.1.0 -> 0.1.0)
+            const tag = process.env.GITHUB_REF_NAME.replace(/^v/, '');
+            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+            
+            // Regex matches '## [0.1.0]' or '## 0.1.0' until the next '## ' header or EOF
+            const escapedTag = tag.replace(/\./g, '\\.');
+            const regex = new RegExp('## \\\\[?' + escapedTag + '\\\\]?.*\\n([\\s\\S]*?)(?=\\n## |$)', 'i');
+            const match = changelog.match(regex);
+            
+            if (!match || !match[1].trim()) {
+              console.error('Could not find release notes for version ' + tag + ' in CHANGELOG.md');
+              process.exit(1);
+            }
+            
+            fs.writeFileSync('RELEASE_CHANGELOG.md', match[1].trim());
+          "
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_CHANGELOG.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

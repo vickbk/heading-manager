@@ -6,29 +6,29 @@ React Context and custom hooks that power the automatic heading level management
 
 ## Exports
 
-| Export | Type | Description |
-|---|---|---|
-| `HeadingCtx` | `React.Context<HeadingLevel>` | Context storing the current 0-based heading level index |
-| `useHeading` | Custom Hook | Computes the next heading level index for a nested region |
+| Export       | Type                          | Description                                               |
+| ------------ | ----------------------------- | --------------------------------------------------------- |
+| `HeadingCtx` | `React.Context<HeadingLevel>` | Context storing the current 0-based heading level index   |
+| `useHeading` | Custom Hook                   | Computes the next heading level index for a nested region |
 
 ---
 
 ## `HeadingCtx`
 
 ```ts
-const HeadingCtx: React.Context<HeadingLevel>
+const HeadingCtx: React.Context<HeadingLevel>;
 ```
 
 A `React.Context` that carries the **current 0-based heading level index** (`HeadingLevel`):
 
 | Context Value | Rendered Heading |
-|---|---|
-| `0` | `<h1>` |
-| `1` | `<h2>` |
-| `2` | `<h3>` |
-| `3` | `<h4>` |
-| `4` | `<h5>` |
-| `5` | `<h6>` |
+| ------------- | ---------------- |
+| `0`           | `<h1>`           |
+| `1`           | `<h2>`           |
+| `2`           | `<h3>`           |
+| `3`           | `<h4>`           |
+| `4`           | `<h5>`           |
+| `5`           | `<h6>`           |
 
 The default value is `0` (H1), meaning any `<Heading>` outside a region wrapper renders as `<h1>`.
 
@@ -37,16 +37,16 @@ The default value is `0` (H1), meaning any `<Heading>` outside a region wrapper 
 ## `useHeading(hasH1?)`
 
 ```ts
-function useHeading(hasH1?: boolean): HeadingLevel
+function useHeading(hasH1?: boolean): HeadingLevel;
 ```
 
 Reads `HeadingCtx` and computes the **next** heading level for a nested section using `calculateNextHeadingLevel`.
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `hasH1` | `boolean` | `true` | Whether the current page/section already has an H1 — affects level clamping at depth 0 |
+| Parameter | Type      | Default | Description                                                                            |
+| --------- | --------- | ------- | -------------------------------------------------------------------------------------- |
+| `hasH1`   | `boolean` | `true`  | Whether the current page/section already has an H1 — affects level clamping at depth 0 |
 
 ### Returns
 
@@ -55,7 +55,7 @@ Reads `HeadingCtx` and computes the **next** heading level for a nested section 
 ### Example
 
 ```tsx
-import { HeadingCtx, useHeading } from 'heading-manager/hooks';
+import { HeadingCtx, useHeading } from "react-heading-manager";
 
 function CustomRegion({ children }: { children: React.ReactNode }) {
   // Compute next level from ambient context
@@ -63,9 +63,7 @@ function CustomRegion({ children }: { children: React.ReactNode }) {
 
   return (
     <section>
-      <HeadingCtx.Provider value={nextLevel}>
-        {children}
-      </HeadingCtx.Provider>
+      <HeadingCtx.Provider value={nextLevel}>{children}</HeadingCtx.Provider>
     </section>
   );
 }

@@ -6,8 +6,8 @@ Custom Playwright assertion matchers and testing infrastructure for auditing hea
 
 ## Exports
 
-| Export | Type | Description |
-|---|---|---|
+| Export                        | Type               | Description                                                               |
+| ----------------------------- | ------------------ | ------------------------------------------------------------------------- |
 | `toHaveValidHeadingHierarchy` | Playwright Matcher | Audits the heading hierarchy of a `Page` or `Locator` for WCAG violations |
 
 ---
@@ -18,17 +18,17 @@ Import this module once in your Playwright configuration to register the custom 
 
 ```ts
 // playwright.config.ts or a global setup file
-import 'heading-manager/testing';
+import "react-heading-manager/testing";
 ```
 
 Or register it in a specific test file:
 
 ```ts
-import 'heading-manager/testing';
-import { test, expect } from '@playwright/test';
+import "react-heading-manager/testing";
+import { test, expect } from "@playwright/test";
 
-test('heading hierarchy is valid', async ({ page }) => {
-  await page.goto('/');
+test("heading hierarchy is valid", async ({ page }) => {
+  await page.goto("/");
   await expect(page).toHaveValidHeadingHierarchy();
 });
 ```
@@ -53,9 +53,9 @@ Audits the heading hierarchy of a Playwright `Page` or `Locator` by:
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `initialLevel` | `number` | `1` | Starting heading level context. Use `2` when auditing a sub-component expected to start at H2. |
+| Parameter      | Type     | Default | Description                                                                                    |
+| -------------- | -------- | ------- | ---------------------------------------------------------------------------------------------- |
+| `initialLevel` | `number` | `1`     | Starting heading level context. Use `2` when auditing a sub-component expected to start at H2. |
 
 ### Pass Condition
 
@@ -91,8 +91,8 @@ Found 2 heading accessibility hierarchy violation(s):
 ### Audit an Entire Page
 
 ```ts
-test('page has valid heading hierarchy', async ({ page }) => {
-  await page.goto('/');
+test("page has valid heading hierarchy", async ({ page }) => {
+  await page.goto("/");
   await expect(page).toHaveValidHeadingHierarchy();
 });
 ```
@@ -100,19 +100,19 @@ test('page has valid heading hierarchy', async ({ page }) => {
 ### Audit a Specific Container
 
 ```ts
-test('main content has valid headings', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.locator('main')).toHaveValidHeadingHierarchy();
+test("main content has valid headings", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("main")).toHaveValidHeadingHierarchy();
 });
 ```
 
 ### Audit a Sub-Component Starting at H2
 
 ```ts
-test('sidebar headings are valid starting at H2', async ({ page }) => {
-  await page.goto('/');
+test("sidebar headings are valid starting at H2", async ({ page }) => {
+  await page.goto("/");
   // The sidebar is expected to start with H2 (not H1)
-  await expect(page.locator('aside')).toHaveValidHeadingHierarchy(2);
+  await expect(page.locator("aside")).toHaveValidHeadingHierarchy(2);
 });
 ```
 
@@ -120,20 +120,20 @@ test('sidebar headings are valid starting at H2', async ({ page }) => {
 
 ## Internal Structure
 
-| File | Description |
-|---|---|
-| [`evaluator.ts`](./evaluator.ts) | Registers the matcher via `expect.extend()` |
-| [`helpers/to-have-valid-heading-hierarchy.ts`](./helpers/to-have-valid-heading-hierarchy.ts) | Core matcher implementation |
-| [`types.d.ts`](./types.d.ts) | TypeScript augmentation for `PlaywrightTest.Matchers<R>` |
-| [`index.ts`](./index.ts) | Barrel export — side-effectfully imports `evaluator.ts` |
-| [`vitest.setup.ts`](./vitest.setup.ts) | Vitest setup integration |
+| File                                                                                         | Description                                              |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [`evaluator.ts`](./evaluator.ts)                                                             | Registers the matcher via `expect.extend()`              |
+| [`helpers/to-have-valid-heading-hierarchy.ts`](./helpers/to-have-valid-heading-hierarchy.ts) | Core matcher implementation                              |
+| [`types.d.ts`](./types.d.ts)                                                                 | TypeScript augmentation for `PlaywrightTest.Matchers<R>` |
+| [`index.ts`](./index.ts)                                                                     | Barrel export — side-effectfully imports `evaluator.ts`  |
+| [`vitest.setup.ts`](./vitest.setup.ts)                                                       | Vitest setup integration                                 |
 
 ---
 
 ## Accessibility Notes
 
 - **WCAG 2.1 SC 1.3.1 (Info and Relationships):** This matcher directly validates that heading levels are sequential and non-skipping, a key requirement for screen reader navigation.
-- **WCAG 2.1 SC 2.4.6 (Headings and Labels):** Although this matcher does not validate heading *content*, it helps ensure the structural foundation for labelled regions is correct.
+- **WCAG 2.1 SC 2.4.6 (Headings and Labels):** Although this matcher does not validate heading _content_, it helps ensure the structural foundation for labelled regions is correct.
 - Uses `happy-dom` for DOM parsing — no browser launch required for the heading audit logic itself (the DOM is parsed from serialized HTML).
 
 ---

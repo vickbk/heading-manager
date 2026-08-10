@@ -133,14 +133,15 @@ All components accept all standard HTML attributes for their underlying element,
 
 These landmark components render an HTML5 sectioning element and **increment the `HeadingCtx` level** for nested `<Heading>` children. `<HeadingFragment>` is a non-rendering sectioning provider that also updates the ambient `HeadingCtx` without emitting a wrapper element.
 
-| Component   | HTML Element | Description                                                         |
-| ----------- | ------------ | ------------------------------------------------------------------- |
-| `<Main>`    | `<main>`     | Page-level content region. Resets context to H1. Use once per page. |
-| `<Section>` | `<section>`  | Generic sectioning boundary.                                        |
-| `<Article>` | `<article>`  | Self-contained, independently distributable content.                |
-| `<Header>`  | `<header>`   | Introductory or navigational header within a landmark.              |
-| `<Aside>`   | `<aside>`    | Tangentially related content (e.g. sidebars).                       |
-| `<Legend>`  | `<legend>`   | Fieldset legend region.                                             |
+| Component           | HTML Element                | Description                                                                                                             |
+| ------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `<Main>`            | `<main>`                    | Page-level content region. Resets context to H1. Use once per page.                                                     |
+| `<Section>`         | `<section>`                 | Generic sectioning boundary.                                                                                            |
+| `<Article>`         | `<article>`                 | Self-contained, independently distributable content.                                                                    |
+| `<Header>`          | `<header>`                  | Introductory or navigational header within a landmark.                                                                  |
+| `<Aside>`           | `<aside>`                   | Tangentially related content (e.g. sidebars).                                                                           |
+| `<Legend>`          | `<legend>`                  | Fieldset legend region.                                                                                                 |
+| `<HeadingFragment>` | `None` / `<React.Fragment>` | Non-rendering sectioning provider that increments or overrides ambient `HeadingCtx` without emitting a wrapper element. |
 
 ```tsx
 import {

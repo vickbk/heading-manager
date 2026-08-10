@@ -65,16 +65,16 @@
 - **Steps**:
   - [x] Create root `LICENSE` file containing standard MIT license text.
   - [x] Create `README.md` with package overview, installation instructions, usage examples, and API reference.
-  - [x] Create `CHANGELOG.md` documenting initial `1.0.0` release features.
+  - [x] Create `CHANGELOG.md` documenting initial `0.1.0` release features.
 
 ### 6. Release Verification & Quality Assurance
 
-- [ ] **Execute Pre-Publication Verification and Pack Dry-Run**
-- **Status**: 🧑‍💻 Doing
+- [x] **Execute Pre-Publication Verification and Pack Dry-Run**
+- **Status**: ✅ Done
 - **Target**: 2026-08-10
 - **Description**: Perform a full build, typecheck, test execution, and npm pack dry-run to ensure the published tarball is ready for distribution.
 - **Steps**:
   - [x] Run `pnpm clean && pnpm run typecheck` to verify zero TypeScript errors.
   - [x] Run `pnpm run test:run` to verify all Vitest unit and integration suites pass.
   - [x] Run `pnpm run build` to generate distribution bundles in `/dist`.
-  - [ ] Run `pnpm pack --dry-run` to inspect tarball output and verify file inclusions.
+  - [x] Run `pnpm pack --dry-run` to inspect tarball output and verify file inclusions.

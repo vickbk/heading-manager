@@ -6,17 +6,17 @@ React sectioning components that automatically manage heading levels via React C
 
 ## Exports
 
-| Export            | Type             | HTML Element     | Description                                                                                                        |
-| ----------------- | ---------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `createRegion`    | Factory Function | _(configurable)_ | HOC that creates a landmark wrapper component for any HTML tag                                                     |
-| `Main`            | Component        | `<main>`         | Page-level main content region — resets heading context to H1                                                      |
-| `Section`         | Component        | `<section>`      | Generic sectioning region                                                                                          |
-| `Article`         | Component        | `<article>`      | Self-contained article region                                                                                      |
-| `Header`          | Component        | `<header>`       | Introductory or navigational region                                                                                |
-| `Aside`           | Component        | `<aside>`        | Tangentially related content region                                                                                |
-| `Legend`          | Component        | `<legend>`       | Fieldset legend region                                                                                             |
-| `Heading`         | Component        | `<h1>`–`<h6>`    | Heading rendered at the current context level                                                                      |
-| `HeadingFragment` | Component        | `None`           | Non-rendering sectioning provider that increments or overrides ambient `HeadingCtx` without emitting a DOM wrapper |
+| Export            | Type             | HTML Element                | Description                                                                                                        |
+| ----------------- | ---------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `createRegion`    | Factory Function | _(configurable)_            | HOC that creates a landmark wrapper component for any HTML tag                                                     |
+| `Main`            | Component        | `<main>`                    | Page-level main content region — resets heading context to H1                                                      |
+| `Section`         | Component        | `<section>`                 | Generic sectioning region                                                                                          |
+| `Article`         | Component        | `<article>`                 | Self-contained article region                                                                                      |
+| `Header`          | Component        | `<header>`                  | Introductory or navigational region                                                                                |
+| `Aside`           | Component        | `<aside>`                   | Tangentially related content region                                                                                |
+| `Legend`          | Component        | `<legend>`                  | Fieldset legend region                                                                                             |
+| `Heading`         | Component        | `<h1>`–`<h6>`               | Heading rendered at the current context level                                                                      |
+| `HeadingFragment` | Component        | `None` / `<React.Fragment>` | Non-rendering sectioning provider that increments or overrides ambient `HeadingCtx` without emitting a DOM wrapper |
 
 ---
 
