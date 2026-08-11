@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-11
+
+### 💥 Breaking Changes
+
+- Removed implicit side-effect matcher registration (`import "react-heading-manager/matchers"`).
+- Replaced automatic module execution with explicit initializer `registerPlaywright(customExpect?)`.
+
+### 🚀 Added
+
+- Introduced dedicated subpath export `react-heading-manager/testing/playwright`.
+- Added `registerPlaywright` initializer function to explicitly bind `toHaveValidHeadingHierarchy` to Playwright's `expect` instance without relying on tree-shakable side effects.
+- Added support for passing custom `expect` instances for isolated or multi-project Playwright configurations.
+
+### 🐛 Fixed
+
+- Fixed generic parameter arity mismatch on Playwright's `Matchers<R, T = {}>` interface augmentation (`TS2428`).
+- Fixed bundler tree-shaking issues where DTS bundlers stripped `declare global` type blocks from exported sub-files.
+- Resolved type pollution where importing core utilities leaked Playwright types into non-Playwright consumer projects.
+
 ## [0.1.0] - 2026-08-11
 
 ### Added
