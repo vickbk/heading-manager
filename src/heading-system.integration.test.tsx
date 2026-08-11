@@ -28,7 +28,7 @@ describe("Heading System Integration Test Suite", () => {
   // =========================================================================
   describe("Happy Path & Full Pipeline Validation", () => {
     it("renders a valid sequential hierarchy and passes checkHeadingOrderReport", () => {
-      const { container } = render(
+      render(
         <Main data-testid="root-main">
           <Heading>Main Application Title</Heading>
 
@@ -46,7 +46,9 @@ describe("Heading System Integration Test Suite", () => {
         </Main>,
       );
 
-      const mapping: RegionMapping = drawRegion(container);
+      const mapping: RegionMapping = drawRegion(
+        screen.getByTestId("root-main"),
+      );
 
       // Verify DOM tree extracted by drawRegion
       expect(mapping.tagName).toBe("main");
@@ -62,7 +64,7 @@ describe("Heading System Integration Test Suite", () => {
     });
 
     it("integrates HeadingFragment seamlessly without breaking drawRegion tree structure", () => {
-      const { container } = render(
+      render(
         <Main data-testid="root-main">
           <Heading>Document Header</Heading>
 

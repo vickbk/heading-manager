@@ -1,8 +1,15 @@
 import { Window } from "happy-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  MockInstance,
+  vi,
+} from "vitest";
 
 import { HeadingOrderError } from "@/src/types";
-import { checkHeadingOrderReport, drawRegion } from "@/src/utils";
 import { Locator, Page } from "@playwright/test";
 import { toHaveValidHeadingHierarchy } from "./to-have-valid-heading-hierarchy";
 
@@ -65,18 +72,22 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
     expect(result.message()).toContain("Heading level skipped");
   });
 
-  describe("Exhaustive test suite", () => {
-    // Mock the core tree analyzer utilities
-    vi.mock("@/src/utils", () => ({
-      drawRegion: vi.fn(),
-      checkHeadingOrderReport: vi.fn(),
-    }));
+  describe("Exhaustive test suite", async () => {
+    const utils = await import("@/src/utils");
+    const _drawRegion = utils.drawRegion;
 
     describe("toHaveValidHeadingHierarchy", () => {
-      const mockDrawRegion = vi.mocked(drawRegion);
-      const mockCheckHeadingOrderReport = vi.mocked(checkHeadingOrderReport);
+      let mockDrawRegion: MockInstance;
+      let mockCheckHeadingOrderReport: MockInstance;
 
       beforeEach(() => {
+        mockDrawRegion = vi.spyOn(utils, "drawRegion");
+        mockCheckHeadingOrderReport = vi.spyOn(
+          utils,
+          "checkHeadingOrderReport",
+        );
+      });
+      afterEach(() => {
         vi.clearAllMocks();
       });
 
@@ -111,7 +122,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           const mockPage = createMockPage(mockLocator);
 
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: true,
@@ -131,7 +142,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           const mockLocator = createMockLocator();
 
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: true,
@@ -188,7 +199,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
         it("should default initialLevel to 1 when omitted", async () => {
           const mockLocator = createMockLocator();
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: true,
@@ -206,7 +217,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
         it("should pass custom initialLevel to checkHeadingOrderReport", async () => {
           const mockLocator = createMockLocator();
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: true,
@@ -236,7 +247,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           );
 
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: true,
@@ -261,7 +272,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           );
 
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: true,
@@ -279,7 +290,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
         it("should return pass=true and success message when report is valid", async () => {
           const mockLocator = createMockLocator();
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: true,
@@ -299,7 +310,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
         it("should format single error without text or selector info", async () => {
           const mockLocator = createMockLocator();
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: false,
@@ -327,7 +338,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
         it("should format errors containing text snippets and selector information", async () => {
           const mockLocator = createMockLocator();
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: false,
@@ -357,7 +368,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
         it("should format multiple violations correctly joined by double newlines", async () => {
           const mockLocator = createMockLocator();
           mockDrawRegion.mockReturnValue(
-            {} as unknown as ReturnType<typeof drawRegion>,
+            {} as unknown as ReturnType<typeof _drawRegion>,
           );
           mockCheckHeadingOrderReport.mockReturnValue({
             isValid: false,

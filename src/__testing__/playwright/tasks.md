@@ -17,7 +17,7 @@
 - **Description**: Augment Playwright's `Matchers` interface using proper generic arity to fix TypeScript autocomplete and type checking in consumer applications.
 - **Steps**:
   - [x] Update `PlaywrightTest.Matchers<R, T="{}">` in the type declaration file.
-  - [ ] Add `import type {} from "@playwright/test";` at file root to preserve module context and avoid bundler type-stripping.
+  - [x] Add `import type {} from "@playwright/test";` at file root to preserve module context and avoid bundler type-stripping.
   - [x] Ensure `@playwright/test` is marked as an optional peer dependency in `package.json`.
 
 ## Build & Package Export Configuration
