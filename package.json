@@ -11,6 +11,9 @@
     "LICENSE",
     "CHANGELOG.md"
   ],
+  "repository": {
+    "url": "https://github.com/vickbk/heading-manager"
+  },
   "exports": {
     ".": {
       "types": {
