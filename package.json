@@ -1,6 +1,6 @@
 {
   "name": "react-heading-manager",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Accessible automatic heading hierarchy and ARIA region landmark manager for React",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
