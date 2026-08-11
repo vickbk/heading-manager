@@ -31,13 +31,13 @@
       "import": "./dist/utils/index.mjs",
       "require": "./dist/utils/index.cjs"
     },
-    "./testing": {
+    "./testing/playwright": {
       "types": {
-        "import": "./dist/testing/index.d.mts",
-        "require": "./dist/testing/index.d.cts"
+        "import": "./dist/testing/playwright/index.d.mts",
+        "require": "./dist/testing/playwright/index.d.cts"
       },
-      "import": "./dist/testing/index.mjs",
-      "require": "./dist/testing/index.cjs"
+      "import": "./dist/testing/playwright/index.mjs",
+      "require": "./dist/testing/playwright/index.cjs"
     }
   },
   "scripts": {
@@ -53,6 +53,7 @@
     "a11y",
     "accessibility",
     "heading level",
+    "react",
     "automatic",
     "header",
     "level",
@@ -61,13 +62,7 @@
   "author": "Vick Bake",
   "license": "MIT",
   "sideEffects": false,
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.18.0",
-      "onFail": "download"
-    }
-  },
+  "devEngines": {},
   "type": "module",
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.0",

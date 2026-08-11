@@ -1,41 +1,66 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import { parser, plugin } from "typescript-eslint";
+import tseslint from "typescript-eslint";
 
-const eslintConfig = defineConfig([
-  // Override default ignores of eslint-config-next.
+export default defineConfig([
+  // 1. Global Ignores
   globalIgnores([
-    // Default ignores of eslint-config-next:
-
     "out/**",
     "build/**",
+    "dist/",
     "coverage/",
     "playwright-report/",
     "test-results/",
   ]),
+
+  // 2. Base TypeScript Recommended Rules
+  ...tseslint.configs.recommended,
+
+  // 3. Project File Overrides & Specific Variable Rules
   {
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
-      parser,
+      parser: tseslint.parser,
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module",
+        // Enable type-aware linting if tsconfig is present
+        projectService: true,
       },
     },
-    plugins: {
-      "@typescript-eslint": plugin,
-    },
     settings: {
-      // 2. The crucial piece: instructs ESLint resolution engines
-      // to read your tsconfig.json compilerOptions.paths
       "import/resolver": {
         typescript: {
           alwaysTryTypes: true,
-          // Point to your config if it's named differently,
-          // but true defaults to checking the root tsconfig.json
         },
       },
     },
+    rules: {
+      // Warn on variables used before they are defined
+      "@typescript-eslint/no-use-before-define": [
+        "warn",
+        { functions: false, classes: true, variables: true },
+      ],
+
+      // Disable core JS unused-vars to prevent false positives in TypeScript
+      "no-unused-vars": "off",
+
+      // Warn on unused variables (allows underscores as unused parameters, e.g. `_req`)
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+
+      // Warn on undeclared/missing variables
+      // Note: TypeScript compiler catches missing variables natively (TS2304).
+      // Turn this on if you specifically need ESLint to catch missing global variables.
+      // "no-undef": "warn",
+
+      // Warn on shadowing variables in parent scopes
+      "@typescript-eslint/no-shadow": "warn",
+    },
   },
 ]);
-
-export default eslintConfig;

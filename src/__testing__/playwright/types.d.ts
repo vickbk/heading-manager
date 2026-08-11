@@ -1,4 +1,5 @@
-import "@playwright/test";
+import type { Page } from "@playwright/test";
+export type CustomPage = Page;
 
 declare global {
   namespace PlaywrightTest {
