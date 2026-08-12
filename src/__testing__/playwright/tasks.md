@@ -11,8 +11,8 @@
 
 ## Type Definitions & Ambient Declarations
 
-- [ ] **Fix Playwright Generic Type Augmentation**
-- **Status**: ⏳ Todo
+- [x] **Fix Playwright Generic Type Augmentation**
+- **Status**: ✅ Done
 - **Target**: 2026-08-12
 - **Description**: Augment Playwright's `Matchers` interface using proper generic arity to fix TypeScript autocomplete and type checking in consumer applications.
 - **Steps**:
@@ -33,11 +33,11 @@
 
 ## Documentation & Integration Verification
 
-- [ ] **Update Documentation & Verify End-to-End Build**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-13
+- [x] **Update Documentation & Verify End-to-End Build**
+- **Status**: ✅ Done
+- **Target**: 2026-08-12
 - **Description**: Update README documentation to showcase the explicit initializer pattern and verify the build output via `pnpm pack`.
 - **Steps**:
-  - [ ] Update `README.md` and `src/__testing__/README.md` with `registerPlaywrightMatchers` setup examples.
-  - [ ] Execute full `pnpm run typecheck`, `pnpm run test:run`, and `pnpm build` sequence.
-  - [ ] Perform `pnpm pack --dry-run` to inspect generated `.d.ts` declaration outputs.
+  - [x] Update `README.md` and `src/__testing__/README.md` with `registerPlaywrightMatchers` setup examples.
+  - [x] Execute full `pnpm run typecheck`, `pnpm run test:run`, and `pnpm build` sequence.
+  - [x] Perform `pnpm pack --dry-run` to inspect generated `.d.ts` declaration outputs.
