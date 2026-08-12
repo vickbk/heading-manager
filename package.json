@@ -56,6 +56,7 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "release-note": "tsx ./scripts/releases/extract-release-note.ts",
+    "release-tag": "tsx ./scripts/releases/extract-version-tag.ts",
     "comment": "tsx ./scripts/comments/vitest.ts",
     "coverage-summary": "tsx ./scripts/comments/coverage-summary.ts"
   },

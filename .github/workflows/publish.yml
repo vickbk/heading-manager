@@ -5,6 +5,8 @@ on:
     tags:
       - "v*"
 
+env:
+  DIST_TAG: latest
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -47,8 +49,11 @@ jobs:
       - name: Build distribution artifacts
         run: pnpm build
 
+      - name: Write tag to environment
+        run: pnpm release-tag
+
       - name: Publish package
-        run: pnpm publish --access public --provenance --no-git-checks
+        run: pnpm publish --access public --tag ${{ env.DIST_TAG }} --provenance --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
