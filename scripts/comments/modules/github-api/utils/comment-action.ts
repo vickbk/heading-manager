@@ -19,6 +19,9 @@ export async function commentAction({
   });
 
   if (!response.ok) {
+    console.log(
+      `[CGithub API] Failed to edit comment with respose: ${await response.text()}`,
+    );
     throw new Error(
       `[GitHub API] Failed to ${post ? "post" : "edit"} comment: HTTP ${response.status} ${response.statusText}`,
     );
