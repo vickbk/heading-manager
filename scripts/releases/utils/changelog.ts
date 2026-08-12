@@ -3,7 +3,7 @@ export function parseReleaseNotes(
   version: string,
 ): string {
   const normalizedChangelog = changelogContent.replace(/\r\n/g, "\n");
-  const escapedVersion = version.replace(/\./g, "\\.");
+  const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const headerRegex = new RegExp(
     `^##[^\\S\\r\\n]+\\[?v?${escapedVersion}\\]?(?:[^\\S\\r\\n]+.*)?$`,
     "m",
