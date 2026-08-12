@@ -1,9 +1,9 @@
-import type { Page } from "@playwright/test";
-export type CustomPage = Page;
+import "@playwright/test";
 
 declare global {
   namespace PlaywrightTest {
-    interface Matchers<R, _ = unknown> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interface Matchers<R, T = unknown, _ = unknown> {
       /**
        * Asserts that the page or locator container contains a valid, non-skipping
        * WCAG heading hierarchy (e.g. h1 -> h2 -> h3 without jumping levels).
@@ -14,3 +14,5 @@ declare global {
     }
   }
 }
+
+export {};

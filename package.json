@@ -9,35 +9,42 @@
     "dist",
     "README.md",
     "LICENSE",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "src/__testing__/playwright/types.d.ts"
   ],
   "repository": {
     "url": "https://github.com/vickbk/heading-manager"
   },
   "exports": {
     ".": {
-      "types": {
-        "import": "./dist/index.d.mts",
-        "require": "./dist/index.d.cts"
+      "import": {
+        "default": "./dist/index.mjs",
+        "types": "./dist/index.d.mts"
       },
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "require": {
+        "default": "./dist/index.cjs",
+        "types": "./dist/index.d.cts"
+      }
     },
     "./utils": {
-      "types": {
-        "import": "./dist/utils/index.d.mts",
-        "require": "./dist/utils/index.d.cts"
+      "import": {
+        "default": "./dist/utils/index.mjs",
+        "types": "./dist/utils/index.d.mts"
       },
-      "import": "./dist/utils/index.mjs",
-      "require": "./dist/utils/index.cjs"
+      "require": {
+        "default": "./dist/utils/index.cjs",
+        "types": "./dist/utils/index.d.cts"
+      }
     },
     "./testing/playwright": {
-      "types": {
-        "import": "./dist/testing/playwright/index.d.mts",
-        "require": "./dist/testing/playwright/index.d.cts"
+      "import": {
+        "default": "./dist/testing/playwright/index.mjs",
+        "types": "./dist/testing/playwright/index.d.mts"
       },
-      "import": "./dist/testing/playwright/index.mjs",
-      "require": "./dist/testing/playwright/index.cjs"
+      "require": {
+        "default": "./dist/testing/playwright/index.cjs",
+        "types": "./dist/testing/playwright/index.d.cts"
+      }
     }
   },
   "scripts": {
