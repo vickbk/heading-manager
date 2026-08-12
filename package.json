@@ -48,9 +48,9 @@
     "test:run": "vitest run",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "release-note": "tsx .\\scripts\\releases\\extract-release-note.ts",
-    "comment": "tsx .\\scripts\\comments\\vitest.ts",
-    "coverage-summary": "tsx .\\scripts\\comments\\coverage-summary.ts"
+    "release-note": "tsx ./scripts/releases/extract-release-note.ts",
+    "comment": "tsx ./scripts/comments/vitest.ts",
+    "coverage-summary": "tsx ./scripts/comments/coverage-summary.ts"
   },
   "keywords": [
     "a11y",
