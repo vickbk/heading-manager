@@ -10,10 +10,15 @@ export async function commentAction({
   body: string;
   id: number | null;
 }): Promise<GitHubComment> {
-  const post = id === null;
-  const url = `https://api.github.com/repos/${config.repository}/issues/${config.prNumber}/comments${post ? "" : "/" + id}`;
+  const isPost = id === null;
+
+  // Correct URL routing per GitHub REST API specs
+  const url = isPost
+    ? `https://api.github.com/repos/${config.repository}/issues/${config.prNumber}/comments`
+    : `https://api.github.com/repos/${config.repository}/issues/comments/${id}`;
+
   const response = await fetch(url, {
-    method: post ? "POST" : "PATCH",
+    method: isPost ? "POST" : "PATCH",
     headers: getHeaders(config.token),
     body: JSON.stringify({ body }),
   });
@@ -23,7 +28,7 @@ export async function commentAction({
       `[CGithub API] Failed to edit comment with respose: ${await response.text()}`,
     );
     throw new Error(
-      `[GitHub API] Failed to ${post ? "post" : "edit"} comment: HTTP ${response.status} ${response.statusText}`,
+      `[GitHub API] Failed to ${isPost ? "post" : "edit"} comment: HTTP ${response.status} ${response.statusText}`,
     );
   }
 

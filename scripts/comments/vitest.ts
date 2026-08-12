@@ -16,12 +16,12 @@ export async function postCoverageComment() {
         ? `[Coverage Runner] Updating existing PR comment ID: ${comment.id}`
         : "[Coverage Runner] Posting new PR comment...",
     );
-    commentAction({
+    await commentAction({
       config,
       body: report.commentBody,
       id: comment?.id ?? null,
     });
-    console.log("[Coverage Runner] Posting new PR comment...");
+    console.log("[Coverage Runner] Comment processed successfully.");
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[Coverage Runner] Fatal error: ${message}`);

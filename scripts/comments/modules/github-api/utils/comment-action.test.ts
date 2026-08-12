@@ -96,7 +96,7 @@ describe("commentAction", () => {
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       expect(fetchSpy).toHaveBeenCalledWith(
-        "https://api.github.com/repos/octocat/hello-world/issues/42/comments/12345",
+        "https://api.github.com/repos/octocat/hello-world/issues/comments/12345",
         {
           method: "PATCH",
           headers: expectedHeaders,
@@ -129,13 +129,11 @@ describe("commentAction", () => {
 
   describe("Edge Cases & Input Boundary Conditions", () => {
     it("should treat id = 0 as a valid comment ID and issue a PATCH request to /comments/0", async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, "fetch")
-        .mockResolvedValue(
-          new Response(JSON.stringify({ id: 0, body: "Zero ID comment" }), {
-            status: 200,
-          }),
-        );
+      const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+        new Response(JSON.stringify({ id: 0, body: "Zero ID comment" }), {
+          status: 200,
+        }),
+      );
 
       await commentAction({
         config: mockConfig,
@@ -144,19 +142,17 @@ describe("commentAction", () => {
       });
 
       expect(fetchSpy).toHaveBeenCalledWith(
-        "https://api.github.com/repos/octocat/hello-world/issues/42/comments/0",
+        "https://api.github.com/repos/octocat/hello-world/issues/comments/0",
         expect.objectContaining({ method: "PATCH" }),
       );
     });
 
     it("should correctly handle negative integer IDs for PATCH requests", async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, "fetch")
-        .mockResolvedValue(
-          new Response(JSON.stringify({ id: -1, body: "Negative ID" }), {
-            status: 200,
-          }),
-        );
+      const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+        new Response(JSON.stringify({ id: -1, body: "Negative ID" }), {
+          status: 200,
+        }),
+      );
 
       await commentAction({
         config: mockConfig,
@@ -165,7 +161,7 @@ describe("commentAction", () => {
       });
 
       expect(fetchSpy).toHaveBeenCalledWith(
-        "https://api.github.com/repos/octocat/hello-world/issues/42/comments/-1",
+        "https://api.github.com/repos/octocat/hello-world/issues/comments/-1",
         expect.objectContaining({ method: "PATCH" }),
       );
     });
@@ -195,13 +191,11 @@ describe("commentAction", () => {
       const complexBody =
         "## Header\n\n- [ ] Item 1\n- [x] Item 2\n\n`code block` & <script>alert(1)</script> 🚀";
 
-      const fetchSpy = vi
-        .spyOn(globalThis, "fetch")
-        .mockResolvedValue(
-          new Response(JSON.stringify({ id: 100, body: complexBody }), {
-            status: 200,
-          }),
-        );
+      const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+        new Response(JSON.stringify({ id: 100, body: complexBody }), {
+          status: 200,
+        }),
+      );
 
       await commentAction({
         config: mockConfig,
