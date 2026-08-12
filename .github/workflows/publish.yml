@@ -53,7 +53,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Extract Release Notes from CHANGELOG.md
-        run: pnpm exec tsx scripts/releases/extract-release-notes
+        run: pnpm release-note
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

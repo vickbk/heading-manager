@@ -48,14 +48,14 @@ jobs:
       - name: Generate Coverage Report Summary
         if: ${{ !cancelled() }}
         id: coverage
-        run: pnpm exec tsx .\scripts\comments\coverage-summary
+        run: pnpm coverage-summary
 
       - name: Post Coverage Comment on PR
         if: github.event_name == 'pull_request' && !cancelled()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
-        run: pnpm exec tsx .\scripts\comments\vitest
+        run: pnpm comment
 
       - name: Upload HTML Coverage Artifact
         uses: actions/upload-artifact@v7

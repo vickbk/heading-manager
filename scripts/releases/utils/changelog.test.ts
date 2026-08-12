@@ -74,6 +74,15 @@ All notable changes to this project will be documented in this file.
       const result = parseReleaseNotes(changelog, "1.0.0");
       expect(result).toBe("- Exact version release notes");
     });
+
+    it("should safely match semver tags containing build metadata with '+' signs", () => {
+      const changelog = `
+## [1.0.0+build.2026] - 2026-08-12
+- Build metadata release notes
+`;
+      const result = parseReleaseNotes(changelog, "1.0.0+build.2026");
+      expect(result).toBe("- Build metadata release notes");
+    });
   });
 
   describe("Horizontal vs Vertical Whitespace (Newline Boundary Safety)", () => {

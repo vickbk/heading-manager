@@ -195,13 +195,11 @@ describe("generateCoverageSummary", () => {
 
     let githubApi = await import("./modules/github-api");
     let reportModule = await import("./utils/report");
-    let nodefs = await import("node:fs");
     beforeEach(async () => {
       vi.resetModules(); // Clears import cache for top-level code re-evaluation
       vi.restoreAllMocks();
       githubApi = await import("./modules/github-api");
       reportModule = await import("./utils/report");
-      nodefs = await import("node:fs");
       vi.spyOn(console, "log").mockImplementation(() => {});
       vi.spyOn(console, "warn").mockImplementation(() => {});
     });
@@ -214,10 +212,10 @@ describe("generateCoverageSummary", () => {
     describe("generateCoverageSummary() function", () => {
       it("should warn and exit early when summary file does not exist", () => {
         vi.spyOn(fs, "existsSync").mockReturnValue(false);
-        const writeStepSummarySpy = vi
-          .spyOn(githubApi, "writeStepSummary")
-          .mockImplementation(() => {});
-        const getReportSpy = vi.spyOn(reportModule, "getReport");
+        vi.spyOn(coverageModule, "writeStepSummary").mockImplementation(
+          () => {},
+        );
+        const getReportSpy = vi.spyOn(reportUtils, "getReport");
 
         generateCoverageSummary("/custom/path/coverage.json");
 
@@ -227,7 +225,7 @@ describe("generateCoverageSummary", () => {
         expect(console.warn).toHaveBeenCalledWith(
           "[Coverage Script] No coverage file found at /custom/path/coverage.json",
         );
-        expect(writeStepSummarySpy).toHaveBeenCalledWith(
+        expect(coverageModule.writeStepSummary).toHaveBeenCalledWith(
           "No coverage summary file found.",
         );
         expect(getReportSpy).not.toHaveBeenCalled();
@@ -235,31 +233,33 @@ describe("generateCoverageSummary", () => {
 
       it("should log markdown, write step summary, and export TOTAL_PCT when summary file exists", async () => {
         vi.spyOn(fs, "existsSync").mockReturnValue(true);
-        vi.spyOn(reportModule, "getReport").mockReturnValue({
+        vi.spyOn(reportUtils, "getReport").mockReturnValue({
           totalPct: "88.5",
           markdownSummary: "### Coverage: 88.5%",
-        } as ReturnType<typeof reportModule.getReport>);
+        } as ReturnType<typeof reportUtils.getReport>);
 
         const writeStepSummarySpy = vi
-          .spyOn(githubApi, "writeStepSummary")
+          .spyOn(coverageModule, "writeStepSummary")
           .mockImplementation(() => {});
         const exportGithubEnvSpy = vi
-          .spyOn(githubApi, "exportGithubEnv")
+          .spyOn(coverageModule, "exportGithubEnv")
           .mockImplementation(() => {});
 
         generateCoverageSummary("/custom/path/coverage.json");
 
-        expect(reportModule.getReport).toHaveBeenCalledWith(
+        expect(reportUtils.getReport).toHaveBeenCalledWith(
           "/custom/path/coverage.json",
         );
         expect(console.log).toHaveBeenCalledWith("### Coverage: 88.5%");
         expect(writeStepSummarySpy).toHaveBeenCalledWith("### Coverage: 88.5%");
-        expect(exportGithubEnvSpy).toHaveBeenCalledWith("TOTAL_PCT", 88.5);
+        expect(exportGithubEnvSpy).toHaveBeenCalledWith("TOTAL_PCT", "88.5");
       });
 
       it("should fall back to default path when parameter is omitted", () => {
         const existsSpy = vi.spyOn(fs, "existsSync").mockReturnValue(false);
-        vi.spyOn(githubApi, "writeStepSummary").mockImplementation(() => {});
+        vi.spyOn(coverageModule, "writeStepSummary").mockImplementation(
+          () => {},
+        );
 
         generateCoverageSummary();
 
