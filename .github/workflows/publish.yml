@@ -5,6 +5,10 @@ on:
     tags:
       - "v*"
 
+env:
+  DIST_TAG: latest
+  IS_PRERELEASE: false
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -47,35 +51,20 @@ jobs:
       - name: Build distribution artifacts
         run: pnpm build
 
+      - name: Write tag to environment
+        run: pnpm release-tag
+
       - name: Publish package
-        run: pnpm publish --access public --provenance --no-git-checks
+        run: pnpm publish --access public --tag ${{ env.DIST_TAG }} --provenance --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Extract Release Notes from CHANGELOG.md
-        run: |
-          node -e "
-            const fs = require('fs');
-            // Remove 'v' prefix if present (e.g., v0.1.0 -> 0.1.0)
-            const tag = process.env.GITHUB_REF_NAME.replace(/^v/, '');
-            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
-            
-            // Regex matches '## [0.1.0]' or '## 0.1.0' until the next '## ' header or EOF
-            const escapedTag = tag.replace(/\./g, '\\.');
-            const regex = new RegExp('## \\\\[?' + escapedTag + '\\\\]?.*\\n([\\s\\S]*?)(?=\\n## |$)', 'i');
-            const match = changelog.match(regex);
-            
-            if (!match || !match[1].trim()) {
-              console.error('Could not find release notes for version ' + tag + ' in CHANGELOG.md');
-              process.exit(1);
-            }
-            
-            fs.writeFileSync('RELEASE_CHANGELOG.md', match[1].trim());
-          "
+        run: pnpm release-note
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           body_path: RELEASE_CHANGELOG.md
           draft: false
-          prerelease: false
+          prerelease: ${{env.IS_PRERELEASE}}

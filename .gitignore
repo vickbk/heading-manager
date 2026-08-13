@@ -17,6 +17,7 @@
 # production
 /build
 /dist
+RELEASE_CHANGELOG.md
 
 # misc
 .DS_Store

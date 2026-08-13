@@ -1,6 +1,6 @@
 {
   "name": "react-heading-manager",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "Accessible automatic heading hierarchy and ARIA region landmark manager for React",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -16,28 +16,34 @@
   },
   "exports": {
     ".": {
-      "types": {
-        "import": "./dist/index.d.mts",
-        "require": "./dist/index.d.cts"
+      "import": {
+        "default": "./dist/index.mjs",
+        "types": "./dist/index.d.mts"
       },
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "require": {
+        "default": "./dist/index.cjs",
+        "types": "./dist/index.d.cts"
+      }
     },
     "./utils": {
-      "types": {
-        "import": "./dist/utils/index.d.mts",
-        "require": "./dist/utils/index.d.cts"
+      "import": {
+        "default": "./dist/utils/index.mjs",
+        "types": "./dist/utils/index.d.mts"
       },
-      "import": "./dist/utils/index.mjs",
-      "require": "./dist/utils/index.cjs"
+      "require": {
+        "default": "./dist/utils/index.cjs",
+        "types": "./dist/utils/index.d.cts"
+      }
     },
-    "./testing": {
-      "types": {
-        "import": "./dist/testing/index.d.mts",
-        "require": "./dist/testing/index.d.cts"
+    "./testing/playwright": {
+      "import": {
+        "default": "./dist/testing/playwright/index.mjs",
+        "types": "./dist/testing/playwright/index.d.mts"
       },
-      "import": "./dist/testing/index.mjs",
-      "require": "./dist/testing/index.cjs"
+      "require": {
+        "default": "./dist/testing/playwright/index.cjs",
+        "types": "./dist/testing/playwright/index.d.cts"
+      }
     }
   },
   "scripts": {
@@ -47,12 +53,17 @@
     "test": "vitest",
     "test:run": "vitest run",
     "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "release-note": "tsx ./scripts/releases/extract-release-note.ts",
+    "release-tag": "tsx ./scripts/releases/extract-version-tag.ts",
+    "comment": "tsx ./scripts/comments/vitest.ts",
+    "coverage-summary": "tsx ./scripts/comments/coverage-summary.ts"
   },
   "keywords": [
     "a11y",
     "accessibility",
     "heading level",
+    "react",
     "automatic",
     "header",
     "level",
@@ -61,13 +72,7 @@
   "author": "Vick Bake",
   "license": "MIT",
   "sideEffects": false,
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.18.0",
-      "onFail": "download"
-    }
-  },
+  "devEngines": {},
   "type": "module",
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.0",
@@ -80,6 +85,7 @@
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.39.5",
     "tsdown": "^0.22.14",
+    "tsx": "^4.23.12",
     "typescript": "^6",
     "typescript-eslint": "^8.66.0",
     "vitest": "^4.1.10"

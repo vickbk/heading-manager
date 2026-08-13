@@ -224,7 +224,7 @@ describe("HeadingFragment Component", () => {
     });
 
     it("interoperates seamlessly when interleaved with Section landmark components", () => {
-      const { container } = render(
+      render(
         <main>
           <Heading>Page H1</Heading>
 

@@ -6,6 +6,68 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-13
+
+### Fixed
+
+- **Testing Subpath & Playwright Decoupling (`react-heading-manager/testing/playwright`):** Fixed a broken state from `v0.1.1` where testing utilities failed to resolve due to missing runtime exports and TypeScript declaration (`.d.ts`) files. Playwright utilities have now been relocated to a dedicated subpath (`react-heading-manager/testing/playwright`), eliminating rigid framework coupling and preventing Playwright types from leaking into consumer projects.
+
+### Changed
+
+- **Publish Release Note Syncing:** Enhanced release note extraction scripts (`extract-release-note.ts`) to cleanly isolate version section headers during publish workflows, preventing empty or misaligned section boundaries in generated release notes.
+- **Automated Version Guardrails:** Integrated strict pre-publish assertion checks (`assertVersionMatch`) during release tagging to automatically fail pipelines if the Git release tag drifts from the `package.json` version string.
+
+## [0.2.0-beta.3] - 2026-08-13
+
+### Changed
+
+- **Release Automation:** Refactored version tag extraction logic (`extract-version-tag.ts`) to dynamically calculate npm `DIST_TAG` and `IS_PRERELEASE` workflow variables during build and publish steps.
+
+### Added
+
+- **Strict Version Guardrail:** Integrated automated version assertion (`assertVersionMatch`) to prevent publish jobs if the Git release tag doesn't strictly match the `package.json` version.
+- **Enhanced Changelog Extraction:** Improved release note extraction workflow (`extract-release-note.ts`) for clean boundary matching across prerelease versions and prerelease tags.
+
+## [0.2.0-beta.1] - 2026-08-13
+
+> **Pre-release Note:** This beta release ensures ambient type declarations are properly preserved in `tsdown` DTS outputs and improves Playwright setup patterns.
+
+---
+
+### 🐛 Bug Fixes & Type System Improvements
+
+- **Preserved `tsdown` Module Augmentation:** Fixed an issue where `tsdown`'s DTS generation tree-shook ambient `declare global` blocks from output declaration bundles (`.d.mts`, `.d.cts`, `.d.ts`). Playwright's `expect(...)` chain now natively recognizes `.toHaveValidHeadingHierarchy()` without requiring manual type imports or casting.
+- **Strict Heading Level Types:** Exported the `HeadingLevel` type (`1 | 2 | 3 | 4 | 5 | 6`) to enforce strict compile-time checks on `initialLevel`, preventing invalid or non-positive integers from passing in test files.
+
+## [0.2.0] - 2026-08-11
+
+### 💥 Breaking Changes
+
+- Removed implicit side-effect matcher registration (`import "react-heading-manager/matchers"`).
+- Replaced automatic module execution with explicit initializer `registerPlaywright(customExpect?)`.
+
+### 🚀 Added
+
+- Introduced dedicated subpath export `react-heading-manager/testing/playwright`.
+- Added `registerPlaywright` initializer function to explicitly bind `toHaveValidHeadingHierarchy` to Playwright's `expect` instance without relying on tree-shakable side effects.
+- Added support for passing custom `expect` instances for isolated or multi-project Playwright configurations.
+
+### 🐛 Fixed
+
+- Fixed generic parameter arity mismatch on Playwright's `Matchers<R, T = {}>` interface augmentation (`TS2428`).
+- Fixed bundler tree-shaking issues where DTS bundlers stripped `declare global` type blocks from exported sub-files.
+- Resolved type pollution where importing core utilities leaked Playwright types into non-Playwright consumer projects.
+
+## [0.1.1] - 2026-08-11
+
+### Security
+
+- Switched npm publishing authentication from static `NPM_TOKEN` secrets to npm OIDC Trusted Publishers.
+
+### Changed
+
+- Removed `NODE_AUTH_TOKEN` environment variable from the publish workflow step in `.github/workflows/publish.yml`.
+
 ## [0.1.0] - 2026-08-11
 
 ### Added
@@ -46,12 +108,62 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 [Unreleased]: https://github.com/vickbk/heading-manager/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/vickbk/heading-manager/releases/tag/v0.1.0
 
-## [0.1.1] - 2026-08-11
+---
 
-### Security
+### 📦 Global Setup (Recommended)
 
-- Switched npm publishing authentication from static `NPM_TOKEN` secrets to npm OIDC Trusted Publishers.
+To avoid re-registering custom matchers in individual spec files, call `registerPlaywright()` once inside your `playwright.config.ts`:
 
-### Changed
+#### `playwright.config.ts`
 
-- Removed `NODE_AUTH_TOKEN` environment variable from the publish workflow step in `.github/workflows/publish.yml`.
+```typescript
+import { defineConfig } from "@playwright/test";
+import { registerPlaywright } from "react-heading-manager/testing";
+
+// Register matchers globally across the entire test suite
+registerPlaywright();
+
+export default defineConfig({
+  testDir: "./e2e",
+  use: {
+    baseURL: "http://localhost:3000",
+  },
+});
+```
+
+#### `e2e/accessibility.spec.ts`
+
+```typescript
+import { test, expect } from "@playwright/test";
+import type { HeadingLevel } from "react-heading-manager/testing";
+
+test("audits page heading hierarchy", async ({ page }) => {
+  await page.goto("/");
+
+  // Full IDE autocomplete & zero TypeScript compilation errors
+  await expect(page).toHaveValidHeadingHierarchy();
+
+  // Scoped audit starting at an H2 level
+  const initialLevel: HeadingLevel = 2;
+  await expect(page.locator('main[role="main"]')).toHaveValidHeadingHierarchy(
+    initialLevel,
+  );
+});
+```
+
+---
+
+### 🛠️ Migration
+
+No breaking runtime changes. If you previously had per-file `registerPlaywright` calls in your tests, you can consolidate them into `playwright.config.ts`.
+
+Here is the markdown section ready to add to **`CHANGELOG.md`**:
+
+```markdown
+## [0.2.0-beta.2] - 2026-08-13
+
+### Fixed
+
+- **Release Automation:** Updated `extract-release-note.ts` to properly normalize version headers and reliably match prerelease tags (e.g., `v0.2.0-beta.2`).
+- **Publish Pipeline:** Fixed section boundary lookup logic to prevent exit code 1 errors when generating `RELEASE_CHANGELOG.md` during publish workflows.
+```

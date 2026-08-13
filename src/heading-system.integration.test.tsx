@@ -21,7 +21,6 @@ import {
 const Section = createRegion<HTMLElement>("section");
 const Article = createRegion<HTMLElement>("article");
 const Aside = createRegion<HTMLElement>("aside");
-const Nav = createRegion<HTMLElement>("nav");
 
 describe("Heading System Integration Test Suite", () => {
   // =========================================================================
@@ -29,7 +28,7 @@ describe("Heading System Integration Test Suite", () => {
   // =========================================================================
   describe("Happy Path & Full Pipeline Validation", () => {
     it("renders a valid sequential hierarchy and passes checkHeadingOrderReport", () => {
-      const { container } = render(
+      render(
         <Main data-testid="root-main">
           <Heading>Main Application Title</Heading>
 
@@ -47,8 +46,9 @@ describe("Heading System Integration Test Suite", () => {
         </Main>,
       );
 
-      const mainEl = screen.getByTestId("root-main");
-      const mapping: RegionMapping = drawRegion(mainEl);
+      const mapping: RegionMapping = drawRegion(
+        screen.getByTestId("root-main"),
+      );
 
       // Verify DOM tree extracted by drawRegion
       expect(mapping.tagName).toBe("main");
@@ -64,7 +64,7 @@ describe("Heading System Integration Test Suite", () => {
     });
 
     it("integrates HeadingFragment seamlessly without breaking drawRegion tree structure", () => {
-      const { container } = render(
+      render(
         <Main data-testid="root-main">
           <Heading>Document Header</Heading>
 

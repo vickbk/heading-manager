@@ -1,15 +1,18 @@
 import "@playwright/test";
 
+export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
 declare global {
   namespace PlaywrightTest {
-    interface Matchers<R> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interface Matchers<R, T = unknown, _ = unknown> {
       /**
        * Asserts that the page or locator container contains a valid, non-skipping
        * WCAG heading hierarchy (e.g. h1 -> h2 -> h3 without jumping levels).
        *
        * @param initialLevel - Optional starting heading level context (default: 1).
        */
-      toHaveValidHeadingHierarchy(intialLevel?: number): Promise<R>;
+      toHaveValidHeadingHierarchy(initialLevel?: HeadingLevel): Promise<R>;
     }
   }
 }

@@ -17,7 +17,7 @@ Never manually track heading levels again — nest landmark components and let t
 - 🏗️ **Semantic landmark components** — `<Main>`, `<Section>`, `<Article>`, `<Header>`, `<Aside>`, and `<Legend>` each create an accessible HTML5 sectioning boundary.
 - 🔤 **`<Heading>` and `<HeadingFragment>`** — Semantic heading output plus virtual sectioning context providers that stay correct across deeply nested component trees.
 - 🔬 **DOM auditing utilities** — `drawRegion`, `checkHeadingOrderReport`, and friends available under `react-heading-manager/utils` for runtime and test-time analysis — zero impact on your component bundle.
-- 🧪 **First-class testing support** — `toHaveValidHeadingHierarchy` Playwright / Testing Library matcher ships under `react-heading-manager/testing`.
+- 🧪 **First-class testing support** — `toHaveValidHeadingHierarchy` Playwright matcher ships under `react-heading-manager/testing/playwright` via the explicit `registerPlaywright(expect)` initializer.
 - ♿ **WCAG 2.1 SC 1.3.1 compliant** — The architecture structurally prevents skipped heading levels (e.g. H1 → H3), a common screen-reader navigation failure.
 - 📦 **Dual ESM + CJS output** — Full TypeScript declarations included.
 - 🌐 **Next.js App Router ready** — All components are marked `"use client"` and SSR-safe.
@@ -244,6 +244,7 @@ import {
   drawRegion,
   checkHeadingOrderReport,
   checkHeadingOrder,
+  calculateNextHeadingLevel,
   parseHeadingLevel,
   resolveHeadingDetail,
   getRegionIdentifier,
@@ -283,35 +284,50 @@ if (!report.isValid) {
 
 Boolean shorthand — returns `true` if the heading hierarchy is fully valid.
 
+#### `calculateNextHeadingLevel(parentLevel: number, requestedLevel: number): number`
+
+Calculates the next valid heading depth while preventing skipped levels and clamping to the H6 maximum. This keeps nested regions compliant with WCAG heading sequencing and is used internally by `useHeading()`.
+
 #### `parseHeadingLevel(tagName: string): number | null`
 
 Parses `"h1"`–`"h6"` (case-insensitive) into a numeric level. Returns `null` for non-heading tags.
 
-#### `resolveHeadingDetail(element: Element): HeadingDetail`
+#### `resolveHeadingDetail(node: RegionMapping, index?: number): { rawHeading: string; parsedLevel: number | null; text?: string; element?: unknown } | null`
 
-Extracts structured metadata (`tag`, `text`, `element`) from a heading DOM node.
+Extracts structured metadata from a heading entry inside a `RegionMapping` tree. It prioritizes rich `detailedHeadings` metadata and falls back to the legacy string heading list when needed.
+
+```ts
+const regionTree = drawRegion(document.querySelector("main")!);
+const details = resolveHeadingDetail(regionTree, 0);
+// { rawHeading: 'h1', parsedLevel: 1, text: 'My Blog', ... }
+```
 
 ---
 
-### Testing — `react-heading-manager/testing`
+### Testing — `react-heading-manager/testing/playwright`
 
-Custom Playwright / Testing Library matcher for end-to-end and integration accessibility auditing.
+Explicit Playwright matcher registration for end-to-end and integration accessibility auditing.
 
 ```ts
-import "react-heading-manager/testing";
+import { expect } from "@playwright/test";
+import { registerPlaywright } from "react-heading-manager/testing/playwright";
+
+registerPlaywright(expect);
 ```
 
-> Importing this module registers `toHaveValidHeadingHierarchy` on Playwright's `expect` via `expect.extend()` as a side effect.
+This initializer binds `toHaveValidHeadingHierarchy` to the provided Playwright `expect` instance without relying on a tree-shakable side-effect import.
 
 #### `toHaveValidHeadingHierarchy(initialLevel?)`
 
-Audits a `Page` or `Locator` for heading hierarchy violations. Internally uses `drawRegion` + `checkHeadingOrderReport`.
+Audits a `Page` or `Locator` for skipped or invalid heading hierarchy levels. Internally uses `drawRegion` + `checkHeadingOrderReport`.
 
 | Parameter      | Type     | Default | Description                                                                 |
 | -------------- | -------- | ------- | --------------------------------------------------------------------------- |
 | `initialLevel` | `number` | `1`     | Starting heading level. Use `2` for sub-components expected to start at H2. |
 
-**TypeScript augmentation** is automatically included — no additional setup required.
+The matcher accepts an optional custom starting level for sub-regions, and its failure output is formatted as a numbered diagnostic with the offending path, message, optional heading text, and selector.
+
+**TypeScript augmentation** is included for Playwright's `Matchers<R, T = unknown>` interface when you import the dedicated subpath.
 
 ---
 
@@ -321,8 +337,10 @@ Audits a `Page` or `Locator` for heading hierarchy violations. Internally uses `
 
 ```ts
 // playwright.config.ts
-import "react-heading-manager/testing";
-import { defineConfig } from "@playwright/test";
+import { defineConfig, expect } from "@playwright/test";
+import { registerPlaywright } from "react-heading-manager/testing/playwright";
+
+registerPlaywright(expect);
 
 export default defineConfig({
   // ... your config
@@ -331,8 +349,10 @@ export default defineConfig({
 
 ```ts
 // tests/accessibility.spec.ts
-import { test, expect } from "@playwright/test";
-import "react-heading-manager/testing";
+import { expect, test } from "@playwright/test";
+import { registerPlaywright } from "react-heading-manager/testing/playwright";
+
+registerPlaywright(expect);
 
 test("home page has a valid heading hierarchy", async ({ page }) => {
   await page.goto("/");
@@ -350,6 +370,8 @@ test("sidebar headings start at H2", async ({ page }) => {
   await expect(page.locator("aside")).toHaveValidHeadingHierarchy(2);
 });
 ```
+
+> In a custom or multi-project Playwright setup, pass a specific `expect` instance to `registerPlaywright(customExpect)` instead of the global default.
 
 ### Vitest / Integration Testing
 
