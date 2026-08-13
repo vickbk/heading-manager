@@ -135,9 +135,25 @@ test("audits page heading hierarchy", async ({ page }) => {
 
 No breaking runtime changes. If you previously had per-file `registerPlaywright` calls in your tests, you can consolidate them into `playwright.config.ts`.
 
+Here is the markdown section ready to add to **`CHANGELOG.md`**:
+
+```markdown
 ## [0.2.0-beta.2] - 2026-08-13
 
 ### Fixed
 
 - **Release Automation:** Updated `extract-release-note.ts` to properly normalize version headers and reliably match prerelease tags (e.g., `v0.2.0-beta.2`).
 - **Publish Pipeline:** Fixed section boundary lookup logic to prevent exit code 1 errors when generating `RELEASE_CHANGELOG.md` during publish workflows.
+```
+
+---
+
+### Verification Step
+
+After adding this section to `CHANGELOG.md` and ensuring `"version": "0.2.0-beta.2"` is set in `package.json`, run the script to confirm the release notes are extracted cleanly:
+
+```powershell
+pnpm release-note 0.2.0-beta.2
+Get-Content RELEASE_CHANGELOG.md
+
+```

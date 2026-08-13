@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { writeDistTagToGithubOutput } from "./extract-version-tag";
-import * as versionTagModule from "./utils/version-tag";
+import * as releaseTypeModule from "./utils/release-type";
 
 describe("writeDistTagToGithubOutput", () => {
   const originalArgv = process.argv;
@@ -11,6 +11,7 @@ describe("writeDistTagToGithubOutput", () => {
     vi.resetModules();
     vi.restoreAllMocks();
     vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(releaseTypeModule, "getReleaseType");
   });
 
   afterEach(() => {
@@ -23,15 +24,14 @@ describe("writeDistTagToGithubOutput", () => {
       process.argv = ["node", "get-dist-tag.js", "v1.0.0"];
       vi.stubEnv("GITHUB_ENV", mockGithubOutput);
 
-      vi.spyOn(versionTagModule, "resolveVersionTag").mockReturnValue("latest");
       const appendSpy = vi
         .spyOn(fs, "appendFileSync")
         .mockImplementation(() => {});
 
       writeDistTagToGithubOutput();
 
-      expect(versionTagModule.resolveVersionTag).toHaveBeenCalledWith("v1.0.0");
-      expect(appendSpy).toHaveBeenCalledTimes(1);
+      expect(releaseTypeModule.getReleaseType).toHaveBeenCalledWith("v1.0.0");
+      expect(appendSpy).toHaveBeenCalledTimes(2);
       expect(appendSpy).toHaveBeenCalledWith(
         mockGithubOutput,
         "DIST_TAG=latest\n",
@@ -45,15 +45,19 @@ describe("writeDistTagToGithubOutput", () => {
     it("should pass empty string to resolveVersionTag when process.argv[2] is missing", () => {
       process.argv = ["node", "get-dist-tag.js"];
       vi.stubEnv("GITHUB_ENV", mockGithubOutput);
-
-      vi.spyOn(versionTagModule, "resolveVersionTag").mockReturnValue("next");
+      vi.spyOn(releaseTypeModule, "getReleaseType").mockReturnValue({
+        IS_PRERELEASE: true,
+        releaseTag: "next",
+        normalized: "next",
+        version: "",
+      });
       const appendSpy = vi
         .spyOn(fs, "appendFileSync")
         .mockImplementation(() => {});
 
       writeDistTagToGithubOutput();
 
-      expect(versionTagModule.resolveVersionTag).toHaveBeenCalledWith("");
+      expect(releaseTypeModule.getReleaseType).toHaveBeenCalledWith("");
       expect(appendSpy).toHaveBeenCalledWith(
         mockGithubOutput,
         "DIST_TAG=next\n",
@@ -68,14 +72,13 @@ describe("writeDistTagToGithubOutput", () => {
       process.argv = ["node", "get-dist-tag.js", "2.0.0-beta.1"];
       vi.stubEnv("GITHUB_ENV", "");
 
-      vi.spyOn(versionTagModule, "resolveVersionTag").mockReturnValue("beta");
       const appendSpy = vi
         .spyOn(fs, "appendFileSync")
         .mockImplementation(() => {});
 
       writeDistTagToGithubOutput();
 
-      expect(versionTagModule.resolveVersionTag).toHaveBeenCalledWith(
+      expect(releaseTypeModule.getReleaseType).toHaveBeenCalledWith(
         "2.0.0-beta.1",
       );
       expect(appendSpy).not.toHaveBeenCalled();
@@ -88,9 +91,10 @@ describe("writeDistTagToGithubOutput", () => {
       process.argv = ["node", "get-dist-tag.js", "invalid-tag"];
       vi.stubEnv("GITHUB_ENV", mockGithubOutput);
 
-      vi.spyOn(versionTagModule, "resolveVersionTag").mockImplementation(() => {
+      vi.spyOn(releaseTypeModule, "getReleaseType").mockImplementation(() => {
         throw new Error("Invalid semver version tag");
       });
+
       const appendSpy = vi
         .spyOn(fs, "appendFileSync")
         .mockImplementation(() => {});
@@ -107,7 +111,6 @@ describe("writeDistTagToGithubOutput", () => {
       process.argv = ["node", "get-dist-tag.js", "1.0.0"];
       vi.stubEnv("GITHUB_ENV", mockGithubOutput);
 
-      vi.spyOn(versionTagModule, "resolveVersionTag").mockReturnValue("latest");
       vi.spyOn(fs, "appendFileSync").mockImplementation(() => {
         throw new Error("EACCES: permission denied");
       });
@@ -151,12 +154,11 @@ describe("writeDistTagToGithubOutput", () => {
     it("should NOT automatically execute writeDistTagToGithubOutput when process.argv[1] does not match", async () => {
       process.argv = ["node", "/workspace/scripts/other-utility.ts", "1.0.0"];
 
-      const resolveSpy = vi.spyOn(versionTagModule, "resolveVersionTag");
       const appendSpy = vi.spyOn(fs, "appendFileSync");
 
       await import("./extract-version-tag");
 
-      expect(resolveSpy).not.toHaveBeenCalled();
+      expect(releaseTypeModule.getReleaseType).not.toHaveBeenCalled();
       expect(appendSpy).not.toHaveBeenCalled();
     });
   });

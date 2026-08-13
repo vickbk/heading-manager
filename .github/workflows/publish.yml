@@ -7,6 +7,8 @@ on:
 
 env:
   DIST_TAG: latest
+  IS_PRERELEASE: false
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -65,4 +67,4 @@ jobs:
         with:
           body_path: RELEASE_CHANGELOG.md
           draft: false
-          prerelease: false
+          prerelease: ${{env.IS_PRERELEASE}}
