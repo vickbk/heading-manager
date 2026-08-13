@@ -74,3 +74,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 ### Changed
 
 - Removed `NODE_AUTH_TOKEN` environment variable from the publish workflow step in `.github/workflows/publish.yml`.
+
+## v0.2.0-beta.1
+
+> **Pre-release Note:** This beta release ensures ambient type declarations are properly preserved in `tsdown` DTS outputs and improves Playwright setup patterns.
+
+---
+
+### 🐛 Bug Fixes & Type System Improvements
+
+- **Preserved `tsdown` Module Augmentation:** Fixed an issue where `tsdown`'s DTS generation tree-shook ambient `declare global` blocks from output declaration bundles (`.d.mts`, `.d.cts`, `.d.ts`). Playwright's `expect(...)` chain now natively recognizes `.toHaveValidHeadingHierarchy()` without requiring manual type imports or casting.
+- **Strict Heading Level Types:** Exported the `HeadingLevel` type (`1 | 2 | 3 | 4 | 5 | 6`) to enforce strict compile-time checks on `initialLevel`, preventing invalid or non-positive integers from passing in test files.
+
+---
+
+### 📦 Global Setup (Recommended)
+
+To avoid re-registering custom matchers in individual spec files, call `registerPlaywright()` once inside your `playwright.config.ts`:
+
+#### `playwright.config.ts`
+
+```typescript
+import { defineConfig } from "@playwright/test";
+import { registerPlaywright } from "react-heading-manager/testing";
+
+// Register matchers globally across the entire test suite
+registerPlaywright();
+
+export default defineConfig({
+  testDir: "./e2e",
+  use: {
+    baseURL: "http://localhost:3000",
+  },
+});
+```
+
+#### `e2e/accessibility.spec.ts`
+
+```typescript
+import { test, expect } from "@playwright/test";
+import type { HeadingLevel } from "react-heading-manager/testing";
+
+test("audits page heading hierarchy", async ({ page }) => {
+  await page.goto("/");
+
+  // Full IDE autocomplete & zero TypeScript compilation errors
+  await expect(page).toHaveValidHeadingHierarchy();
+
+  // Scoped audit starting at an H2 level
+  const initialLevel: HeadingLevel = 2;
+  await expect(page.locator('main[role="main"]')).toHaveValidHeadingHierarchy(
+    initialLevel,
+  );
+});
+```
+
+---
+
+### 🛠️ Migration
+
+No breaking runtime changes. If you previously had per-file `registerPlaywright` calls in your tests, you can consolidate them into `playwright.config.ts`.
