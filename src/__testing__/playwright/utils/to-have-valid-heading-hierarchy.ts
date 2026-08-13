@@ -1,6 +1,7 @@
 import { checkHeadingOrderReport, drawRegion } from "@/src/utils";
 import { Locator, Page } from "@playwright/test";
 import { Window } from "happy-dom";
+import { HeadingLevel } from "../types";
 
 const w = new Window();
 const parser = new w.DOMParser();
@@ -27,7 +28,7 @@ const parser = new w.DOMParser();
  */
 export async function toHaveValidHeadingHierarchy(
   target: Page | Locator,
-  initialLevel = 1,
+  initialLevel: HeadingLevel = 1,
 ) {
   const locator = "locator" in target ? target.locator("body") : target;
   const elementHandle = await locator.elementHandle();
