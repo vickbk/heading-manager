@@ -10,6 +10,6 @@ export function runExtractReleaseNotes(): void {
   }
 }
 
-if (process.argv[1]?.includes("extract-release-notes")) {
+if (process.argv[1]?.includes("extract-release-note")) {
   runExtractReleaseNotes();
 }

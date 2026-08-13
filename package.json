@@ -1,6 +1,6 @@
 {
   "name": "react-heading-manager",
-  "version": "0.2.0-beta.1",
+  "version": "0.2.0-beta.2",
   "description": "Accessible automatic heading hierarchy and ARIA region landmark manager for React",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -9,8 +9,7 @@
     "dist",
     "README.md",
     "LICENSE",
-    "CHANGELOG.md",
-    "src/__testing__/playwright/types.d.ts"
+    "CHANGELOG.md"
   ],
   "repository": {
     "url": "https://github.com/vickbk/heading-manager"

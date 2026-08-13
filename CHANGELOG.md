@@ -75,7 +75,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 
 - Removed `NODE_AUTH_TOKEN` environment variable from the publish workflow step in `.github/workflows/publish.yml`.
 
-## v0.2.0-beta.1
+## [0.2.0-beta.1] - 2026-08-13
 
 > **Pre-release Note:** This beta release ensures ambient type declarations are properly preserved in `tsdown` DTS outputs and improves Playwright setup patterns.
 
@@ -134,3 +134,10 @@ test("audits page heading hierarchy", async ({ page }) => {
 ### 🛠️ Migration
 
 No breaking runtime changes. If you previously had per-file `registerPlaywright` calls in your tests, you can consolidate them into `playwright.config.ts`.
+
+## [0.2.0-beta.2] - 2026-08-13
+
+### Fixed
+
+- **Release Automation:** Updated `extract-release-note.ts` to properly normalize version headers and reliably match prerelease tags (e.g., `v0.2.0-beta.2`).
+- **Publish Pipeline:** Fixed section boundary lookup logic to prevent exit code 1 errors when generating `RELEASE_CHANGELOG.md` during publish workflows.
