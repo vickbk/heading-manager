@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as githubEnvModule from "../shared/github-env";
 import { writeDistTagToGithubOutput } from "./extract-version-tag";
+import * as assertModule from "./utils/assert-version";
 import * as releaseTypeModule from "./utils/release-type";
 
 describe("writeDistTagToGithubOutput", () => {
@@ -12,6 +14,7 @@ describe("writeDistTagToGithubOutput", () => {
     vi.restoreAllMocks();
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(releaseTypeModule, "getReleaseType");
+    vi.spyOn(assertModule, "assertVersionMatch").mockImplementation(() => "");
   });
 
   afterEach(() => {
@@ -31,10 +34,10 @@ describe("writeDistTagToGithubOutput", () => {
       writeDistTagToGithubOutput();
 
       expect(releaseTypeModule.getReleaseType).toHaveBeenCalledWith("v1.0.0");
-      expect(appendSpy).toHaveBeenCalledTimes(2);
+      expect(appendSpy).toHaveBeenCalledTimes(1);
       expect(appendSpy).toHaveBeenCalledWith(
         mockGithubOutput,
-        "DIST_TAG=latest\n",
+        "DIST_TAG=latest\nIS_PRERELEASE=false\n",
         "utf8",
       );
       expect(console.log).toHaveBeenCalledWith(
@@ -60,11 +63,11 @@ describe("writeDistTagToGithubOutput", () => {
       expect(releaseTypeModule.getReleaseType).toHaveBeenCalledWith("");
       expect(appendSpy).toHaveBeenCalledWith(
         mockGithubOutput,
-        "DIST_TAG=next\n",
+        "DIST_TAG=next\nIS_PRERELEASE=true\n",
         "utf8",
       );
       expect(console.log).toHaveBeenCalledWith(
-        "Publishing with npm dist-tag: next",
+        "Publishing with npm dist-tag: next (Pre-release)",
       );
     });
 
@@ -83,7 +86,7 @@ describe("writeDistTagToGithubOutput", () => {
       );
       expect(appendSpy).not.toHaveBeenCalled();
       expect(console.log).toHaveBeenCalledWith(
-        "Publishing with npm dist-tag: beta",
+        "Publishing with npm dist-tag: beta (Pre-release)",
       );
     });
 
@@ -143,7 +146,7 @@ describe("writeDistTagToGithubOutput", () => {
       expect(spyied).toHaveBeenCalledWith("1.0.0");
       expect(appendSpy).toHaveBeenCalledWith(
         mockGithubOutput,
-        "DIST_TAG=latest\n",
+        "DIST_TAG=latest\nIS_PRERELEASE=false\n",
         "utf8",
       );
       expect(console.log).toHaveBeenCalledWith(
@@ -160,6 +163,215 @@ describe("writeDistTagToGithubOutput", () => {
 
       expect(releaseTypeModule.getReleaseType).not.toHaveBeenCalled();
       expect(appendSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("assertVersionMatch & githubWriteEnv Integration", () => {
+    it("should pass the normalized version from getReleaseType directly into assertVersionMatch", () => {
+      process.argv = ["node", "extract-version-tag.js", "v0.2.0-beta.2"];
+
+      vi.spyOn(releaseTypeModule, "getReleaseType").mockReturnValue({
+        releaseTag: "beta",
+        normalized: "0.2.0-beta.2",
+        version: "0.2.0",
+        IS_PRERELEASE: true,
+      });
+
+      const assertSpy = vi
+        .spyOn(assertModule, "assertVersionMatch")
+        .mockReturnValue("0.2.0-beta.2");
+
+      writeDistTagToGithubOutput();
+
+      expect(assertSpy).toHaveBeenCalledTimes(1);
+      expect(assertSpy).toHaveBeenCalledWith("0.2.0-beta.2");
+    });
+
+    it("should abort execution and NOT call githubWriteEnv or console.log when assertVersionMatch throws", () => {
+      process.argv = ["node", "extract-version-tag.js", "v0.2.0-beta.2"];
+
+      vi.spyOn(releaseTypeModule, "getReleaseType").mockReturnValue({
+        releaseTag: "beta",
+        normalized: "0.2.0-beta.2",
+        version: "0.2.0",
+        IS_PRERELEASE: true,
+      });
+
+      vi.spyOn(assertModule, "assertVersionMatch").mockImplementation(() => {
+        throw new Error(
+          "Version mismatch blocker: Git tag does not match package.json",
+        );
+      });
+
+      const githubWriteEnvSpy = vi
+        .spyOn(githubEnvModule, "githubWriteEnv")
+        .mockImplementation(() => {});
+
+      expect(() => writeDistTagToGithubOutput()).toThrow(
+        "Version mismatch blocker: Git tag does not match package.json",
+      );
+
+      expect(githubWriteEnvSpy).not.toHaveBeenCalled();
+      expect(console.log).not.toHaveBeenCalled();
+    });
+
+    it("should pass exact DIST_TAG and IS_PRERELEASE payload to githubWriteEnv on successful assertion", () => {
+      process.argv = ["node", "extract-version-tag.js", "v1.0.0"];
+
+      vi.spyOn(releaseTypeModule, "getReleaseType").mockReturnValue({
+        releaseTag: "latest",
+        normalized: "1.0.0",
+        version: "1.0.0",
+        IS_PRERELEASE: false,
+      });
+
+      const githubWriteEnvSpy = vi
+        .spyOn(githubEnvModule, "githubWriteEnv")
+        .mockImplementation(() => {});
+
+      writeDistTagToGithubOutput();
+
+      expect(githubWriteEnvSpy).toHaveBeenCalledTimes(1);
+      expect(githubWriteEnvSpy).toHaveBeenCalledWith({
+        DIST_TAG: "latest",
+        IS_PRERELEASE: false,
+      });
+    });
+
+    it("should execute operations in strict order: getReleaseType -> assertVersionMatch -> githubWriteEnv -> console.log", () => {
+      process.argv = ["node", "extract-version-tag.js", "1.0.0"];
+
+      const callOrder: string[] = [];
+
+      vi.spyOn(releaseTypeModule, "getReleaseType").mockImplementation(
+        (tag) => {
+          callOrder.push("getReleaseType");
+          return {
+            releaseTag: "latest",
+            normalized: tag,
+            version: tag,
+            IS_PRERELEASE: false,
+          };
+        },
+      );
+
+      vi.spyOn(assertModule, "assertVersionMatch").mockImplementation(() => {
+        callOrder.push("assertVersionMatch");
+        return "1.0.0";
+      });
+
+      vi.spyOn(githubEnvModule, "githubWriteEnv").mockImplementation(() => {
+        callOrder.push("githubWriteEnv");
+      });
+
+      vi.spyOn(console, "log").mockImplementation(() => {
+        callOrder.push("console.log");
+      });
+
+      writeDistTagToGithubOutput();
+
+      expect(callOrder).toEqual([
+        "getReleaseType",
+        "assertVersionMatch",
+        "githubWriteEnv",
+        "console.log",
+      ]);
+    });
+  });
+
+  describe("CLI Entrypoint & Top-Level Try/Catch Error Handling", () => {
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+    let processExitSpy: ReturnType<typeof vi.spyOn>;
+    let spiedAssert: ReturnType<typeof vi.spyOn> = vi.spyOn(
+      assertModule,
+      "assertVersionMatch",
+    );
+
+    beforeEach(async () => {
+      consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      processExitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation(() => undefined as never);
+      spiedAssert = vi
+        .spyOn(await import("./utils/assert-version"), "assertVersionMatch")
+        .mockReturnValue("");
+    });
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it("should catch standard Error instances, print formatted error message, and exit with code 1", async () => {
+      process.argv = [
+        "node",
+        "/workspace/scripts/extract-version-tag.ts",
+        "invalid-version",
+      ];
+
+      vi.spyOn(
+        await import("./utils/release-type"),
+        "getReleaseType",
+      ).mockImplementation(() => {
+        throw new Error("Invalid semver release tag format");
+      });
+
+      await import("./extract-version-tag");
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "❌ Invalid semver release tag format",
+      );
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle non-Error thrown primitives (strings) by converting to String and exiting with code 1", async () => {
+      process.argv = [
+        "node",
+        "/workspace/scripts/extract-version-tag.ts",
+        "v0.2.0",
+      ];
+
+      spiedAssert.mockImplementation(() => {
+        // Throwing raw string instead of Error object
+        throw "Fatal script crash";
+      });
+
+      await import("./extract-version-tag");
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith("❌ Fatal script crash");
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle non-Error thrown objects gracefully via String conversion", async () => {
+      process.argv = [
+        "node",
+        "/workspace/scripts/extract-version-tag.ts",
+        "v0.2.0",
+      ];
+
+      spiedAssert.mockImplementation(() => {
+        throw { statusCode: 500, reason: "Unexpected System Fault" };
+      });
+
+      await import("./extract-version-tag");
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith("❌ [object Object]");
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should NOT trigger console.error or process.exit on successful execution when matching entrypoint", async () => {
+      process.argv = [
+        "node",
+        "/workspace/scripts/extract-version-tag.ts",
+        "1.0.0",
+      ];
+
+      await import("./extract-version-tag");
+
+      expect(spiedAssert).toHaveBeenCalled();
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(processExitSpy).not.toHaveBeenCalled();
     });
   });
 });
