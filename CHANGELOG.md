@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-13
+
+### Changed
+
+- Relocated and decoupled the Playwright matcher setup to the dedicated subpath export `react-heading-manager/testing/playwright`, making registration explicit and bundler-safe.
+- Synced release-note generation and version-tag extraction to the final prerelease boundary flow, improving tag matching and changelog extraction across beta iterations.
+- Tightened release publishing guardrails with automated `assertVersionMatch` validation to ensure the Git tag and `package.json` version stay in lockstep before publish.
+
+### Fixed
+
+- Resolved edge cases in prerelease changelog boundary extraction and release-note matching, preventing publish-time errors around beta tag parsing.
+- Preserved module augmentation and type safety for Playwright matcher registration without leaking Playwright types into unrelated consumer projects.
+
 ## [0.2.0] - 2026-08-11
 
 ### 💥 Breaking Changes
@@ -156,3 +169,14 @@ Here is the markdown section ready to add to **`CHANGELOG.md`**:
 
 - **Strict Version Guardrail:** Integrated automated version assertion (`assertVersionMatch`) to prevent publish jobs if the Git release tag doesn't strictly match the `package.json` version.
 - **Enhanced Changelog Extraction:** Improved release note extraction workflow (`extract-release-note.ts`) for clean boundary matching across prerelease versions and prerelease tags.
+
+## [0.2.1] - 2026-08-13
+
+### Fixed
+
+- **Testing Subpath & Playwright Decoupling (`react-heading-manager/testing/playwright`):** Fixed a broken state from `v0.1.1` where testing utilities failed to resolve due to missing runtime exports and TypeScript declaration (`.d.ts`) files. Playwright-specific utilities have now been detached from the general testing entry point and moved into a dedicated working path (`react-heading-manager/testing/playwright`), eliminating rigid framework coupling and restoring environment ergonomy.
+
+### Changed
+
+- **Publish Release Note Syncing:** Enhanced release note extraction scripts (`extract-release-note.ts`) to cleanly isolate version section headers during publish workflows, preventing empty or misaligned section boundaries in generated release notes.
+- **Automated Version Guardrails:** Integrated strict pre-publish assertion checks (`assertVersionMatch`) during release tagging to automatically fail pipelines if the Git release tag drifts from the `package.json` version string.

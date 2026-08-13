@@ -244,6 +244,7 @@ import {
   drawRegion,
   checkHeadingOrderReport,
   checkHeadingOrder,
+  calculateNextHeadingLevel,
   parseHeadingLevel,
   resolveHeadingDetail,
   getRegionIdentifier,
@@ -283,13 +284,23 @@ if (!report.isValid) {
 
 Boolean shorthand — returns `true` if the heading hierarchy is fully valid.
 
+#### `calculateNextHeadingLevel(parentLevel: number, requestedLevel: number): number`
+
+Calculates the next valid heading depth while preventing skipped levels and clamping to the H6 maximum. This keeps nested regions compliant with WCAG heading sequencing and is used internally by `useHeading()`.
+
 #### `parseHeadingLevel(tagName: string): number | null`
 
 Parses `"h1"`–`"h6"` (case-insensitive) into a numeric level. Returns `null` for non-heading tags.
 
-#### `resolveHeadingDetail(element: Element): HeadingDetail`
+#### `resolveHeadingDetail(node: RegionMapping, index?: number): { rawHeading: string; parsedLevel: number | null; text?: string; element?: unknown } | null`
 
-Extracts structured metadata (`tag`, `text`, `element`) from a heading DOM node.
+Extracts structured metadata from a heading entry inside a `RegionMapping` tree. It prioritizes rich `detailedHeadings` metadata and falls back to the legacy string heading list when needed.
+
+```ts
+const regionTree = drawRegion(document.querySelector("main")!);
+const details = resolveHeadingDetail(regionTree, 0);
+// { rawHeading: 'h1', parsedLevel: 1, text: 'My Blog', ... }
+```
 
 ---
 

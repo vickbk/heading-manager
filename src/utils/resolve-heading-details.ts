@@ -7,14 +7,16 @@ import { parseHeadingLevel } from "./parse-heading-level";
  * @description Prioritizes rich `detailedHeadings` metadata (including accessible inner text and DOM element references)
  * and falls back to the legacy string `headings` array if detailed metadata is absent.
  *
- * @param node - The `RegionMapping` region node to inspect.
+ * @param node - The `RegionMapping` tree node to inspect.
  * @param index - Zero-based index of the target heading within the region (defaults to `0`).
- * @returns Object containing `rawHeading`, `parsedLevel`, optional `text`, and optional `element` reference; or `null` if index is out of bounds.
+ * @returns A metadata object containing `rawHeading`, `parsedLevel`, optional `text`, and optional `element`, or `null` if the index is out of bounds.
  *
  * @example
  * ```ts
  * const details = resolveHeadingDetail(regionNode, 0);
- * console.log(details?.parsedLevel, details?.text);
+ * if (details) {
+ *   console.log(details.parsedLevel, details.text);
+ * }
  * ```
  *
  * @a11y Provides normalized heading details for WCAG SC 1.3.1 reporting.
