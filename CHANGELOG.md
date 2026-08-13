@@ -146,14 +146,13 @@ Here is the markdown section ready to add to **`CHANGELOG.md`**:
 - **Publish Pipeline:** Fixed section boundary lookup logic to prevent exit code 1 errors when generating `RELEASE_CHANGELOG.md` during publish workflows.
 ```
 
----
+## [0.2.0-beta.3] - 2026-08-13
 
-### Verification Step
+### Changed
 
-After adding this section to `CHANGELOG.md` and ensuring `"version": "0.2.0-beta.2"` is set in `package.json`, run the script to confirm the release notes are extracted cleanly:
+- **Release Automation:** Refactored version tag extraction logic (`extract-version-tag.ts`) to dynamically calculate npm `DIST_TAG` and `IS_PRERELEASE` workflow variables during build and publish steps.
 
-```powershell
-pnpm release-note 0.2.0-beta.2
-Get-Content RELEASE_CHANGELOG.md
+### Added
 
-```
+- **Strict Version Guardrail:** Integrated automated version assertion (`assertVersionMatch`) to prevent publish jobs if the Git release tag doesn't strictly match the `package.json` version.
+- **Enhanced Changelog Extraction:** Improved release note extraction workflow (`extract-release-note.ts`) for clean boundary matching across prerelease versions and prerelease tags.
