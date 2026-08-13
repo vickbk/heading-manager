@@ -8,16 +8,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 
 ## [0.2.1] - 2026-08-13
 
-### Changed
-
-- Relocated and decoupled the Playwright matcher setup to the dedicated subpath export `react-heading-manager/testing/playwright`, making registration explicit and bundler-safe.
-- Synced release-note generation and version-tag extraction to the final prerelease boundary flow, improving tag matching and changelog extraction across beta iterations.
-- Tightened release publishing guardrails with automated `assertVersionMatch` validation to ensure the Git tag and `package.json` version stay in lockstep before publish.
-
 ### Fixed
 
-- Resolved edge cases in prerelease changelog boundary extraction and release-note matching, preventing publish-time errors around beta tag parsing.
-- Preserved module augmentation and type safety for Playwright matcher registration without leaking Playwright types into unrelated consumer projects.
+- **Testing Subpath & Playwright Decoupling (`react-heading-manager/testing/playwright`):** Fixed a broken state from `v0.1.1` where testing utilities failed to resolve due to missing runtime exports and TypeScript declaration (`.d.ts`) files. Playwright utilities have now been relocated to a dedicated subpath (`react-heading-manager/testing/playwright`), eliminating rigid framework coupling and preventing Playwright types from leaking into consumer projects.
+
+### Changed
+
+- **Publish Release Note Syncing:** Enhanced release note extraction scripts (`extract-release-note.ts`) to cleanly isolate version section headers during publish workflows, preventing empty or misaligned section boundaries in generated release notes.
+- **Automated Version Guardrails:** Integrated strict pre-publish assertion checks (`assertVersionMatch`) during release tagging to automatically fail pipelines if the Git release tag drifts from the `package.json` version string.
+
+## [0.2.0-beta.3] - 2026-08-13
+
+### Changed
+
+- **Release Automation:** Refactored version tag extraction logic (`extract-version-tag.ts`) to dynamically calculate npm `DIST_TAG` and `IS_PRERELEASE` workflow variables during build and publish steps.
+
+### Added
+
+- **Strict Version Guardrail:** Integrated automated version assertion (`assertVersionMatch`) to prevent publish jobs if the Git release tag doesn't strictly match the `package.json` version.
+- **Enhanced Changelog Extraction:** Improved release note extraction workflow (`extract-release-note.ts`) for clean boundary matching across prerelease versions and prerelease tags.
+
+## [0.2.0-beta.1] - 2026-08-13
+
+> **Pre-release Note:** This beta release ensures ambient type declarations are properly preserved in `tsdown` DTS outputs and improves Playwright setup patterns.
+
+---
+
+### 🐛 Bug Fixes & Type System Improvements
+
+- **Preserved `tsdown` Module Augmentation:** Fixed an issue where `tsdown`'s DTS generation tree-shook ambient `declare global` blocks from output declaration bundles (`.d.mts`, `.d.cts`, `.d.ts`). Playwright's `expect(...)` chain now natively recognizes `.toHaveValidHeadingHierarchy()` without requiring manual type imports or casting.
+- **Strict Heading Level Types:** Exported the `HeadingLevel` type (`1 | 2 | 3 | 4 | 5 | 6`) to enforce strict compile-time checks on `initialLevel`, preventing invalid or non-positive integers from passing in test files.
 
 ## [0.2.0] - 2026-08-11
 
@@ -37,6 +57,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 - Fixed generic parameter arity mismatch on Playwright's `Matchers<R, T = {}>` interface augmentation (`TS2428`).
 - Fixed bundler tree-shaking issues where DTS bundlers stripped `declare global` type blocks from exported sub-files.
 - Resolved type pollution where importing core utilities leaked Playwright types into non-Playwright consumer projects.
+
+## [0.1.1] - 2026-08-11
+
+### Security
+
+- Switched npm publishing authentication from static `NPM_TOKEN` secrets to npm OIDC Trusted Publishers.
+
+### Changed
+
+- Removed `NODE_AUTH_TOKEN` environment variable from the publish workflow step in `.github/workflows/publish.yml`.
 
 ## [0.1.0] - 2026-08-11
 
@@ -77,27 +107,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 
 [Unreleased]: https://github.com/vickbk/heading-manager/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/vickbk/heading-manager/releases/tag/v0.1.0
-
-## [0.1.1] - 2026-08-11
-
-### Security
-
-- Switched npm publishing authentication from static `NPM_TOKEN` secrets to npm OIDC Trusted Publishers.
-
-### Changed
-
-- Removed `NODE_AUTH_TOKEN` environment variable from the publish workflow step in `.github/workflows/publish.yml`.
-
-## [0.2.0-beta.1] - 2026-08-13
-
-> **Pre-release Note:** This beta release ensures ambient type declarations are properly preserved in `tsdown` DTS outputs and improves Playwright setup patterns.
-
----
-
-### 🐛 Bug Fixes & Type System Improvements
-
-- **Preserved `tsdown` Module Augmentation:** Fixed an issue where `tsdown`'s DTS generation tree-shook ambient `declare global` blocks from output declaration bundles (`.d.mts`, `.d.cts`, `.d.ts`). Playwright's `expect(...)` chain now natively recognizes `.toHaveValidHeadingHierarchy()` without requiring manual type imports or casting.
-- **Strict Heading Level Types:** Exported the `HeadingLevel` type (`1 | 2 | 3 | 4 | 5 | 6`) to enforce strict compile-time checks on `initialLevel`, preventing invalid or non-positive integers from passing in test files.
 
 ---
 
@@ -158,25 +167,3 @@ Here is the markdown section ready to add to **`CHANGELOG.md`**:
 - **Release Automation:** Updated `extract-release-note.ts` to properly normalize version headers and reliably match prerelease tags (e.g., `v0.2.0-beta.2`).
 - **Publish Pipeline:** Fixed section boundary lookup logic to prevent exit code 1 errors when generating `RELEASE_CHANGELOG.md` during publish workflows.
 ```
-
-## [0.2.0-beta.3] - 2026-08-13
-
-### Changed
-
-- **Release Automation:** Refactored version tag extraction logic (`extract-version-tag.ts`) to dynamically calculate npm `DIST_TAG` and `IS_PRERELEASE` workflow variables during build and publish steps.
-
-### Added
-
-- **Strict Version Guardrail:** Integrated automated version assertion (`assertVersionMatch`) to prevent publish jobs if the Git release tag doesn't strictly match the `package.json` version.
-- **Enhanced Changelog Extraction:** Improved release note extraction workflow (`extract-release-note.ts`) for clean boundary matching across prerelease versions and prerelease tags.
-
-## [0.2.1] - 2026-08-13
-
-### Fixed
-
-- **Testing Subpath & Playwright Decoupling (`react-heading-manager/testing/playwright`):** Fixed a broken state from `v0.1.1` where testing utilities failed to resolve due to missing runtime exports and TypeScript declaration (`.d.ts`) files. Playwright-specific utilities have now been detached from the general testing entry point and moved into a dedicated working path (`react-heading-manager/testing/playwright`), eliminating rigid framework coupling and restoring environment ergonomy.
-
-### Changed
-
-- **Publish Release Note Syncing:** Enhanced release note extraction scripts (`extract-release-note.ts`) to cleanly isolate version section headers during publish workflows, preventing empty or misaligned section boundaries in generated release notes.
-- **Automated Version Guardrails:** Integrated strict pre-publish assertion checks (`assertVersionMatch`) during release tagging to automatically fail pipelines if the Git release tag drifts from the `package.json` version string.
