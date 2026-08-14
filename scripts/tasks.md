@@ -69,15 +69,15 @@ scripts/ (or tools/)
   - [x] Create `index.ts` to export `extractReleaseNotes` accepting the unified `WorkflowConfig` object.
   - [x] Migrate and execute all corresponding unit tests under `scripts/features/release-notes/*.test.ts`.
 
-- [ ] **Coverage Domain Isolation (`scripts/features/coverage/`)**
-- **Status**: ⏳ Todo
+- [x] **Coverage Domain Isolation (`scripts/features/vitest/`)**
+- **Status**: ✅ Done
 - **Target**: 2026-08-14
 - **Description**: Group Vitest coverage parsing, summary formatting, and PR commenting logic under a unified feature namespace.
 - **Steps**:
-  - [ ] Create `report.ts` containing JSON summary parsing and Markdown transformation utilities.
-  - [ ] Create `summary.ts` containing `generateCoverageSummary` workflow orchestration logic.
-  - [ ] Create `comment.ts` containing PR comment retrieval and update logic.
-  - [ ] Create `index.ts` to expose unified public feature contracts.
+  - [x] Create `report.ts` containing JSON summary parsing and Markdown transformation utilities.
+  - [x] Create `summary.ts` containing `generateCoverageSummary` workflow orchestration logic.
+  - [x] Create `comment.ts` containing PR comment retrieval and update logic.
+  - [x] Create `index.ts` to expose unified public feature contracts.
 
 ---
 
