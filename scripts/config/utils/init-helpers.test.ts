@@ -1,9 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { vi } from "vitest";
-import { Config } from "../types";
 
-const DEFAULT_TEST_ENV: Config = {
+const DEFAULT_TEST_ENV = {
   cwd: "test/workdir/",
   isCI: false,
   github: {
@@ -24,7 +23,7 @@ const DEFAULT_TEST_ENV: Config = {
 export function initConfig(
   overrides: Record<string, string | undefined | null> = {},
 ): void {
-  const merged: Config = {
+  const merged = {
     ...DEFAULT_TEST_ENV,
     ...overrides,
   };

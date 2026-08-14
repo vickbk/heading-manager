@@ -1,6 +1,6 @@
 import { githubWriteEnv } from "@/scripts/core/github";
-import { assertVersionMatch } from "./utils/assert-version";
-import { getReleaseType } from "./utils/release-type";
+import { assertVersionMatch } from "./assert-version";
+import { getReleaseType } from "./release-type";
 
 export function writeDistTagToGithubOutput(): void {
   const rawTag = process.argv[2] || "";
@@ -18,14 +18,4 @@ export function writeDistTagToGithubOutput(): void {
   console.log(
     `Publishing with npm dist-tag: ${DIST_TAG}${IS_PRERELEASE ? " (Pre-release)" : ""}`,
   );
-}
-
-if (process.argv[1]?.includes("extract-version-tag")) {
-  try {
-    writeDistTagToGithubOutput();
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(`❌ ${message}`);
-    process.exit(1);
-  }
 }

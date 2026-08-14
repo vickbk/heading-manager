@@ -1,1 +1,1 @@
-export { handleFatalError } from "./utils/handle-fatal-error";
+export { runTask } from "./utils/run-task";

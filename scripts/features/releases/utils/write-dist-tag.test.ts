@@ -1,9 +1,9 @@
 import * as githubEnvModule from "@/scripts/core/github";
 import fs from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { writeDistTagToGithubOutput } from "./extract-version-tag";
-import * as assertModule from "./utils/assert-version";
-import * as releaseTypeModule from "./utils/release-type";
+import * as assertModule from "./assert-version";
+import * as releaseTypeModule from "./release-type";
+import { writeDistTagToGithubOutput } from "./write-dist-tag";
 
 describe("writeDistTagToGithubOutput", () => {
   const originalArgv = process.argv;
@@ -76,19 +76,19 @@ describe("writeDistTagToGithubOutput", () => {
       vi.stubEnv("GITHUB_ENV", "");
 
       vi.spyOn(
-        await import("./utils/assert-version"),
+        await import("./assert-version"),
         "assertVersionMatch",
       ).mockReturnValue("ok");
       const appendSpy = vi
         .spyOn(fs, "appendFileSync")
         .mockImplementation(() => {});
       const scopedReleaseType = vi.spyOn(
-        await import("./utils/release-type"),
+        await import("./release-type"),
         "getReleaseType",
       );
 
       const { writeDistTagToGithubOutput: scopedWriteDistTag } =
-        await import("./extract-version-tag");
+        await import("./write-dist-tag");
       scopedWriteDistTag();
 
       expect(scopedReleaseType).toHaveBeenCalledWith("2.0.0-beta.1");
@@ -129,48 +129,6 @@ describe("writeDistTagToGithubOutput", () => {
       expect(() => writeDistTagToGithubOutput()).toThrow(
         "EACCES: permission denied",
       );
-    });
-  });
-
-  describe("Top-Level Module Execution (if block)", () => {
-    it("should automatically execute writeDistTagToGithubOutput when process.argv[1] contains 'get-dist-tag'", async () => {
-      process.argv = [
-        "node",
-        "/workspace/scripts/extract-version-tag.ts",
-        "1.0.0",
-      ];
-      vi.stubEnv("GITHUB_ENV", mockGithubOutput);
-
-      const spyied = vi
-        .spyOn(await import("./utils/version-tag"), "resolveVersionTag")
-        .mockReturnValue("latest");
-      const appendSpy = vi
-        .spyOn(fs, "appendFileSync")
-        .mockImplementation(() => {});
-
-      // Dynamic import evaluates top-level code
-      await import("./extract-version-tag");
-
-      expect(spyied).toHaveBeenCalledWith("1.0.0");
-      expect(appendSpy).toHaveBeenCalledWith(
-        mockGithubOutput,
-        "DIST_TAG=latest\nIS_PRERELEASE=false\n",
-        "utf8",
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        "Publishing with npm dist-tag: latest",
-      );
-    });
-
-    it("should NOT automatically execute writeDistTagToGithubOutput when process.argv[1] does not match", async () => {
-      process.argv = ["node", "/workspace/scripts/other-utility.ts", "1.0.0"];
-
-      const appendSpy = vi.spyOn(fs, "appendFileSync");
-
-      await import("./extract-version-tag");
-
-      expect(releaseTypeModule.getReleaseType).not.toHaveBeenCalled();
-      expect(appendSpy).not.toHaveBeenCalled();
     });
   });
 
@@ -286,102 +244,6 @@ describe("writeDistTagToGithubOutput", () => {
         "githubWriteEnv",
         "console.log",
       ]);
-    });
-  });
-
-  describe("CLI Entrypoint & Top-Level Try/Catch Error Handling", () => {
-    let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
-    let processExitSpy: ReturnType<typeof vi.spyOn>;
-    let spiedAssert: ReturnType<typeof vi.spyOn> = vi.spyOn(
-      assertModule,
-      "assertVersionMatch",
-    );
-
-    beforeEach(async () => {
-      consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      processExitSpy = vi
-        .spyOn(process, "exit")
-        .mockImplementation(() => undefined as never);
-      spiedAssert = vi
-        .spyOn(await import("./utils/assert-version"), "assertVersionMatch")
-        .mockReturnValue("");
-    });
-    afterEach(() => {
-      vi.clearAllMocks();
-    });
-
-    it("should catch standard Error instances, print formatted error message, and exit with code 1", async () => {
-      process.argv = [
-        "node",
-        "/workspace/scripts/extract-version-tag.ts",
-        "invalid-version",
-      ];
-
-      vi.spyOn(
-        await import("./utils/release-type"),
-        "getReleaseType",
-      ).mockImplementation(() => {
-        throw new Error("Invalid semver release tag format");
-      });
-
-      await import("./extract-version-tag");
-
-      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "❌ Invalid semver release tag format",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-    });
-
-    it("should handle non-Error thrown primitives (strings) by converting to String and exiting with code 1", async () => {
-      process.argv = [
-        "node",
-        "/workspace/scripts/extract-version-tag.ts",
-        "v0.2.0",
-      ];
-
-      spiedAssert.mockImplementation(() => {
-        // Throwing raw string instead of Error object
-        throw "Fatal script crash";
-      });
-
-      await import("./extract-version-tag");
-
-      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-      expect(consoleErrorSpy).toHaveBeenCalledWith("❌ Fatal script crash");
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-    });
-
-    it("should handle non-Error thrown objects gracefully via String conversion", async () => {
-      process.argv = [
-        "node",
-        "/workspace/scripts/extract-version-tag.ts",
-        "v0.2.0",
-      ];
-
-      spiedAssert.mockImplementation(() => {
-        throw { statusCode: 500, reason: "Unexpected System Fault" };
-      });
-
-      await import("./extract-version-tag");
-
-      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-      expect(consoleErrorSpy).toHaveBeenCalledWith("❌ [object Object]");
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-    });
-
-    it("should NOT trigger console.error or process.exit on successful execution when matching entrypoint", async () => {
-      process.argv = [
-        "node",
-        "/workspace/scripts/extract-version-tag.ts",
-        "1.0.0",
-      ];
-
-      await import("./extract-version-tag");
-
-      expect(spiedAssert).toHaveBeenCalled();
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
-      expect(processExitSpy).not.toHaveBeenCalled();
     });
   });
 });
