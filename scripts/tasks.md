@@ -47,14 +47,14 @@ scripts/ (or tools/)
   - [ ] Implement `handleFatalError()` supporting string prefixes and template formatter functions.
   - [ ] Add unit tests in `scripts/core/error.test.ts` verifying `process.exit(1)` spy handling, console output formatting, and type assertions.
 
-- [ ] **GitHub Actions API & Step Summary Layer (`scripts/core/github-api.ts`)**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-13
+- [x] **GitHub Actions API & Step Summary Layer (`scripts/core/github-api.ts`)**
+- **Status**: ✅ Done
+- **Target**: 2026-08-14
 - **Description**: Decouple direct GitHub REST API operations and workflow environment writing from core domain modules into a dedicated infrastructure client.
 - **Steps**:
-  - [ ] Move `exportGithubEnv`, `writeStepSummary`, and `commentAction` utilities into `scripts/core/github-api.ts`.
-  - [ ] Add graceful fallback handling when step summary files or GHA environment files are absent during local runs.
-  - [ ] Add mock unit tests covering local execution fallbacks versus live CI runner environments.
+  - [x] Move `exportGithubEnv`, `writeStepSummary`, and `commentAction` utilities into `scripts/core/github-api.ts`.
+  - [x] Add graceful fallback handling when step summary files or GHA environment files are absent during local runs.
+  - [x] Add mock unit tests covering local execution fallbacks versus live CI runner environments.
 
 ---
 
