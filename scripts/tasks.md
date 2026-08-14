@@ -97,14 +97,14 @@ scripts/ (or tools/)
 
 ## Phase 4: Test Environment & CI Isolation
 
-- [ ] **Vitest Environment Hardening (`vitest.setup.ts`)**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-16
+- [x] **Vitest Environment Hardening (`vitest.setup.ts`)**
+- **Status**: ✅ Done
+- **Target**: 2026-08-14
 - **Description**: Guarantee clean isolation between local and GitHub Actions CI runner test suites by stubbing ambient workflow environment variables.
 - **Steps**:
-  - [ ] Configure `beforeEach` hooks in global setup to stub `GITHUB_REF_NAME`, `GITHUB_STEP_SUMMARY`, `GITHUB_ENV`, and `GITHUB_TOKEN` via `vi.stubEnv`.
-  - [ ] Audit ESM module mocks to ensure dynamic `node:fs` calls target `(await import("node:fs")).default` or rely on hoisted `vi.mock("node:fs")`.
-  - [ ] Execute `vitest run --isolation` to verify 0% cross-test state leakages.
+  - [x] Configure `beforeEach` hooks in global setup to stub `GITHUB_REF_NAME`, `GITHUB_STEP_SUMMARY`, `GITHUB_ENV`, and `GITHUB_TOKEN` via `vi.stubEnv`.
+  - [x] Audit ESM module mocks to ensure dynamic `node:fs` calls target `(await import("node:fs")).default` or rely on hoisted `vi.mock("node:fs")`.
+  - [x] Execute `vitest run --isolation` to verify 0% cross-test state leakages.
 
 ---
 
@@ -115,7 +115,7 @@ scripts/ (or tools/)
 - **Target**: 2026-08-17
 - **Description**: Update system orchestration entry points in `package.json` and GitHub Action YAML files to complete the modular migration.
 - **Steps**:
-  - [ ] Update `package.json` script definitions to target `scripts/bin/*.ts` paths.
-  - [ ] Update `.github/workflows/*.yml` steps to invoke the newly established binary scripts.
+  - [x] Update `package.json` script definitions to target `scripts/bin/*.ts` paths.
+  - [x] Update `.github/workflows/*.yml` steps to invoke the newly established binary scripts.
   - [ ] Remove legacy top-level script files (`scripts/changelog.ts`, `scripts/extract-note.ts`, `scripts/comments-vitest.ts`).
   - [ ] Run full test suite with `--coverage` to confirm complete branch coverage across all new modules.
