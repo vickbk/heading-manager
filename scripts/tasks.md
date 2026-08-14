@@ -117,5 +117,5 @@ scripts/ (or tools/)
 - **Steps**:
   - [x] Update `package.json` script definitions to target `scripts/bin/*.ts` paths.
   - [x] Update `.github/workflows/*.yml` steps to invoke the newly established binary scripts.
-  - [ ] Remove legacy top-level script files (`scripts/changelog.ts`, `scripts/extract-note.ts`, `scripts/comments-vitest.ts`).
-  - [ ] Run full test suite with `--coverage` to confirm complete branch coverage across all new modules.
+  - [x] Remove legacy top-level script files (`scripts/changelog.ts`, `scripts/extract-note.ts`, `scripts/comments-vitest.ts`).
+  - [x] Run full test suite with `--coverage` to confirm complete branch coverage across all new modules.
