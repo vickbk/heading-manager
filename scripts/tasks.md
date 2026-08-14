@@ -38,14 +38,14 @@ scripts/ (or tools/)
   - [ ] Export strict `WorkflowConfig` TypeScript interface and environment runtime defaults.
   - [ ] Create unit tests in `scripts/core/config.test.ts` verifying default path resolutions and environment overrides.
 
-- [ ] **Fatal Error Handling Utility (`scripts/core/error.ts`)**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-13
+- [x] **Fatal Error Handling Utility (`scripts/core/error.ts`)**
+- **Status**: ✅ Done
+- **Target**: 2026-08-14
 - **Description**: Provide a unified error-normalization helper that formats fatal log outputs and halts process execution with a explicit `: never` return signature.
 - **Steps**:
-  - [ ] Implement `getErrorMessage(error: unknown): string` to safely extract messages from `Error` objects or unknown values.
-  - [ ] Implement `handleFatalError()` supporting string prefixes and template formatter functions.
-  - [ ] Add unit tests in `scripts/core/error.test.ts` verifying `process.exit(1)` spy handling, console output formatting, and type assertions.
+  - [x] Implement `getErrorMessage(error: unknown): string` to safely extract messages from `Error` objects or unknown values.
+  - [x] Implement `handleFatalError()` supporting string prefixes and template formatter functions.
+  - [x] Add unit tests in `scripts/core/error.test.ts` verifying `process.exit(1)` spy handling, console output formatting, and type assertions.
 
 - [x] **GitHub Actions API & Step Summary Layer (`scripts/core/github-api.ts`)**
 - **Status**: ✅ Done
@@ -60,15 +60,14 @@ scripts/ (or tools/)
 
 ### Phase 2: Domain Feature Migration (`scripts/features/`)
 
-- [ ] **Release Notes Domain Isolation (`scripts/features/release-notes/`)**
-- **Status**: ⏳ Todo
+- [x] **Release Notes Domain Isolation (`scripts/features/release-notes/`)**
+- **Status**: ✅ Done
 - **Target**: 2026-08-14
 - **Description**: Re-architect release note parsing and version resolution into a self-contained feature module free of external entry point side effects.
 - **Steps**:
-  - [ ] Create `parser.ts` containing `parseReleaseNotes` with full regex escaping (`version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")`).
-  - [ ] Create `version.ts` containing normalized `resolveVersionTag` fallback resolution logic.
-  - [ ] Create `index.ts` to export `extractReleaseNotes` accepting the unified `WorkflowConfig` object.
-  - [ ] Migrate and execute all corresponding unit tests under `scripts/features/release-notes/*.test.ts`.
+  - [x] Move all releases files to `features/releases`.
+  - [x] Create `index.ts` to export `extractReleaseNotes` accepting the unified `WorkflowConfig` object.
+  - [x] Migrate and execute all corresponding unit tests under `scripts/features/release-notes/*.test.ts`.
 
 - [ ] **Coverage Domain Isolation (`scripts/features/coverage/`)**
 - **Status**: ⏳ Todo
