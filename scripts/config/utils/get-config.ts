@@ -22,6 +22,11 @@ export const getConfig = (): Config => {
       stepSummaryPath: process.env.GITHUB_STEP_SUMMARY,
       envPath: process.env.GITHUB_ENV,
       refName: process.env.GITHUB_REF_NAME || process.env.RELEASE_VERSION,
+      token: process.env.GITHUB_TOKEN,
+      repository: process.env.GITHUB_REPOSITORY,
+      eventPath: process.env.GITHUB_EVENT_PATH,
+      runId: process.env.GITHUB_RUN_ID,
+      stepSummaryFile: process.env.GITHUB_STEP_SUMMARY,
     },
     paths: {
       vitestReport: process.env.COVERAGE_PATH,

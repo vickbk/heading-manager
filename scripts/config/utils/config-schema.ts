@@ -16,6 +16,11 @@ export const configSchema = z.object({
     stepSummaryPath: z.string().default(""),
     envPath: z.string().default(""),
     refName: z.string().default(""),
+    token: z.string().optional(),
+    repository: z.string().optional(),
+    eventPath: z.string().optional(),
+    runId: z.string().optional(),
+    stepSummaryFile: z.string().optional(),
   }),
 
   paths: z.object({
