@@ -1,14 +1,14 @@
+import { config } from "@/scripts/config";
 import { githubWriteEnv, writeStepSummary } from "@/scripts/core/github";
 import fs from "node:fs";
 import path from "node:path";
-import process from "node:process";
-import { getReport } from "./utils/report";
+import { getReport } from "./report";
 
 /**
  * Main action generator for workflow summary reports and environment outputs.
  */
 export function generateCoverageSummary(
-  summaryPath = path.resolve(process.cwd(), "coverage/coverage-summary.json"),
+  summaryPath = path.resolve(config.cwd, config.paths.vitestReport),
 ): void {
   if (!fs.existsSync(summaryPath)) {
     console.warn(`[Coverage Script] No coverage file found at ${summaryPath}`);
@@ -20,9 +20,5 @@ export function generateCoverageSummary(
   console.log(markdownSummary);
 
   writeStepSummary(markdownSummary);
-  githubWriteEnv({"TOTAL_PCT": totalPct});
-}
-
-if (process.argv[1]?.includes("coverage-summary")) {
-  generateCoverageSummary();
+  githubWriteEnv({ TOTAL_PCT: totalPct });
 }

@@ -1,3 +1,4 @@
+import { config } from "@/scripts/config";
 import fs from "node:fs";
 import path from "path";
 import { CoverageReport, CoverageSummaryJson } from "../types";
@@ -6,7 +7,7 @@ import { formatRow } from "./format";
 export const COMMENT_IDENTIFIER = "<!-- coverage-report-id -->";
 
 export function getReport(
-  summaryPath = path.resolve(process.cwd(), "coverage/coverage-summary.json"),
+  summaryPath = path.resolve(config.cwd, config.paths.vitestReport),
   repository?: string,
   runId?: string,
 ): CoverageReport {

@@ -1,11 +1,11 @@
+import { config } from "@/scripts/config";
 import fs from "node:fs";
 import path from "node:path";
-import process from "node:process";
 import { resolveVersionTag } from "./version-tag";
 
 export function assertVersionMatch(
   normalizedTagVersion: string,
-  packageJsonPath: string = path.resolve(process.cwd(), "package.json"),
+  packageJsonPath: string = path.resolve(config.cwd, config.paths.package),
 ): string {
   if (!fs.existsSync(packageJsonPath)) {
     throw new Error(`package.json not found at ${packageJsonPath}`);

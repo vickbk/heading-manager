@@ -2,8 +2,8 @@ import * as coverageModule from "@/scripts/core/github";
 import fs from "node:fs";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { generateCoverageSummary } from "./coverage-summary";
-import * as reportUtils from "./utils/report";
+import { generateCoverageSummary } from "./generate-coverage-summary";
+import * as reportUtils from "./report";
 
 describe("generateCoverageSummary", () => {
   const MOCK_CUSTOM_PATH = "/custom/workspace/coverage/coverage-summary.json";
@@ -193,13 +193,9 @@ describe("generateCoverageSummary", () => {
       "coverage/coverage-summary.json",
     );
 
-    let githubApi = coverageModule;
-    let reportModule = reportUtils;
     beforeEach(async () => {
       vi.resetModules(); // Clears import cache for top-level code re-evaluation
       vi.restoreAllMocks();
-      githubApi = await import("@/scripts/core/github");
-      reportModule = await import("./utils/report");
       vi.spyOn(console, "log").mockImplementation(() => {});
       vi.spyOn(console, "warn").mockImplementation(() => {});
     });
@@ -264,42 +260,6 @@ describe("generateCoverageSummary", () => {
         generateCoverageSummary();
 
         expect(existsSpy).toHaveBeenCalledWith(defaultSummaryPath);
-      });
-    });
-
-    describe("Top-level execution (if block)", () => {
-      it("should execute generateCoverageSummary when process.argv[1] contains 'coverage-summary'", async () => {
-        process.argv = ["node", "/workspace/scripts/coverage-summary.ts"];
-
-        vi.spyOn(fs, "existsSync").mockReturnValue(true);
-        vi.spyOn(reportModule, "getReport").mockReturnValue({
-          totalPct: "95.0",
-          markdownSummary: "### Coverage: 95%",
-        } as ReturnType<typeof reportModule.getReport>);
-
-        const writeStepSummarySpy = vi
-          .spyOn(githubApi, "writeStepSummary")
-          .mockImplementation(() => {});
-        const githubWriteEnvSpy = vi
-          .spyOn(githubApi, "githubWriteEnv")
-          .mockImplementation(() => {});
-
-        // Dynamic import triggers top-level code execution
-        await import("./coverage-summary");
-
-        expect(fs.existsSync).toHaveBeenCalledWith(defaultSummaryPath);
-        expect(writeStepSummarySpy).toHaveBeenCalledWith("### Coverage: 95%");
-        expect(githubWriteEnvSpy).toHaveBeenCalledWith({ TOTAL_PCT: "95.0" });
-      });
-
-      it("should NOT execute generateCoverageSummary when process.argv[1] does not match", async () => {
-        process.argv = ["node", "/workspace/scripts/different-script.ts"];
-
-        const existsSpy = vi.spyOn(fs, "existsSync");
-
-        await import("./coverage-summary");
-
-        expect(existsSpy).not.toHaveBeenCalled();
       });
     });
   });

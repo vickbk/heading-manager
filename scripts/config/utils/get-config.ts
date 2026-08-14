@@ -32,6 +32,7 @@ export const getConfig = (): Config => {
       vitestReport: process.env.COVERAGE_PATH,
       changelog: process.env.CHANGELOG_PATH,
       releaseChangelog: process.env.RELEASE_CHANGELOG_PATH,
+      package: process.env.PACKAGE,
     },
   });
 

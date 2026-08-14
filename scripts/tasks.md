@@ -83,15 +83,15 @@ scripts/ (or tools/)
 
 ## Phase 3: Executable CLI Entry Points (`scripts/bin/`)
 
-- [ ] **Workflow Executable Entry Points (`scripts/bin/`)**
-- **Status**: ⏳ Todo
+- [x] **Workflow Executable Entry Points (`scripts/bin/`)**
+- **Status**: ✅ Done
 - **Target**: 2026-08-14
 - **Description**: Build lightweight, dedicated CLI entry points that bridge workflow invocation commands to feature orchestration functions.
 - **Steps**:
   - [x] Create `scripts/bin/extract-release-notes.ts` wrapping feature execution in `runTask`.
-  - [ ] Create `scripts/bin/generate-coverage.ts` utilizing `loadWorkflowConfig()`.
-  - [ ] Create `scripts/bin/post-coverage-comment.ts` to handle PR comment updates securely.
-  - [ ] Ensure all bin scripts set standard executable permissions and clean exit codes.
+  - [x] Create `scripts/bin/generate-coverage.ts` utilizing `loadWorkflowConfig()`.
+  - [x] Create `scripts/bin/post-coverage-comment.ts` to handle PR comment updates securely.
+  - [x] Ensure all bin scripts set standard executable permissions and clean exit codes.
 
 ---
 

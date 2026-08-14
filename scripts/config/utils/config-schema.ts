@@ -44,5 +44,11 @@ export const configSchema = z.object({
       .transform((relPath) =>
         normalizePath(path.resolve(process.cwd(), relPath)),
       ),
+    package: z
+      .string()
+      .default("package.json")
+      .transform((relPath) =>
+        normalizePath(path.resolve(process.cwd(), relPath)),
+      ),
   }),
 });
