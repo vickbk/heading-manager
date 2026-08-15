@@ -1,3 +1,4 @@
+import { resetConfig } from "@/scripts/config/testing";
 import fs from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { githubWriteEnv } from "./github-write-env";
@@ -6,12 +7,10 @@ describe("exportToGithubEnv", () => {
   const MOCK_ENV_PATH =
     "/runner/work/_temp/_runner_file_commands/github_env_123";
   let appendFileSyncSpy: ReturnType<typeof vi.spyOn>;
-  let scopedGithubWritter = githubWriteEnv;
 
   beforeEach(async () => {
     vi.unstubAllEnvs();
-    vi.resetModules();
-    scopedGithubWritter = (await import("./github-write-env")).githubWriteEnv;
+    resetConfig();
     appendFileSyncSpy = vi
       .spyOn(fs, "appendFileSync")
       .mockImplementation(() => {});
@@ -42,7 +41,7 @@ describe("exportToGithubEnv", () => {
     it("appends to the file specified in process.env.GITHUB_ENV when set", () => {
       vi.stubEnv("GITHUB_ENV", MOCK_ENV_PATH);
 
-      scopedGithubWritter({ DIST_TAG: "beta" });
+      githubWriteEnv({ DIST_TAG: "beta" });
 
       expect(appendFileSyncSpy).toHaveBeenCalledOnce();
       expect(appendFileSyncSpy).toHaveBeenCalledWith(
@@ -65,7 +64,7 @@ describe("exportToGithubEnv", () => {
     });
 
     it("correctly formats multiple string, boolean, and numeric variables into a single atomic write", () => {
-      scopedGithubWritter({
+      githubWriteEnv({
         DIST_TAG: "beta",
         IS_PRERELEASE: true,
         RELEASE_COUNT: 5,
@@ -87,7 +86,7 @@ describe("exportToGithubEnv", () => {
     });
 
     it("correctly handles zero (0) as a valid numeric value rather than falsy", () => {
-      scopedGithubWritter({ RETRY_COUNT: 0 });
+      githubWriteEnv({ RETRY_COUNT: 0 });
 
       expect(appendFileSyncSpy).toHaveBeenCalledWith(
         MOCK_ENV_PATH,
@@ -103,7 +102,7 @@ describe("exportToGithubEnv", () => {
     });
 
     it("handles empty string values cleanly", () => {
-      scopedGithubWritter({ EMPTY_VAR: "" });
+      githubWriteEnv({ EMPTY_VAR: "" });
 
       expect(appendFileSyncSpy).toHaveBeenCalledWith(
         MOCK_ENV_PATH,
@@ -113,7 +112,7 @@ describe("exportToGithubEnv", () => {
     });
 
     it("preserves equals signs within values", () => {
-      scopedGithubWritter({
+      githubWriteEnv({
         DATABASE_URL: "postgres://user:pass@localhost:5432/db?sslmode=disable",
         FLAG_ARG: "--tag=v0.2.0-beta.2",
       });
@@ -130,7 +129,7 @@ describe("exportToGithubEnv", () => {
     });
 
     it("handles keys with special characters and underscores", () => {
-      scopedGithubWritter({
+      githubWriteEnv({
         _CUSTOM_KEY_123: "value",
         "PREFIXED-KEY": "custom",
       });
@@ -146,8 +145,8 @@ describe("exportToGithubEnv", () => {
     });
 
     it("allows sequential invocations without crashing or overwriting prior state", () => {
-      scopedGithubWritter({ STEP_ONE: "complete" });
-      scopedGithubWritter({ STEP_TWO: "in_progress", PERCENTAGE: 50 });
+      githubWriteEnv({ STEP_ONE: "complete" });
+      githubWriteEnv({ STEP_TWO: "in_progress", PERCENTAGE: 50 });
 
       expect(appendFileSyncSpy).toHaveBeenCalledTimes(2);
       expect(appendFileSyncSpy).toHaveBeenNthCalledWith(
@@ -162,6 +161,11 @@ describe("exportToGithubEnv", () => {
         "STEP_TWO=in_progress\nPERCENTAGE=50\n",
         "utf8",
       );
+    });
+
+    it("does not write to github env if an empty object is passed", () => {
+      githubWriteEnv({});
+      expect(appendFileSyncSpy).not.toHaveBeenCalled();
     });
   });
 });

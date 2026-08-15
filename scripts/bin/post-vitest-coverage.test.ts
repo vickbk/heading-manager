@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 describe("post comment coverage Run Task execution", () => {
   const originalArgv = process.argv;
   beforeEach(() => {
-    vi.resetModules(); // Clears import cache so top-level code re-runs on import
+    vi.resetModules();
     vi.clearAllMocks();
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
@@ -71,7 +71,7 @@ describe("post comment coverage Run Task execution", () => {
       process.argv = ["node", "/workspace/scripts/bin/post-vitest-coverage.ts"];
 
       vi.spyOn(
-        await import("../features/vitest"),
+        await import("@/scripts/features/vitest"),
         "postCoverageComment",
       ).mockImplementation(() => {
         throw new Error("Test Error");

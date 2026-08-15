@@ -5,7 +5,7 @@ export function parseReleaseNotes(
   const normalizedChangelog = changelogContent.replace(/\r\n/g, "\n");
   const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const headerRegex = new RegExp(
-    `^##[^\\S\\r\\n]+\\[?v?${escapedVersion}\\]?(?:[^\\S\\r\\n]+.*)?$`,
+    `^##[^\\S\\r\\n]+\\[?v?${escapedVersion}\\]?(?:\\([^)]*\\))?(?:[^\\S\\r\\n]+.*)?$`,
     "m",
   );
   const headerMatch = headerRegex.exec(normalizedChangelog);

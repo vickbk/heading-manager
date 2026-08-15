@@ -65,10 +65,10 @@ All notable changes to this project will be documented in this file.
 
     it("should prevent false positive partial matches (e.g. searching '1.0.0' must not match '1.0.0-beta.2' or '11.0.0')", () => {
       const changelog = `
-## [1.0.0-beta.2]
+## [1.0.0-beta.2] - 2026-08-01
 - Beta content
 
-## [1.0.0]
+## [1.0.0] - 2026-08-11
 - Exact version release notes
 `;
       const result = parseReleaseNotes(changelog, "1.0.0");
@@ -83,23 +83,43 @@ All notable changes to this project will be documented in this file.
       const result = parseReleaseNotes(changelog, "1.0.0+build.2026");
       expect(result).toBe("- Build metadata release notes");
     });
+
+    it("should match headers with compare markdown links: '## [1.0.0](https://github.com/...)'", () => {
+      const changelog = `## [1.0.0](https://github.com/owner/repo/compare/v0.9.0...v1.0.0) - 2026-08-11\n\n- Linked release notes`;
+      const result = parseReleaseNotes(changelog, "1.0.0");
+      expect(result).toBe("- Linked release notes");
+    });
+
+    it("should match headers with 'Unreleased' or custom date framing", () => {
+      const changelog = `## [1.0.0] - Unreleased\n\n- Unreleased items`;
+      const result = parseReleaseNotes(changelog, "1.0.0");
+      expect(result).toBe("- Unreleased items");
+    });
   });
 
-  describe("Horizontal vs Vertical Whitespace (Newline Boundary Safety)", () => {
-    it("should NOT consume the subsequent content line even when text immediately follows the header without blank lines", () => {
+  describe("Whitespace & Line Ending Boundaries", () => {
+    it("should normalize Windows CRLF (\\r\\n) line endings without leaving orphan \\r characters", () => {
+      const changelogCRLF =
+        "# Changelog\r\n\r\n## [1.0.0] - 2026-08-11\r\n\r\n### Added\r\n- CRLF test item 1\r\n- CRLF test item 2\r\n\r\n## [0.9.0]";
+
+      const result = parseReleaseNotes(changelogCRLF, "1.0.0");
+
+      expect(result).toBe("### Added\n- CRLF test item 1\n- CRLF test item 2");
+      expect(result).not.toContain("\r");
+    });
+
+    it("should NOT consume subsequent lines when text directly follows the header", () => {
       const changelog = `
 ## [1.0.0]
-- Immediate first line item without preceding newline
+- Immediate first line item
 - Second line item
 ## [0.9.0]
 `;
       const result = parseReleaseNotes(changelog, "1.0.0");
-      expect(result).toBe(
-        "- Immediate first line item without preceding newline\n- Second line item",
-      );
+      expect(result).toBe("- Immediate first line item\n- Second line item");
     });
 
-    it("should preserve internal code blocks and list indents while trimming external block padding", () => {
+    it("should trim surrounding whitespace while preserving internal code blocks and list indents", () => {
       const changelog = `
 ## [1.0.0]
 
@@ -119,19 +139,7 @@ All notable changes to this project will be documented in this file.
     });
   });
 
-  describe("Line Endings (CRLF vs LF)", () => {
-    it("should normalize Windows CRLF (\\r\\n) line endings and return output cleanly using \\n", () => {
-      const changelogCRLF =
-        "# Changelog\r\n\r\n## [1.0.0] - 2026-08-11\r\n\r\n### Added\r\n- CRLF test item 1\r\n- CRLF test item 2\r\n\r\n## [0.9.0]";
-
-      const result = parseReleaseNotes(changelogCRLF, "1.0.0");
-
-      expect(result).toBe("### Added\n- CRLF test item 1\n- CRLF test item 2");
-      expect(result).not.toContain("\r");
-    });
-  });
-
-  describe("Section Isolation & End of File (EOF)", () => {
+  describe("Section Boundaries & EOF Isolation", () => {
     it("should stop reading when encountering the next level-2 heading ('## ')", () => {
       const result = parseReleaseNotes(sampleChangelog, "1.2.0");
 
@@ -140,7 +148,7 @@ All notable changes to this project will be documented in this file.
       expect(result).not.toContain("Initial support for GitHub Step Summaries");
     });
 
-    it("should retain lower level headings (###, ####, #####) inside the extracted section", () => {
+    it("should retain subheadings (###, ####, #####) within the target section", () => {
       const changelog = `
 ## [2.0.0]
 
@@ -157,7 +165,7 @@ All notable changes to this project will be documented in this file.
       );
     });
 
-    it("should extract to EOF when the target version is the last section in the file", () => {
+    it("should extract to End of File (EOF) when target version is the last section", () => {
       const result = parseReleaseNotes(sampleChangelog, "1.0.0-beta.2");
       expect(result).toBe("- Pre-release testing notes");
     });
@@ -170,7 +178,7 @@ All notable changes to this project will be documented in this file.
       );
     });
 
-    it("should throw an error when the header is found but section content is empty before the next heading", () => {
+    it("should throw an error when the version section exists but contains no content", () => {
       const changelog = `
 ## [1.0.0]
 

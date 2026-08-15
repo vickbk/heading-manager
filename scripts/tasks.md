@@ -219,33 +219,33 @@ scripts/
   - [x] Export `extractReleaseNotes` alongside `writeDistTagToGithubOutput` in `scripts/features/releases/index.ts`.
   - [x] Refactor `scripts/bin/extract-release-note.ts` to import directly from `@/scripts/features/releases` instead of deep internal paths.
 
-- [ ] **Vitest Feature Public Barrel (`scripts/features/vitest/index.ts`)**
-- **Status**: ⏳ Todo
+- [x] **Vitest Feature Public Barrel (`scripts/features/vitest/index.ts`)**
+- **Status**: ✅ Done
 - **Target**: 2026-08-15
 - **Description**: Consolidate and re-export all Vitest coverage and reporting utilities.
 - **Steps**:
-  - [ ] Export `generateCoverageSummary` and `postCoverageComment` in `scripts/features/vitest/index.ts`.
-  - [ ] Refactor `scripts/bin/coverage-summary.ts` and `scripts/bin/post-vitest-coverage.ts` to import from the public barrel.
+  - [x] Export `generateCoverageSummary` and `postCoverageComment` in `scripts/features/vitest/index.ts`.
+  - [x] Refactor `scripts/bin/coverage-summary.ts` and `scripts/bin/post-vitest-coverage.ts` to import from the public barrel.
 
-- [ ] **Pure Domain Utility Refactoring (`scripts/features/releases/utils/extract-note.ts`)**
-- **Status**: ⏳ Todo
+- [x] **Pure Domain Utility Refactoring (`scripts/features/releases/utils/extract-note.ts`)**
+- **Status**: ✅ Done
 - **Target**: 2026-08-16
 - **Description**: Decouple domain utilities from direct CLI argument reading (`process.argv[2]`) to make them pure and easily testable.
 - **Steps**:
-  - [ ] Refactor `extractReleaseNotes` to accept options/parameters with fallback resolution handled explicitly via configuration or entrypoint.
-  - [ ] Update `scripts/features/releases/utils/extract-note.test.ts` to test pure domain logic without mutating global `process.argv`.
+  - [x] Refactor `extractReleaseNotes` to accept options/parameters with fallback resolution handled explicitly via configuration or entrypoint.
+  - [x] Update `scripts/features/releases/utils/extract-note.test.ts` to test pure domain logic without mutating global `process.argv`.
 
 ---
 
 ### Phase 3: Path Alias & Import Standardization (`scripts/`)
 
-- [ ] **Import Path Alignment (`scripts/**/\*.ts`)\*\*
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-17
+- [x] **Import Path Alignment (`scripts/**/\*.ts`)\*\*
+- **Status**: ✅ Done
+- **Target**: 2026-08-15
 - **Description**: Standardize internal script imports to consistently use `@/scripts/...` path aliases configured in `tsconfig.json`.
 - **Steps**:
-  - [ ] Scan and update all relative imports in `scripts/bin/` to use `@/scripts/` alias pathing.
-  - [ ] Verify TypeScript resolution and build pipeline compatibility.
+  - [x] Scan and update all relative imports in `scripts/bin/` to use `@/scripts/` alias pathing.
+  - [x] Verify TypeScript resolution and build pipeline compatibility.
 
 ---
 

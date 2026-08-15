@@ -1,21 +1,20 @@
+import * as releasesModule from "@/scripts/features/releases";
 import process from "node:process";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import * as errorsModule from "../core/errors/utils/handle-fatal-error";
-import * as releasesModule from "../features/releases";
 
 describe("bin/extract-version-tag entrypoint", () => {
   const originalArgv = [...process.argv];
-  let scopedErrorsModule = errorsModule;
   let scopedReleaseModule = releasesModule;
 
   beforeEach(async () => {
     vi.restoreAllMocks();
-    vi.resetModules(); // Resets module cache so top-level await runTask re-runs on dynamic import
+    vi.resetModules();
     process.argv = [...originalArgv];
 
-    scopedErrorsModule =
-      await import("../core/errors/utils/handle-fatal-error");
-    scopedReleaseModule = await import("../features/releases");
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(process, "exit").mockReturnValue("" as never);
+
+    scopedReleaseModule = await import("@/scripts/features/releases");
   });
 
   afterEach(() => {
@@ -31,15 +30,10 @@ describe("bin/extract-version-tag entrypoint", () => {
         .spyOn(scopedReleaseModule, "writeDistTagToGithubOutput")
         .mockImplementation(() => {});
 
-      const fatalSpy = vi
-        .spyOn(scopedErrorsModule, "handleFatalError")
-        .mockImplementation((() => {}) as never);
-
-      // Trigger top-level script execution
       await import("./extract-version-tag");
 
       expect(writeSpy).toHaveBeenCalledTimes(1);
-      expect(fatalSpy).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     it("should skip execution when process.argv[1] does not match 'extract-version-tag'", async () => {
@@ -68,16 +62,11 @@ describe("bin/extract-version-tag entrypoint", () => {
         throw thrownError;
       });
 
-      const fatalSpy = vi
-        .spyOn(scopedErrorsModule, "handleFatalError")
-        .mockImplementation((() => {}) as never);
-
       await import("./extract-version-tag");
 
-      expect(fatalSpy).toHaveBeenCalledTimes(1);
-      expect(fatalSpy).toHaveBeenCalledWith(
-        thrownError,
-        "❌ [Version tag] Fatal Error",
+      expect(console.error).toHaveBeenCalledTimes(1);
+      expect(console.error).toHaveBeenCalledWith(
+        "❌ [Version tag] Fatal Error: Invalid semver release tag format",
       );
     });
   });
