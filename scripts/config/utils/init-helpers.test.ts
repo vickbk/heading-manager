@@ -1,29 +1,24 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { vi } from "vitest";
-
-const DEFAULT_TEST_ENV = {
-  cwd: "test/workdir/",
-  isCI: false,
-  github: {
-    stepSummaryPath: "test/step/summary/path",
-    envPath: "test/env/path",
-    refName: "test/ref/name",
-  },
-  paths: {
-    vitestReport: "test/vitest/coverage-report.json",
-    changelog: "test/CHANGELOG.md",
-  },
+// Local flat environment baseline stubs
+const DEFAULT_TEST_ENV: Record<string, string> = {
+  CWD: "test/workdir/",
+  IS_CI: "false",
+  GITHUB_STEP_SUMMARY_PATH: "test/step/summary/path",
+  GITHUB_ENV_PATH: "test/env/path",
+  GITHUB_REF_NAME: "test/ref/name",
+  PATH_VITEST_REPORT: "test/vitest/coverage-report.json",
+  PATH_CHANGELOG: "test/CHANGELOG.md",
 };
 
 /**
  * Initializes process.env with baseline test defaults and applies optional overrides.
- * Uses `vi.stubEnv` when available to enable automatic cleanup with `vi.unstubAllEnvs()`.
+ * Uses `vi.stubEnv` for isolated, auto-cleared test state.
  */
 export function initConfig(
   overrides: Record<string, string | undefined | null> = {},
 ): void {
-  const merged = {
+  const merged: Record<string, string | undefined | null> = {
     ...DEFAULT_TEST_ENV,
     ...overrides,
   };
@@ -31,10 +26,8 @@ export function initConfig(
   for (const [key, value] of Object.entries(merged)) {
     if (value === undefined || value === null) {
       delete process.env[key];
-    } else if (typeof vi !== "undefined" && typeof vi.stubEnv === "function") {
-      vi.stubEnv(key, value as string);
     } else {
-      process.env[key] = value as string;
+      vi.stubEnv(key, value);
     }
   }
 }
@@ -43,9 +36,7 @@ export function initConfig(
  * Restores process.env to its un-stubbed state.
  */
 export function resetConfig(): void {
-  if (typeof vi !== "undefined" && typeof vi.unstubAllEnvs === "function") {
-    vi.unstubAllEnvs();
-  }
+  vi.unstubAllEnvs();
 }
 
 describe("env resolution with central config setup", () => {
@@ -59,11 +50,18 @@ describe("env resolution with central config setup", () => {
     resetConfig();
   });
 
-  it("should initialize with default keys", () => {
+  it("should initialize default baseline environment variables", () => {
+    expect(process.env.CWD).toBe("test/workdir/");
+    expect(process.env.IS_CI).toBe("false");
+    expect(process.env.GITHUB_REF_NAME).toBe("test/ref/name");
+  });
+
+  it("should initialize with custom provided keys", () => {
     initConfig({
       DATABASE_URL: "test_db_url",
       AUTH_SECRET: "test_auth_secret",
     });
+
     expect(process.env.DATABASE_URL).toBe("test_db_url");
     expect(process.env.AUTH_SECRET).toBe("test_auth_secret");
   });
@@ -84,8 +82,24 @@ describe("env resolution with central config setup", () => {
   it("should allow unsetting/deleting specific variables", () => {
     initConfig({
       TMDB_API_KEY: undefined,
+      GITHUB_REF_NAME: null,
     });
 
     expect(process.env.TMDB_API_KEY).toBeUndefined();
+    expect(process.env.GITHUB_REF_NAME).toBeUndefined();
+  });
+
+  it("should completely restore original process.env on resetConfig", () => {
+    const stubSpy = vi.spyOn(vi, "unstubAllEnvs");
+
+    initConfig({
+      TEMPORARY_VAR: "temporary_value",
+    });
+    expect(process.env.TEMPORARY_VAR).toBe("temporary_value");
+
+    resetConfig();
+
+    expect(stubSpy).toHaveBeenCalledTimes(1);
+    expect(process.env.TEMPORARY_VAR).toBeUndefined();
   });
 });

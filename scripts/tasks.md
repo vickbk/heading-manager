@@ -251,21 +251,21 @@ scripts/
 
 ### Phase 4: Test Suite & Scaffolding Cleanup (`scripts/**/*.test.ts`)
 
-- [ ] **Test Helper Isolation (`scripts/features/releases/utils/version-tag.test.ts`)**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-17
+- [x] **Test Helper Isolation (`scripts/features/releases/utils/version-tag.test.ts`)**
+- **Status**: ✅ Done
+- **Target**: 2026-08-15
 - **Description**: Remove test scaffolding leaks and clean up dead/empty test blocks.
 - **Steps**:
-  - [ ] Replace external test-helper imports from `init-helpers.test.ts` with local environment stubs and explicit mocks.
-  - [ ] Remove empty or dead `describe("")` blocks in `version-tag.test.ts`.
+  - [x] Replace external test-helper imports from `init-helpers.test.ts` with local environment stubs and explicit mocks.
+  - [x] Remove empty or dead `describe("")` blocks in `version-tag.test.ts`.
 
-- [ ] **Entrypoint Integration Test Alignment (`scripts/bin/*.test.ts`)**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-17
+- [x] **Entrypoint Integration Test Alignment (`scripts/bin/*.test.ts`)**
+- **Status**: ✅ Done
+- **Target**: 2026-08-15
 - **Description**: Align entrypoint tests across all `bin/` scripts to verify entrypoint selector matching, function invocation, and fatal error delegation.
 - **Steps**:
-  - [ ] Audit `scripts/bin/coverage-summary.test.ts`, `extract-release-note.test.ts`, `extract-version-tag.test.ts`, and `post-vitest-coverage.test.ts`.
-  - [ ] Standardize mock reset patterns using `vi.resetModules()` and `process.argv` isolation.
+  - [x] Audit `scripts/bin/coverage-summary.test.ts`, `extract-release-note.test.ts`, `extract-version-tag.test.ts`, and `post-vitest-coverage.test.ts`.
+  - [x] Standardize mock reset patterns using `vi.resetModules()` and `process.argv` isolation.
 
 ---
 

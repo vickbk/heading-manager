@@ -14,10 +14,8 @@ describe("post comment coverage Run Task execution", () => {
 
   describe("Top level execution and basic error handling", () => {
     it("should execute postCoverageComment and handle process.exit(1) on failure when process.argv matches", async () => {
-      // 1. Set CLI path to match the if condition
       process.argv = ["node", "/workspace/scripts/bin/post-vitest-coverage.ts"];
 
-      // 2. Mock process.exit to throw so execution halts cleanly in test environment
       const exitSpy = vi.spyOn(process, "exit").mockImplementation((code?) => {
         return `process.exit: ${code}` as never;
       });
@@ -46,7 +44,7 @@ describe("post comment coverage Run Task execution", () => {
         "postCoverageComment",
       ).mockImplementation(async () => {});
       vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
-      // Trigger top-level execution
+
       await import("./post-vitest-coverage");
 
       expect(console.error).not.toHaveBeenCalledWith();
@@ -60,6 +58,7 @@ describe("post comment coverage Run Task execution", () => {
         await import("@/scripts/features/vitest"),
         "postCoverageComment",
       );
+
       await import("./post-vitest-coverage");
 
       expect(spiedPoster).not.toHaveBeenCalled();

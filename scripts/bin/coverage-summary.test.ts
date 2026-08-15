@@ -18,7 +18,6 @@ describe("Top-level execution (if block)", () => {
 
     vi.spyOn(fs, "existsSync").mockReturnValue(true);
 
-    // Dynamic import triggers top-level code execution
     await import("./coverage-summary");
 
     expect(fs.existsSync).toHaveBeenCalledWith(defaultSummaryPath);
