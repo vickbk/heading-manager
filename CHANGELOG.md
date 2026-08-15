@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/0.1.0/),
 
 ## [Unreleased]
 
+# Changelog
+
+## [v0.2.1-test] - 2026-08-15
+
+### ⚙️ Refactoring & Script Management Architecture
+
+- **Modular Directory Restructuring**: Refactored the `/scripts` tree into a domain-driven, modular architecture categorized under `bin/`, `core/`, `features/`, `config/`, and `shared/`.
+- **CLI Entrypoint Standardization**:
+  - Updated CLI runners under `scripts/bin/` to utilize `runTask` for selector matching and fatal error delegation.
+  - Resolved non-deterministic process termination by adding missing `await` operators to asynchronous entrypoints (e.g., `post-vitest-coverage.ts`).
+- **Pure Domain Utilities & Public Barrels**:
+  - Established public API barrels for feature modules (`@/scripts/features/releases` and `@/scripts/features/vitest`).
+  - Decoupled domain handlers from direct global `process.argv` and `process.env` mutations.
+- **Environment Configuration Isolation**: Eliminated import-time side-effects (such as top-level `expandEnv()`) in favor of explicit initialization hooks inside configuration getters and CLI entrypoints.
+- **Path Alias & Import Alignment**: Migrated internal script imports across all utilities to use standard `@/scripts/...` path aliases.
+- **Test Suite & Scaffolding Cleanup**:
+  - Replaced external test helpers with local environment stubs (`vi.stubEnv` / `vi.unstubAllEnvs`) for isolated test executions.
+  - Standardized module reset patterns across `bin/` integration tests using `vi.resetModules()`.
+- **Comprehensive Documentation**:
+  - Added complete JSDoc/TSDoc coverage across all exported script APIs (`@param`, `@returns`, and `@throws`).
+  - Created architecture guides and `README.md` documentation across `bin/`, `core/github/`, `core/errors/`, `features/`, and top-level `scripts/`.
+
 ## [0.2.1] - 2026-08-13
 
 ### Fixed
