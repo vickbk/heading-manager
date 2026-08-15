@@ -2,6 +2,10 @@ import { normalizePath } from "@/scripts/shared/normalize-path";
 import path from "node:path";
 import { z } from "zod";
 
+/**
+ * Validates and normalizes the runtime configuration used by workflow automation scripts.
+ * The schema resolves working directories, GitHub action paths, and file-system paths consistently across local and CI runs.
+ */
 export const configSchema = z.object({
   cwd: z
     .string("Current working directory must be a string")

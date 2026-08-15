@@ -1,3 +1,11 @@
+/**
+ * Extracts the markdown section for a specific version from a changelog document.
+ *
+ * @param changelogContent - Full changelog text to inspect.
+ * @param version - Version to locate within the changelog.
+ * @returns The markdown section corresponding to the requested release version.
+ * @throws {Error} When the target version section cannot be found or contains no content.
+ */
 export function parseReleaseNotes(
   changelogContent: string,
   version: string,

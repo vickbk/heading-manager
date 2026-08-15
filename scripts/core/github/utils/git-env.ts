@@ -2,6 +2,12 @@ import { config } from "@/scripts/config";
 import fs from "node:fs";
 import { GithubParams } from "../types";
 
+/**
+ * Reads the GitHub Actions event payload and validates the subset of environment values required to act on a pull request.
+ *
+ * @returns The repository, token, pull request number, and run metadata necessary for workflow actions.
+ * @throws {Error} When required environment variables are missing, the event file cannot be read, or the payload is not attached to a pull request.
+ */
 export function getGithubParams(): GithubParams {
   const { token, repository, eventPath, runId } = config.github;
 

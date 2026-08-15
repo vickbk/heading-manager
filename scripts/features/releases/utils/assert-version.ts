@@ -3,6 +3,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { resolveVersionTag } from "./version-tag";
 
+/**
+ * Validates that the current package version matches the release tag before publishing or generating a release artifact.
+ *
+ * @param normalizedTagVersion - Version tag to compare against package.json.
+ * @param packageJsonPath - Optional override for the package manifest path.
+ * @returns The resolved normalized version if the check succeeds.
+ * @throws {Error} When package.json is missing, invalid, or does not match the provided release tag.
+ */
 export function assertVersionMatch(
   normalizedTagVersion: string,
   packageJsonPath: string = path.resolve(config.cwd, config.paths.package),

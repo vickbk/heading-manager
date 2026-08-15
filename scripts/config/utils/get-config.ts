@@ -4,12 +4,20 @@ import { configSchema } from "./config-schema";
 let cachedConfig: Config | null = null;
 
 /**
- * Resets the cached configuration. Essential for test isolation in Vitest/Jest.
+ * Clears the memoized configuration so tests and isolated execution contexts can re-resolve environment values.
+ *
+ * @returns void - Resets the cached config singleton.
  */
 export const resetConfig = (): void => {
   cachedConfig = null;
 };
 
+/**
+ * Reads the current process environment, validates it against the workflow schema, and returns a cached config object.
+ *
+ * @returns The resolved workflow configuration for GitHub Actions metadata, file paths, and runtime flags.
+ * @throws {Error} When required configuration values are invalid or fail schema validation.
+ */
 export const getConfig = (): Config => {
   if (cachedConfig) return cachedConfig;
 

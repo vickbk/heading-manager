@@ -4,8 +4,20 @@ import path from "path";
 import { CoverageReport, CoverageSummaryJson } from "../types";
 import { formatRow } from "./format";
 
+/**
+ * Stable HTML comment marker used to detect previously posted coverage updates on the pull request.
+ */
 export const COMMENT_IDENTIFIER = "<!-- coverage-report-id -->";
 
+/**
+ * Parses the aggregated Vitest coverage report and builds the markdown summary and PR comment payload.
+ *
+ * @param summaryPath - File path to the coverage-summary.json file.
+ * @param repository - GitHub repository slug used to build the Actions run link.
+ * @param runId - GitHub run identifier used in the documentation link.
+ * @returns Structured coverage data for a summary table and sticky PR comment.
+ * @throws {Error} When the summary file is missing or the JSON payload is malformed.
+ */
 export function getReport(
   summaryPath = path.resolve(config.cwd, config.paths.vitestReport),
   repository?: string,

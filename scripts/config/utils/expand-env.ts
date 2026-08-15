@@ -1,9 +1,11 @@
 const regex = /\${([^}]+)}/g;
 
 /**
- * Recursively expands environment variables containing ${VAR_NAME} placeholders.
+ * Recursively expands environment variable placeholders such as ${GITHUB_REF_NAME}.
+ * This keeps workflow values resolvable without requiring each call site to manually interpolate them.
  *
- * @param maxPasses Safety ceiling to prevent unbounded iterations (default: 10).
+ * @param maxPasses - Maximum passes allowed before the expansion loop stops to avoid runaway iteration.
+ * @returns void - Mutates the current process environment in place.
  */
 export function expandEnv(maxPasses = 10): void {
   let hasChanged = true;

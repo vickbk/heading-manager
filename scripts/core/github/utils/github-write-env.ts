@@ -2,7 +2,11 @@ import { config } from "@/scripts/config";
 import fs from "node:fs";
 
 /**
- * Appends environment variables to the $GITHUB_ENV file for downstream workflow steps.
+ * Appends key/value pairs to the GitHub Actions environment file so downstream workflow steps can consume them.
+ *
+ * @param vars - Environment variables to persist for later steps in the workflow.
+ * @returns void - Writes the payload to $GITHUB_ENV when the file path is available.
+ * @throws {NodeJS.ErrnoException} When the destination environment file cannot be written.
  */
 export function githubWriteEnv(
   vars: Record<string, string | boolean | number>,

@@ -1,3 +1,6 @@
+/**
+ * Coverage metric populated by the generated Vitest JSON summary.
+ */
 export type CoverageMetric = {
   total: number;
   covered: number;
@@ -5,6 +8,9 @@ export type CoverageMetric = {
   pct: number;
 };
 
+/**
+ * Raw Vitest JSON summary structure read from coverage-summary.json.
+ */
 export type CoverageSummaryJson = {
   total: {
     lines: CoverageMetric;
@@ -14,6 +20,9 @@ export type CoverageSummaryJson = {
   };
 };
 
+/**
+ * Final markdown and comment payloads generated for GitHub Actions reporting.
+ */
 export type CoverageReport = {
   totalPct: string;
   commentBody: string;
