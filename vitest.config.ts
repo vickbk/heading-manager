@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "happy-dom",
-    setupFiles: ["./src/__testing__/vitest.setup.ts"],
+    setupFiles: ["./tests/setup/vitest.setup.ts"],
     globals: true,
     alias: {
       "@": path.resolve(import.meta.dirname, "./"),

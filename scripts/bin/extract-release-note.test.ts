@@ -18,7 +18,6 @@ describe("bin/extract-release-note entrypoint integration", () => {
     scopedReleasesModule = await import("@/scripts/features/releases");
     scopedErrorsModule = await import("@/scripts/core/errors");
     vi.spyOn(process, "exit").mockImplementation((() => {}) as never);
-    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {

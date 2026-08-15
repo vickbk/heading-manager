@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { config } from "@/scripts/config";
 import { resetConfig } from "@/scripts/config/testing";
 import { normalizePath } from "@/scripts/shared/normalize-path";
+import { shutConsole } from "@/tests/setup/console";
 import { extractReleaseNotes } from "./extract-note";
 
 describe("extractReleaseNotes", async () => {
@@ -29,7 +30,7 @@ All notable changes to this project will be documented in this file.
   beforeEach(async () => {
     resetConfig();
     vi.restoreAllMocks();
-    vi.spyOn(console, "log").mockImplementation(() => {});
+    shutConsole();
 
     const { resolve } = path;
     vi.spyOn(path, "resolve").mockImplementation((...args: string[]) => {

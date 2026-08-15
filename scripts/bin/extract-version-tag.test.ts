@@ -1,4 +1,5 @@
 import * as releasesModule from "@/scripts/features/releases";
+import { shutConsole } from "@/tests/setup/console";
 import process from "node:process";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,7 +12,7 @@ describe("bin/extract-version-tag entrypoint", () => {
     vi.resetModules();
     process.argv = [...originalArgv];
 
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    shutConsole();
     vi.spyOn(process, "exit").mockReturnValue("" as never);
 
     scopedReleaseModule = await import("@/scripts/features/releases");

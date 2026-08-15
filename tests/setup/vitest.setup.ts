@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom";
 import { afterEach, beforeEach, vi } from "vitest";
+import { resetConsole, shutConsole } from "./console";
 
 // Environment variables to isolate across all tests
 const GHA_ENV_VARS = [
@@ -22,8 +23,11 @@ beforeEach(() => {
       vi.stubEnv(envVar, "");
     }
   }
+
+  shutConsole();
 });
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  resetConsole();
 });

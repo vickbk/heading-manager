@@ -1,4 +1,5 @@
 import * as githubEnvModule from "@/scripts/core/github";
+import { shutConsole } from "@/tests/setup/console";
 import fs from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as assertModule from "./assert-version";
@@ -12,7 +13,8 @@ describe("writeDistTagToGithubOutput", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.restoreAllMocks();
-    vi.spyOn(console, "log").mockImplementation(() => {});
+
+    shutConsole();
     vi.spyOn(releaseTypeModule, "getReleaseType");
     vi.spyOn(assertModule, "assertVersionMatch").mockImplementation(() => "");
   });

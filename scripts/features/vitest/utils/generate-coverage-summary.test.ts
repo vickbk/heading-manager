@@ -1,4 +1,5 @@
 import * as coverageModule from "@/scripts/core/github";
+import { shutConsole } from "@/tests/setup/console";
 import fs from "node:fs";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -22,8 +23,7 @@ describe("generateCoverageSummary", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
 
-    vi.spyOn(console, "log").mockImplementation(() => {});
-    vi.spyOn(console, "warn").mockImplementation(() => {});
+    shutConsole();
   });
 
   describe("Happy Path Execution (File Exists)", () => {
@@ -196,8 +196,8 @@ describe("generateCoverageSummary", () => {
     beforeEach(async () => {
       vi.resetModules(); // Clears import cache for top-level code re-evaluation
       vi.restoreAllMocks();
-      vi.spyOn(console, "log").mockImplementation(() => {});
-      vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      shutConsole();
     });
 
     afterEach(() => {

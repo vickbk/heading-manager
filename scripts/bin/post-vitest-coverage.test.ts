@@ -5,7 +5,6 @@ describe("post comment coverage Run Task execution", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
-    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {

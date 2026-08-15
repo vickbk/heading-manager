@@ -3,7 +3,6 @@ import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("Top-level execution (if block)", () => {
-  const spyError = vi.spyOn(console, "error");
   const defaultSummaryPath = path.resolve(
     process.cwd(),
     "coverage/coverage-summary.json",
@@ -43,8 +42,8 @@ describe("Top-level execution (if block)", () => {
     await import("./coverage-summary");
 
     expect(spied).toHaveBeenCalled();
-    expect(spyError).toHaveBeenCalled();
-    expect(spyError).toHaveBeenCalledWith(
+    expect(console.error).toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledWith(
       "❌ [Coverage Script] Fatal Error: Just trying errors",
     );
   });

@@ -1,4 +1,5 @@
 import * as githubApi from "@/scripts/core/github";
+import { shutConsole } from "@/tests/setup/console";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as vitest from "./post-coverage-comment";
 import * as reportUtils from "./report";
@@ -22,8 +23,7 @@ describe("postCoverageComment (Runner Entry Point)", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
 
-    vi.spyOn(console, "log").mockImplementation(() => {});
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    shutConsole();
     vi.spyOn(process, "exit").mockImplementation(
       (code?: string | number | null) => {
         throw new Error(`process.exit called with code: ${code}`);

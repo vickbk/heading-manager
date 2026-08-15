@@ -8,7 +8,7 @@ describe("handleFatalError", () => {
 
   beforeEach(() => {
     // Intercept console.error to prevent pollution during test runs
-    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    consoleErrorSpy = console.error;
 
     // Prevent process.exit from terminating the test runner node process
     processExitSpy = vi
