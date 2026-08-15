@@ -89,7 +89,7 @@ describe("bin/extract-release-note entrypoint integration", () => {
       expect(fatalSpy).toHaveBeenCalledTimes(1);
       expect(fatalSpy).toHaveBeenCalledWith(
         thrownError,
-        "[Release Note] Fatal Error",
+        "❌ [Release Note] Fatal Error",
       );
     });
   });

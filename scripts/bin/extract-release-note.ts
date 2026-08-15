@@ -1,8 +1,8 @@
-import { runTask } from "../core/errors";
-import { extractReleaseNotes } from "../features/releases/utils/extract-note";
+import { runTask } from "@/scripts/core/errors";
+import { extractReleaseNotes } from "@/scripts/features/releases";
 
 await runTask(
   "extract-release-note",
   extractReleaseNotes,
-  "[Release Note] Fatal Error",
+  "❌ [Release Note] Fatal Error",
 );

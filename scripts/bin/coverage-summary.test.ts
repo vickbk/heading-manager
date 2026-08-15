@@ -46,7 +46,7 @@ describe("Top-level execution (if block)", () => {
     expect(spied).toHaveBeenCalled();
     expect(spyError).toHaveBeenCalled();
     expect(spyError).toHaveBeenCalledWith(
-      "[Coverage Script] Fatal Error: Just trying errors",
+      "❌ [Coverage Script] Fatal Error: Just trying errors",
     );
   });
 });
