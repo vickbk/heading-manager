@@ -19,16 +19,6 @@ describe("env.ts Proxy & Integration Suite", () => {
     vi.unstubAllEnvs();
   });
 
-  describe("Module Initialization Side Effects", () => {
-    it("should execute expandEnv() at module load time without vi.mock", async () => {
-      const expandEnvSpy = vi.spyOn(await import("./expand-env"), "expandEnv");
-
-      await import("./env");
-
-      expect(expandEnvSpy).toHaveBeenCalled();
-    });
-  });
-
   describe("Real Config Proxy Evaluation", () => {
     it("should dynamically resolve config properties from the real getConfig() implementation", () => {
       vi.stubEnv("CI", "true");

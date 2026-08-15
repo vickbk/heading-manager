@@ -1,3 +1,4 @@
+import path from "node:path";
 import process from "node:process";
 import { LogFormatter } from "../types";
 import { handleFatalError } from "./handle-fatal-error";
@@ -17,7 +18,16 @@ export async function runTask<T>(
 ): Promise<T | undefined> {
   const entryScript = process.argv[1];
 
-  if (!entryScript || !entryScript.includes(scriptName)) {
+  if (!entryScript) {
+    return undefined;
+  }
+
+  const { name, base } = path.parse(entryScript);
+
+  // Exact comparison against file stem ("extract-version-tag") or full filename ("extract-version-tag.ts")
+  const isMatch = scriptName === name || scriptName === base;
+
+  if (!isMatch) {
     return undefined;
   }
 

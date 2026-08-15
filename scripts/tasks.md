@@ -190,38 +190,38 @@ scripts/
   - [x] Add `await` keyword to top-level `runTask("post-vitest-coverage", ...)` invocation.
   - [x] Update `scripts/bin/post-vitest-coverage.test.ts` to verify async promise resolution behavior.
 
-- [ ] **Environment Initialization & Config Side-Effect Cleanup (`scripts/config/utils/env.ts`)**
-- **Status**: ⏳ Todo
+- [x] **Environment Initialization & Config Side-Effect Cleanup (`scripts/config/utils/env.ts`)**
+- **Status**: ✅ Done
 - **Target**: 2026-08-15
 - **Description**: Eliminate import-time side-effects (`expandEnv()`) to make environment loading explicit, pure, and predictable during module imports and testing.
 - **Steps**:
-  - [ ] Wrap automatic environment expansion into an explicit initialization function (e.g., `initWorkflowEnv()`).
-  - [ ] Call `initWorkflowEnv()` explicitly inside CLI entrypoints or explicit config getters instead of top-level module scope.
-  - [ ] Add unit tests in `scripts/config/utils/env.test.ts` verifying isolated environment setup.
+  - [x] Wrap automatic environment expansion into an explicit initialization function (e.g., `expandEnv()`).
+  - [x] Call `expandEnv()` explicitly inside CLI entrypoints or explicit config getters instead of top-level module scope.
+  - [x] Add unit tests in `scripts/config/utils/env.test.ts` verifying isolated environment setup.
 
-- [ ] **Core Selector Guard Enhancement (`scripts/core/errors/utils/run-task.ts`)**
-- **Status**: ⏳ Todo
+- [x] **Core Selector Guard Enhancement (`scripts/core/errors/utils/run-task.ts`)**
+- **Status**: ✅ Done
 - **Target**: 2026-08-15
 - **Description**: Strengthen script matching logic in `runTask` to avoid false positives on partial path or file name matches.
 - **Steps**:
-  - [ ] Refactor path matching in `runTask` to perform exact file stem or path boundary comparisons against `process.argv[1]`.
-  - [ ] Update `scripts/core/errors/utils/run-task.test.ts` with test cases covering edge-case script names and exact path matching.
+  - [x] Refactor path matching in `runTask` to perform exact file stem or path boundary comparisons against `process.argv[1]`.
+  - [x] Update `scripts/core/errors/utils/run-task.test.ts` with test cases covering edge-case script names and exact path matching.
 
 ---
 
 ### Phase 2: Public API Barrels & Domain Isolation (`scripts/features/`)
 
-- [ ] **Releases Feature Public Barrel (`scripts/features/releases/index.ts`)**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-16
+- [x] **Releases Feature Public Barrel (`scripts/features/releases/index.ts`)**
+- **Status**: ✅ Done
+- **Target**: 2026-08-15
 - **Description**: Consolidate and re-export all public release management utilities to establish a strict feature boundary.
 - **Steps**:
-  - [ ] Export `extractReleaseNotes` alongside `writeDistTagToGithubOutput` in `scripts/features/releases/index.ts`.
-  - [ ] Refactor `scripts/bin/extract-release-note.ts` to import directly from `@/scripts/features/releases` instead of deep internal paths.
+  - [x] Export `extractReleaseNotes` alongside `writeDistTagToGithubOutput` in `scripts/features/releases/index.ts`.
+  - [x] Refactor `scripts/bin/extract-release-note.ts` to import directly from `@/scripts/features/releases` instead of deep internal paths.
 
 - [ ] **Vitest Feature Public Barrel (`scripts/features/vitest/index.ts`)**
 - **Status**: ⏳ Todo
-- **Target**: 2026-08-16
+- **Target**: 2026-08-15
 - **Description**: Consolidate and re-export all Vitest coverage and reporting utilities.
 - **Steps**:
   - [ ] Export `generateCoverageSummary` and `postCoverageComment` in `scripts/features/vitest/index.ts`.
