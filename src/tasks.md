@@ -111,31 +111,31 @@ react-heading-manager/
 - [x] Move integration tests to `src/adapters/react/__tests__/heading-system.integration.test.tsx`.
 - [x] Create `src/adapters/react/index.ts` barrel file.
 
-- [ ] **Migrate Playwright Matcher Adapter (`src/adapters/playwright/`)**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-20
+- [x] **Migrate Playwright Matcher Adapter (`src/adapters/playwright/`)**
+- **Status**: ✅ Done
+- **Target**: 2026-08-16
 - **Description**: Relocate Playwright custom matchers and initializers to `src/adapters/playwright/`.
 - **Steps**:
-- [ ] Move `register.ts`, `to-have-valid-heading-hierarchy.ts`, and tests to `src/adapters/playwright/utils/`.
-- [ ] Move ambient declaration file to `src/adapters/playwright/types.d.ts`.
-- [ ] Create `src/adapters/playwright/index.ts` barrel file.
-- [ ] Create `src/adapters/playwright/README.md` with Playwright usage instructions.
+- [x] Move `register.ts`, `to-have-valid-heading-hierarchy.ts`, and tests to `src/adapters/playwright/utils/`.
+- [x] Move ambient declaration file to `src/adapters/playwright/types.d.ts`.
+- [x] Create `src/adapters/playwright/index.ts` barrel file.
+- [x] Create `src/adapters/playwright/README.md` with Playwright usage instructions.
 
 ---
 
 ### Phase 4: Main Entrypoint Router (`src/main/`) & Bundler Alignment
 
-- [ ] **Create Lightweight Re-export Shims in `src/main/**`
-- **Status**: ⏳ Todo
+- [x] **Create Lightweight Re-export Shims in `src/main/**`
+- **Status**: ✅ Done
 - **Target**: 2026-08-21
 - **Description**: Implement thin entrypoint router files inside `src/main/` that expose public API subpaths without containing business logic.
 - **Steps**:
-- [ ] Create `src/main/index.ts` re-exporting from `../adapters/react`.
-- [ ] Create `src/main/utils.ts` re-exporting from `../core/heading-auditor` and `../shared/types`.
-- [ ] Create `src/main/testing/playwright.ts` re-exporting from `../../adapters/playwright`.
-- [ ] Update `tsdown.config.ts` entrypoints to target `src/main/*`:
+- [x] Create `src/main/index.ts` re-exporting from `../adapters/react`.
+- [x] Create `src/main/utils.ts` re-exporting from `../core/heading-auditor` and `../shared/types`.
+- [x] Create `src/main/testing/playwright.ts` re-exporting from `../../adapters/playwright`.
+- [x] Update `tsdown.config.ts` entrypoints to target `src/main/*`:
       `ts entry: { index: "src/main/index.ts", "utils/index": "src/main/utils.ts", "testing/playwright/index": "src/main/testing/playwright.ts", } `
-- [ ] Update `package.json` `exports` mapping.
+- [x] Update `package.json` `exports` mapping.
 
 ---
 

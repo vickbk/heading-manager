@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { HeadingLevel } from "../types";
 import { calculateNextHeadingLevel } from "./calculate-heading-level";
-import { HeadingLevel } from "./types";
 
 describe("calculateNextHeadingLevel", () => {
   // ==========================================
