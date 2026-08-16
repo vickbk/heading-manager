@@ -451,7 +451,7 @@ describe("drawRegion", () => {
         });
       });
 
-      it("falls back to native tagName when role='heading' lacks an aria-level attribute", () => {
+      it("falls back to h2 when role='heading' lacks an aria-level attribute", () => {
         container.innerHTML = `
         <main>
           <div role="heading">Unlevelled Heading</div>
@@ -462,9 +462,10 @@ describe("drawRegion", () => {
         const mainEl = container.querySelector("main")!;
         const region = drawRegion(mainEl);
 
-        expect(region.headings).toEqual(["div", "span"]);
-        expect(region.detailedHeadings![0].level).toBe("div");
-        expect(region.detailedHeadings![1].level).toBe("span");
+        // This is an expected behavior as defined by wai-aria
+        expect(region.headings).toEqual(["h2", "h2"]);
+        expect(region.detailedHeadings![0].level).toBe("h2");
+        expect(region.detailedHeadings![1].level).toBe("h2");
       });
 
       it("allows aria-level to override native heading HTML tags", () => {

@@ -7,9 +7,13 @@
  * and calculating heading levels (`calculateNextHeadingLevel`, `parseHeadingLevel`, `resolveHeadingDetail`).
  */
 export {
+  drawRegion,
+  getHeadingLevel,
+  getRegionHeadings,
+} from "../modules/region/utils";
+export {
   checkHeadingOrder,
   checkHeadingOrderReport,
 } from "./check-heading-order-report";
-export { drawRegion } from "./draw-region";
 export { parseHeadingLevel } from "./parse-heading-level";
 export { resolveHeadingDetail } from "./resolve-heading-details";

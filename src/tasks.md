@@ -143,11 +143,11 @@ react-heading-manager/
 
 - [ ] **Update Import Paths & Run Quality Audit**
 - **Status**: ⏳ Todo
-- **Target**: 2026-08-22
+- **Target**: 2026-08-16
 - **Description**: Update all relative import paths across the codebase to adhere to the strict dependency flow rules and run verification scripts.
 - **Steps**:
-- [ ] Fix relative import paths in all moved files.
-- [ ] Run `pnpm typecheck` to verify zero type leaks or invalid imports.
-- [ ] Run `pnpm test` (Vitest) to ensure 100% test pass rate.
-- [ ] Run `pnpm build` to confirm `dist/` outputs (`dist/index.js`, `dist/utils/index.js`, `dist/testing/playwright/index.js`) generate cleanly.
+- [x] Fix relative import paths in all moved files.
+- [x] Run `pnpm typecheck` to verify zero type leaks or invalid imports.
+- [x] Run `pnpm test` (Vitest) to ensure 100% test pass rate.
+- [x] Run `pnpm build` to confirm `dist/` outputs (`dist/index.js`, `dist/utils/index.js`, `dist/testing/playwright/index.js`) generate cleanly.
 - [ ] Run `pnpm pack --dry-run` to verify published tarball structure.
