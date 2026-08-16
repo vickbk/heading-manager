@@ -86,16 +86,16 @@ react-heading-manager/
 
 ### Phase 2: Core WCAG Engine Migration (`src/core/`)
 
-- [ ] **Consolidate Pure Engine Logic into `src/core/heading-auditor/**`
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-18
+- [x] **Consolidate Pure Engine Logic into `src/core/heading-auditor/**`
+- **Status**: ✅ Done
+- **Target**: 2026-08-16
 - **Description**: Relocate pure WCAG calculation rules, DOM parsers, and region drawer utilities into `src/core/heading-auditor/`. Ensure `core` only imports from `src/shared`.
 - **Steps**:
-- [ ] Move `check-heading-order-report.ts` and tests to `src/core/heading-auditor/`.
-- [ ] Move `draw-region.ts` and tests to `src/core/heading-auditor/`.
-- [ ] Move `heading-level.ts`, `parse-heading-level.ts`, and `resolve-heading-details.ts` with tests to `src/core/heading-auditor/`.
-- [ ] Create barrel file `src/core/heading-auditor/index.ts` re-exporting all core utilities.
-- [ ] Create `src/core/heading-auditor/README.md` documenting internal core APIs.
+- [x] Move `check-heading-order-report.ts` and tests to `src/core/auditor/`.
+- [x] Move `draw-region.ts` and tests to `src/core/auditor/`.
+- [x] Move `parse-level.ts` and `resolve-details.ts` with tests to `src/core/auditor/`.
+- [x] Create barrel file `src/core/auditor/index.ts` re-exporting all core utilities.
+- [ ] Create `src/core/auditor/README.md` documenting internal core APIs.
 
 ---
 
