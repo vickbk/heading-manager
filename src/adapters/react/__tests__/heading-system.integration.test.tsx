@@ -2,20 +2,16 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 // Types
-import type { HeadingOrderReport, RegionMapping } from "./types";
 
 // Core Components & Context
-import { createRegion } from "./components/create-region";
-import { Heading } from "./components/heading";
-import { HeadingFragment } from "./components/heading-fragment";
-import { Main } from "./components/main";
+import { createRegion, Heading, HeadingFragment, Main } from "../components";
 
 // Verification Helpers
 import {
   checkHeadingOrder,
   checkHeadingOrderReport,
   drawRegion,
-} from "./utils";
+} from "@/src/core/audit/utils";
 
 // Landmark regions created via createRegion factory
 const Section = createRegion<HTMLElement>("section");
@@ -46,9 +42,7 @@ describe("Heading System Integration Test Suite", () => {
         </Main>,
       );
 
-      const mapping: RegionMapping = drawRegion(
-        screen.getByTestId("root-main"),
-      );
+      const mapping = drawRegion(screen.getByTestId("root-main"));
 
       // Verify DOM tree extracted by drawRegion
       expect(mapping.tagName).toBe("main");
@@ -56,7 +50,7 @@ describe("Heading System Integration Test Suite", () => {
       expect(mapping.children).toHaveLength(2); // section and aside
 
       // Run assertion report
-      const report: HeadingOrderReport = checkHeadingOrderReport(mapping);
+      const report = checkHeadingOrderReport(mapping);
 
       expect(report.isValid).toBe(true);
       expect(report.errors).toHaveLength(0);

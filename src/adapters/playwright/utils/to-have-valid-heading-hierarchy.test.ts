@@ -71,7 +71,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
   });
 
   describe("Exhaustive test suite", async () => {
-    const utils = await import("@/src/utils");
+    const utils = await import("@/src/core/audit");
     const _drawRegion = utils.drawRegion;
 
     describe("toHaveValidHeadingHierarchy", () => {
