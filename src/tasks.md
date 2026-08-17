@@ -141,13 +141,111 @@ react-heading-manager/
 
 ### Phase 5: Path Auditing & Quality Verification
 
-- [ ] **Update Import Paths & Run Quality Audit**
-- **Status**: ⏳ Todo
-- **Target**: 2026-08-16
+- [x] **Update Import Paths & Run Quality Audit**
+- **Status**: ✅ Done
+- **Target**: 2026-08-17
 - **Description**: Update all relative import paths across the codebase to adhere to the strict dependency flow rules and run verification scripts.
 - **Steps**:
 - [x] Fix relative import paths in all moved files.
 - [x] Run `pnpm typecheck` to verify zero type leaks or invalid imports.
 - [x] Run `pnpm test` (Vitest) to ensure 100% test pass rate.
 - [x] Run `pnpm build` to confirm `dist/` outputs (`dist/index.js`, `dist/utils/index.js`, `dist/testing/playwright/index.js`) generate cleanly.
-- [ ] Run `pnpm pack --dry-run` to verify published tarball structure.
+- [x] Run `pnpm pack --dry-run` to verify published tarball structure.
+
+## Bottom-Up Documentation Remediation & Alignment Plan
+
+A bottom-up approach ensures that code-level TSDoc becomes the single source of truth, cascading directly into sub-directory architectural READMEs, and ultimately synthesizing into an accurate root `README.md` and `CHANGELOG.md`.
+
+---
+
+### Phase 1: Inline TSDoc & JSDoc Standardization (Module Level)
+
+- [x] **Task 1: Audit & Standardize TSDoc for Shared Primitives**
+- **Status**: ✅ To Do
+- **Target**: 2026-08-17
+- **Description**: Clear stale or incomplete JSDoc tags in `src/shared/` and re-document all exported primitives, types, and AST utilities.
+- **Steps**:
+- [x] Clear outdated inline JSDoc comments referencing legacy file paths in `src/shared/`.
+- [x] Add explicit `@description`, `@param`, and `@returns` tags to all shared domain types and helper functions.
+- [x] Ensure shared helpers include concrete, self-contained `@example` snippets.
+
+- [ ] **Task 2: Audit & Standardize TSDoc for Core Engine**
+- **Status**: 🔴 To Do
+- **Target**: 2026-08-18
+- **Description**: Standardize TSDoc annotations across `src/core/heading-auditor/` to reflect pure, framework-agnostic WCAG auditing logic.
+- **Steps**:
+- [ ] Audit all core auditing functions (`auditHeadingHierarchy`, DOM node processors, and rule validators).
+- [ ] Ensure complete TSDoc metadata (`@description`, `@param`, `@returns`, `@throws`) across every exported core module.
+- [ ] Verify core TSDoc examples do not import React or Playwright dependencies.
+
+- [ ] **Task 3: Audit & Standardize TSDoc for Adapters & Public Routers**
+- **Status**: 🔴 To Do
+- **Target**: 2026-08-18
+- **Description**: Refactor TSDoc for React UI elements, Playwright matchers, and `src/main/` subpath entrypoints.
+- **Steps**:
+- [ ] Add `@param` and `@returns` tags to `<Heading>` (`heading.tsx`) and `<Main>` (`main.tsx`).
+- [ ] Add complete JSDoc headers to Playwright utility `registerPlaywright` (`register.ts`).
+- [ ] Standardize TSDoc tags for `landmarks.ts` and all public subpath router files in `src/main/`.
+
+---
+
+### Phase 2: Sub-Directory Architecture READMEs (Layer Level)
+
+- [ ] **Task 4: Author Shared Layer README**
+- **Status**: 🔴 To Do
+- **Target**: 2026-08-19
+- **Description**: Create `src/shared/README.md` based on verified TSDoc primitives to document zero-dependency layer rules.
+- **Steps**:
+- [ ] Document domain types, AST helpers, and primitive utilities directly from completed TSDoc annotations.
+- [ ] Expressly define the zero-import policy (`shared` cannot import from `core`, `adapters`, or `main`).
+
+- [ ] **Task 5: Author Core Engine Architecture README**
+- **Status**: 🔴 To Do
+- **Target**: 2026-08-19
+- **Description**: Create `src/core/heading-auditor/README.md` summarizing the core auditing boundary and API surface.
+- **Steps**:
+- [ ] Aggregate public core functions documented in Phase 1 into a coherent layer README.
+- [ ] Define framework-agnostic architectural constraints and WCAG compliance scope.
+
+- [ ] **Task 6: Author Adapters Architecture READMEs**
+- **Status**: 🔴 To Do
+- **Target**: 2026-08-19
+- **Description**: Create `src/adapters/react/README.md` and `src/adapters/playwright/README.md` to document framework bindings.
+- **Steps**:
+- [ ] Replace legacy file paths (`src/components`, `src/hooks`, `src/utils`) with correct subpaths in React adapter docs.
+- [ ] Update Playwright adapter docs to reflect subpath export `react-heading-manager/testing/playwright`.
+- [ ] Document strict uni-directional dependencies (`adapters` -> `core` / `shared`).
+
+---
+
+### Phase 3: Root Documentation & Changelog Synthesis (Package Level)
+
+- [ ] **Task 7: Synthesize Root README from Refined Sub-Layers**
+- **Status**: 🔴 To Do
+- **Target**: 2026-08-20
+- **Description**: Rewrite root `README.md` using complementary data from layer READMEs and public TSDoc examples.
+- **Steps**:
+- [ ] Document the Hexagonal Architecture breakdown using verified layer READMEs as source material.
+- [ ] Validate all code blocks against actual `package.json` subpaths (`react-heading-manager`, `react-heading-manager/utils`, `react-heading-manager/testing/playwright`).
+- [ ] Remove all legacy package references (`heading-manager`).
+
+- [ ] **Task 8: Normalize and Update CHANGELOG.md**
+- **Status**: 🔴 To Do
+- **Target**: 2026-08-20
+- **Description**: Clean up header formatting and record the architectural refactor following Keep a Changelog standards.
+- **Steps**:
+- [ ] Remove duplicate `# Changelog` top-level header.
+- [ ] Document the architectural refactor and new subpath exports under `[Unreleased]`.
+- [ ] Fix stale export paths in historical entries (e.g., update `react-heading-manager/testing` to `react-heading-manager/testing/playwright`).
+
+---
+
+### Phase 4: CI Verification & Documentation Automation
+
+- [ ] **Task 9: Implement Documentation Regression Check in CI**
+- **Status**: 🔴 To Do
+- **Target**: 2026-08-21
+- **Description**: Set up automated CI guardrails to prevent documentation drift and missing TSDoc annotations.
+- **Steps**:
+- [ ] Add a script to verify the presence of mandatory layer READMEs (`src/shared/`, `src/core/heading-auditor/`, `src/adapters/react/`, `src/adapters/playwright/`).
+- [ ] Integrate TSDoc validation into the linter and pre-publish release workflow.
