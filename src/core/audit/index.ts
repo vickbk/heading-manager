@@ -7,4 +7,5 @@
  * and calculating heading levels (`calculateNextHeadingLevel`, `parseHeadingLevel`, `resolveHeadingDetail`).
  */
 export { drawRegion } from "./modules/region";
-export { checkHeadingOrderReport } from "./utils/check-heading-order-report";
+
+export { checkNormalizedHeadingReport } from "./utils/check-normalized-heading-report";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getHeadingLevel } from "./get-heading-level";
+import { getHeadingLevel } from "./index";
 
 describe("getHeadingLevel", () => {
   const createHeading = (html: string): HTMLElement => {

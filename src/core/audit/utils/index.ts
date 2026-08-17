@@ -15,5 +15,9 @@ export {
   checkHeadingOrder,
   checkHeadingOrderReport,
 } from "./check-heading-order-report";
+export {
+  checkNormalizedHeading,
+  checkNormalizedHeadingReport,
+} from "./check-normalized-heading-report";
 export { parseHeadingLevel } from "./parse-heading-level";
 export { resolveHeadingDetail } from "./resolve-heading-details";

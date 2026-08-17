@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { RegionMapping } from "../types";
+import { RegionMapping } from "../modules/region";
 import { resolveHeadingDetail } from "./resolve-heading-details";
 
 describe("resolveHeadingDetail", () => {
@@ -14,6 +14,7 @@ describe("resolveHeadingDetail", () => {
         detailedHeadings: [
           {
             level: "h2",
+            numLevel: 2,
             text: "Main Features",
             element: mockElement,
           },
@@ -35,7 +36,7 @@ describe("resolveHeadingDetail", () => {
     it("converts numeric level values to string rawHeading and correctly parses level", () => {
       const node: RegionMapping = {
         tagName: "article",
-        detailedHeadings: [{ level: 3, text: "Sub Section" }],
+        detailedHeadings: [{ level: "3", numLevel: 3, text: "Sub Section" }],
         children: [],
         headings: ["h3"],
       };
@@ -53,7 +54,9 @@ describe("resolveHeadingDetail", () => {
     it("handles detailedHeadings where optional text and element are omitted", () => {
       const node: RegionMapping = {
         tagName: "div",
-        detailedHeadings: [{ level: "h1" }],
+        detailedHeadings: [
+          { level: "h1", numLevel: 1, text: undefined as unknown as "" },
+        ],
         children: [],
         headings: ["h1"],
       };
@@ -72,8 +75,8 @@ describe("resolveHeadingDetail", () => {
       const node: RegionMapping = {
         tagName: "main",
         detailedHeadings: [
-          { level: "h1", text: "Primary Heading" },
-          { level: "h2", text: "Secondary Heading" },
+          { level: "h1", numLevel: 1, text: "Primary Heading" },
+          { level: "h2", numLevel: 2, text: "Secondary Heading" },
         ],
         children: [],
         headings: ["h1", "h2"],
@@ -94,7 +97,9 @@ describe("resolveHeadingDetail", () => {
       const node: RegionMapping = {
         tagName: "header",
         headings: ["h3"],
-        detailedHeadings: [{ level: "h1", text: "Priority Heading" }],
+        detailedHeadings: [
+          { level: "h1", numLevel: 1, text: "Priority Heading" },
+        ],
         children: [],
       };
 
@@ -117,6 +122,7 @@ describe("resolveHeadingDetail", () => {
       const node: RegionMapping = {
         tagName: "section",
         headings: ["h2"],
+        detailedHeadings: [],
         children: [],
       };
 
@@ -151,6 +157,7 @@ describe("resolveHeadingDetail", () => {
         tagName: "div",
         headings: ["h2", "h3", "h4"],
         children: [],
+        detailedHeadings: [],
       };
 
       const result = resolveHeadingDetail(node);
@@ -169,6 +176,7 @@ describe("resolveHeadingDetail", () => {
         tagName: "div",
         children: [],
         headings: [],
+        detailedHeadings: [],
       };
 
       expect(resolveHeadingDetail(node)).toBeNull();
@@ -193,7 +201,9 @@ describe("resolveHeadingDetail", () => {
     it("preserves rawHeading and sets parsedLevel to null when level is unparseable", () => {
       const node: RegionMapping = {
         tagName: "section",
-        detailedHeadings: [{ level: "invalid-tag", text: "Broken Title" }],
+        detailedHeadings: [
+          { level: "invalid-tag", numLevel: -1, text: "Broken Title" },
+        ],
         children: [],
         headings: ["invalid-tag"],
       };
@@ -211,7 +221,7 @@ describe("resolveHeadingDetail", () => {
     it("correctly resolves out-of-bounds levels (e.g. h7)", () => {
       const node: RegionMapping = {
         tagName: "div",
-        detailedHeadings: [{ level: "h7", text: "Too Deep" }],
+        detailedHeadings: [{ level: "h7", numLevel: 7, text: "Too Deep" }],
         children: [],
         headings: ["h7"],
       };

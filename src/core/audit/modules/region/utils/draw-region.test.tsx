@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { drawRegion } from "./draw-region";
+import { drawRegion } from "./index";
 
 describe("drawRegion", () => {
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import { checkHeadingOrderReport, drawRegion } from "@/src/core/audit";
+import { checkNormalizedHeadingReport, drawRegion } from "@/src/core/audit";
 import { Locator, Page } from "@playwright/test";
 import { Window } from "happy-dom";
 import { InitialHeading } from "../types";
@@ -52,7 +52,10 @@ export async function toHaveValidHeadingHierarchy(
   const rootElement = content.body.firstElementChild || content.body;
   const regionTree = drawRegion(rootElement as unknown as Element);
 
-  const report = checkHeadingOrderReport(regionTree, initialLevel);
+  const report = checkNormalizedHeadingReport({
+    region: regionTree,
+    level: initialLevel,
+  });
 
   if (report.isValid) {
     return {

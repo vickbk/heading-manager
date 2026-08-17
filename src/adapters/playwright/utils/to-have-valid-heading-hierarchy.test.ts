@@ -76,13 +76,13 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
 
     describe("toHaveValidHeadingHierarchy", () => {
       let mockDrawRegion: MockInstance;
-      let mockCheckHeadingOrderReport: MockInstance;
+      let mockCheckNormalizedHeadingOrderReport: MockInstance;
 
       beforeEach(() => {
         mockDrawRegion = vi.spyOn(utils, "drawRegion");
-        mockCheckHeadingOrderReport = vi.spyOn(
+        mockCheckNormalizedHeadingOrderReport = vi.spyOn(
           utils,
-          "checkHeadingOrderReport",
+          "checkNormalizedHeadingReport",
         );
       });
       afterEach(() => {
@@ -122,7 +122,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: true,
             errors: [],
           });
@@ -142,7 +142,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: true,
             errors: [],
           });
@@ -199,17 +199,17 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: true,
             errors: [],
           });
 
           await toHaveValidHeadingHierarchy(mockLocator as unknown as Locator);
 
-          expect(mockCheckHeadingOrderReport).toHaveBeenCalledWith(
-            expect.anything(),
-            1,
-          );
+          expect(mockCheckNormalizedHeadingOrderReport).toHaveBeenCalledWith({
+            region: expect.anything(),
+            level: 1,
+          });
         });
 
         it("should pass custom initialLevel to checkHeadingOrderReport", async () => {
@@ -217,7 +217,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: true,
             errors: [],
           });
@@ -227,10 +227,10 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
             3,
           );
 
-          expect(mockCheckHeadingOrderReport).toHaveBeenCalledWith(
-            expect.anything(),
-            3,
-          );
+          expect(mockCheckNormalizedHeadingOrderReport).toHaveBeenCalledWith({
+            region: expect.anything(),
+            level: 3,
+          });
         });
       });
 
@@ -247,7 +247,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: true,
             errors: [],
           });
@@ -272,7 +272,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: true,
             errors: [],
           });
@@ -290,7 +290,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: true,
             errors: [],
           });
@@ -310,7 +310,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: false,
             errors: [
               {
@@ -338,7 +338,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: false,
             errors: [
               {
@@ -368,7 +368,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
           mockDrawRegion.mockReturnValue(
             {} as unknown as ReturnType<typeof _drawRegion>,
           );
-          mockCheckHeadingOrderReport.mockReturnValue({
+          mockCheckNormalizedHeadingOrderReport.mockReturnValue({
             isValid: false,
             errors: [
               {

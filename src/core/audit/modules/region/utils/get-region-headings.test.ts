@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getRegionHeadings } from "./get-region-headings";
+import { getRegionHeadings } from "./index";
 
 describe("getRegionHeadings", () => {
   const setup = (html: string): Element => {
