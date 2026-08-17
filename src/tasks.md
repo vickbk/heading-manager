@@ -172,7 +172,7 @@ A bottom-up approach ensures that code-level TSDoc becomes the single source of 
 - [ ] **Task 2: Audit & Standardize TSDoc for Core Engine**
 - **Status**: 🔴 To Do
 - **Target**: 2026-08-18
-- **Description**: Standardize TSDoc annotations across `src/core/heading-auditor/` to reflect pure, framework-agnostic WCAG auditing logic.
+- **Description**: Standardize TSDoc annotations across `src/core/auditor/` to reflect pure, framework-agnostic WCAG auditing logic.
 - **Steps**:
 - [ ] Audit all core auditing functions (`auditHeadingHierarchy`, DOM node processors, and rule validators).
 - [ ] Ensure complete TSDoc metadata (`@description`, `@param`, `@returns`, `@throws`) across every exported core module.

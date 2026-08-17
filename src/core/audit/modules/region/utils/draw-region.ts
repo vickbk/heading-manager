@@ -3,20 +3,21 @@ import type { RegionMapping } from "../types";
 import { getRegionHeadings } from "./get-region-headings";
 
 /**
- * Parses a DOM element tree and constructs a `RegionMapping` representation of landmark sections and headings.
- *
- * @description Scans `element` for HTML sectioning landmarks (`main`, `section`, `article`, etc.) and explicit ARIA roles (`[role="main"]`),
- * extracting direct child headings and recursively building child region mappings.
+ * Recursively parses a DOM element subtree and constructs a structured `RegionMapping` tree.
  *
  * @param element - The root DOM element to scan and map.
- * @returns A `RegionMapping` object representing the parsed landmark tree.
+ * @returns A structured `RegionMapping` node containing landmark identifiers, direct headings, and nested child regions.
+ *
+ * @remarks
+ * **Accessibility (WCAG 2.1 SC 1.3.1):** Scans HTML sectioning elements (`main`, `section`, `article`, etc.)
+ * and explicit ARIA landmark roles (`[role="main"]`) to evaluate regional heading hierarchy structure.
  *
  * @example
  * ```ts
  * const regionTree = drawRegion(document.body);
+ * console.log(regionTree.tagName); // "body"
+ * console.log(regionTree.children); // Array of nested child RegionMapping objects
  * ```
- *
- * @a11y Inspects HTML sectioning elements and ARIA roles for accessibility hierarchy auditing per WCAG 2.1 SC 1.3.1.
  */
 export function drawRegion<T extends Element>(element: T): RegionMapping {
   const tagName = getRegionIdentifier(element);

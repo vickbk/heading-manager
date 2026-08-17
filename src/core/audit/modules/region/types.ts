@@ -1,55 +1,84 @@
 /**
- * Metadata descriptor for an individual heading element discovered in the DOM.
+ * Metadata descriptor for an individual heading element discovered during DOM auditing.
  *
- * @description Captures level, accessible text content, and DOM element handle.
+ * @example
+ * ```ts
+ * const detail: HeadingDetail = {
+ *   level: "h2",
+ *   numLevel: 2,
+ *   text: "Main Features",
+ *   element: domElementRef,
+ * };
+ * ```
  */
 export type HeadingDetail = {
   /**
-   * Normalized heading level represented in `hN` format.
+   * Normalized heading level string in `hN` format (e.g., `"h1"`, `"h2"`, `"h7"`).
    *
-   * Examples: `h1`, `h2`, `h7`, `h10`.
-   *
-   * Kept as a string for backwards API compatibility.
+   * @remarks
+   * Retained as a string for backward compatibility with earlier package versions.
    */
   level: string;
 
   /**
-   * Normalized numeric heading level.
+   * Canonical numeric representation of the heading level (e.g., `1`, `2`, `7`).
    *
-   * This is the canonical value to use for heading hierarchy
-   * comparisons and validation.
-   *
-   * Examples: `1`, `2`, `7`, `10`.
+   * Use this field for numeric level comparisons and hierarchy validation logic.
    */
   numLevel: number;
 
   /**
-   * Trimmed heading text, falling back to `aria-label`.
+   * Accessible text content of the heading, falling back to `aria-label` or `aria-labelledby` if text content is empty.
    */
   text: string;
 
   /**
-   * Original DOM heading element.
+   * Reference to the underlying DOM node handle.
    *
-   * Can be inspected to distinguish native HTML headings
-   * (`h1`-`h6`) from ARIA headings (`role="heading"`).
+   * @remarks
+   * Typed as `unknown` to keep the core auditing logic environment-neutral (e.g., SSR, virtual DOM, or browser environments).
    */
   element?: unknown;
 };
 
 /**
- * Tree representation of an HTML5 landmark sectioning element or ARIA region.
+ * Tree representation of an HTML5 sectioning landmark or ARIA structural region.
  *
- * @description Data structure emitted by `drawRegion` representing sectioning tree depth.
- * @a11y Maps HTML sectioning landmarks (main, section, article) and ARIA roles for hierarchy checking.
+ * @remarks
+ * **Accessibility:** Maps sectioning elements (`main`, `section`, `article`, `nav`) and explicit ARIA roles (`role="navigation"`)
+ * to evaluate nested heading hierarchies within their surrounding region scope.
+ *
+ * @example
+ * ```ts
+ * const mainRegion: RegionMapping = {
+ *   tagName: "main",
+ *   headings: ["h1"],
+ *   detailedHeadings: [
+ *     { level: "h1", numLevel: 1, text: "Dashboard Overview" }
+ *   ],
+ *   children: [
+ *     {
+ *       tagName: "section",
+ *       headings: ["h2"],
+ *       detailedHeadings: [
+ *         { level: "h2", numLevel: 2, text: "Analytics" }
+ *       ],
+ *       children: []
+ *     }
+ *   ]
+ * };
+ * ```
  */
 export type RegionMapping = {
-  /** Identifier of the region node (e.g. "main", "section", or "div[role=\"navigation\"]") */
+  /** Structural identifier of the region node (e.g., `"main"`, `"section"`, or `"div[role=\"navigation\"]"`). */
   tagName: string;
-  /** Legacy string-only headings array (e.g. ["h1", "h2"]) */
+
+  /** Array of normalized string heading levels discovered directly within this region scope (e.g., `["h1", "h2"]`). */
   headings: string[];
-  /** Rich heading metadata with inner text and DOM element references */
+
+  /** Rich metadata descriptors for each heading discovered within this region scope. */
   detailedHeadings: HeadingDetail[];
-  /** Direct nested landmark child regions */
+
+  /** Direct child landmark regions nested within this structural scope. */
   children: RegionMapping[];
 };
