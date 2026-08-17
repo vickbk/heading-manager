@@ -1,11 +1,8 @@
 /**
- * Central barrel subpath export for DOM parsing and WCAG heading hierarchy validation utilities.
+ * Core entry point for DOM landmark tree parsing and sequential heading hierarchy auditing.
  *
- * @module utils
- * @description Provides low-level functions for parsing DOM landmark trees (`drawRegion`),
- * evaluating WCAG 2.1 SC 1.3.1 compliance (`checkHeadingOrderReport`, `checkHeadingOrder`),
- * and calculating heading levels (`calculateNextHeadingLevel`, `parseHeadingLevel`, `resolveHeadingDetail`).
+ * @module core/auditor
  */
-export { drawRegion } from "./modules/region";
 
+export { drawRegion } from "./modules/region";
 export { checkNormalizedHeadingReport } from "./utils/check-normalized-heading-report";

@@ -2,24 +2,9 @@ import { RegionMapping } from "../modules/region";
 import { parseHeadingLevel } from "./parse-heading-level";
 
 /**
- * Resolves heading metadata for a specific heading index inside a `RegionMapping` node.
+ * Resolves heading metadata for a given index, falling back to raw string arrays if necessary.
  *
- * @description Prioritizes rich `detailedHeadings` metadata (including accessible inner text and DOM element references)
- * and falls back to the legacy string `headings` array if detailed metadata is absent.
- *
- * @param node - The `RegionMapping` tree node to inspect.
- * @param index - Zero-based index of the target heading within the region (defaults to `0`).
- * @returns A metadata object containing `rawHeading`, `parsedLevel`, optional `text`, and optional `element`, or `null` if the index is out of bounds.
- *
- * @example
- * ```ts
- * const details = resolveHeadingDetail(regionNode, 0);
- * if (details) {
- *   console.log(details.parsedLevel, details.text);
- * }
- * ```
- *
- * @a11y Provides normalized heading details for WCAG SC 1.3.1 reporting.
+ * @deprecated Legacy helper used by `processHeadingLevel`. Modern pipelines consume `HeadingDetail` directly.
  */
 export function resolveHeadingDetail(
   node: RegionMapping,

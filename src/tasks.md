@@ -169,14 +169,14 @@ A bottom-up approach ensures that code-level TSDoc becomes the single source of 
 - [x] Add explicit `@description`, `@param`, and `@returns` tags to all shared domain types and helper functions.
 - [x] Ensure shared helpers include concrete, self-contained `@example` snippets.
 
-- [ ] **Task 2: Audit & Standardize TSDoc for Core Engine**
-- **Status**: 🔴 To Do
+- [x] **Task 2: Audit & Standardize TSDoc for Core Engine**
+- **Status**: ✅ Done
 - **Target**: 2026-08-18
 - **Description**: Standardize TSDoc annotations across `src/core/auditor/` to reflect pure, framework-agnostic WCAG auditing logic.
 - **Steps**:
-- [ ] Audit all core auditing functions (`auditHeadingHierarchy`, DOM node processors, and rule validators).
-- [ ] Ensure complete TSDoc metadata (`@description`, `@param`, `@returns`, `@throws`) across every exported core module.
-- [ ] Verify core TSDoc examples do not import React or Playwright dependencies.
+- [x] Audit all core auditing functions (`auditHeadingHierarchy`, DOM node processors, and rule validators).
+- [x] Ensure complete TSDoc metadata (`@description`, `@param`, `@returns`, `@throws`) across every exported core module.
+- [x] Verify core TSDoc examples do not import React or Playwright dependencies.
 
 - [ ] **Task 3: Audit & Standardize TSDoc for Adapters & Public Routers**
 - **Status**: 🔴 To Do

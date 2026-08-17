@@ -1,29 +1,9 @@
 import type { ProcessHeadingLevelParams } from "../types";
 
 /**
- * Processes normalized heading details belonging to a region.
+ * Processes normalized heading details within a region and checks for sequential level skips.
  *
- * The normalized heading level is treated as the canonical numeric
- * representation. Levels greater than H6 are therefore preserved rather
- * than rejected or clamped.
- *
- * This function is the deterministic counterpart to `processHeadingLevel`.
- * It operates exclusively on `HeadingDetail.numLevel` and therefore does
- * not parse, infer, or reinterpret heading-level strings.
- *
- * A heading hierarchy error is reported when the current heading increases
- * by more than one level relative to the running hierarchy context.
- *
- * Examples:
- *
- * - H1 → H2: valid
- * - H2 → H3: valid
- * - H2 → H4: hierarchy error
- * - H6 → H7: valid
- * - H6 → H8: hierarchy error
- * - H7 → H10: hierarchy error
- *
- * @param params - Normalized heading processing context.
+ * @param params - Processing context containing running level, target region, accumulated path, and errors list.
  * @param params.level - Current heading hierarchy level inherited from the
  *   parent region.
  * @param params.region - Region whose normalized heading details should be
@@ -32,19 +12,26 @@ import type { ProcessHeadingLevelParams } from "../types";
  * @param params.errors - Mutable accumulator receiving detected hierarchy
  *   errors.
  *
- * @returns The final normalized heading level encountered in the region.
- *   This becomes the hierarchy context for child regions.
+ * @returns The final normalized numeric heading level encountered in the region context.
  *
  * @remarks
- * `detailedHeadings` is intentionally used as the sole heading source here.
- * Unlike the legacy processor, this function does not fall back to the
- * legacy `headings` representation. Callers using this API are expected to
- * provide normalized `HeadingDetail` objects containing `numLevel`.
+ * **Normalized Execution Contract:**
+ * - Operates exclusively on `HeadingDetail.numLevel` without string parsing or level clamping.
+ * - Supports unbounded numeric levels ($1 \dots N$), reflecting WAI-ARIA `aria-level` capabilities (e.g., $H6 \rightarrow H7$ is valid, $H6 \rightarrow H8$ is a skipped level).
+ * - Serves as the primary deterministic alternative to the deprecated `processHeadingLevel`.
  *
- * @a11y Performs normalized heading hierarchy analysis as part of
- * accessibility auditing. The sequential heading-level rule is an
- * accessibility auditing heuristic and should not be interpreted as a
- * direct statement of WCAG conformance.
+ * **Auditing Heuristic:**
+ * Reports an error when a heading's level increases by more than 1 relative to the preceding heading.
+ *
+ * @example
+ * ```ts
+ * const finalLevel = processNormalizedHeadingLevel({
+ *   level: 1,
+ *   region: currentRegion,
+ *   path: "main[0]",
+ *   errors: accumulatedErrors,
+ * });
+ * ```
  */
 export function processNormalizedHeadingLevel({
   level,
@@ -67,7 +54,6 @@ export function processNormalizedHeadingLevel({
         : path;
 
     const textLabel = heading.text ? ` ("${heading.text}")` : "";
-
     const expectedMaxLevel = runningLevel + 1;
 
     if (heading.numLevel > expectedMaxLevel) {

@@ -2,24 +2,11 @@ import { ProcessHeadingLevelParams } from "../types";
 import { resolveHeadingDetail } from "./resolve-heading-details";
 
 /**
- * Processes the headings belonging to a region using the legacy heading
- * resolution strategy.
+ * Legacy processor that evaluates region headings using string parsing and level clamping.
  *
- * The function maintains the current heading hierarchy level while
- * processing the region's headings and returns the final level to be used
- * as the context for child regions.
+ * @deprecated Use {@link processNormalizedHeadingLevel} instead.
  *
- * Heading details are resolved through `resolveHeadingDetail()`, allowing
- * this processor to remain compatible with `RegionMapping` instances that
- * contain legacy `headings` data without populated `detailedHeadings`.
- *
- * A heading hierarchy error is reported when a resolved heading level
- * increases by more than one level relative to the current running level.
- *
- * Invalid or unparseable heading levels are also reported according to
- * the legacy validation rules.
- *
- * @param params - Heading processing context.
+ * @param params - Context object containing current `level`, `region`, `path`, and `errors`.
  * @param params.level - Current heading hierarchy level inherited from the
  *   parent region.
  * @param params.region - Region whose headings should be processed.
@@ -27,13 +14,11 @@ import { resolveHeadingDetail } from "./resolve-heading-details";
  * @param params.errors - Mutable accumulator receiving any detected
  *   heading-order errors.
  *
- * @returns The final resolved heading level of the region. This value is
- *   passed to child regions as their heading hierarchy context.
+ * @returns Final heading level context passed to child regions.
  *
  * @remarks
- * This function intentionally preserves the legacy heading-resolution
- * behavior. The normalized implementation is provided by
- * `processNormalizedHeadingLevel()`.
+ * **Migration Note:** Unlike `processNormalizedHeadingLevel`, this function clamps max expected levels
+ * to H6 and attempts regex string extraction on legacy `headings` string arrays.
  */
 export function processHeadingLevel({
   level,
@@ -91,7 +76,6 @@ export function processHeadingLevel({
         });
       }
 
-      // Update running level for subsequent headings or child regions
       runningLevel = parsedLevel;
     }
   }
