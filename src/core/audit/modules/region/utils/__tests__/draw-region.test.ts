@@ -41,13 +41,34 @@ describe("drawRegion Low-Level DOM Parser", () => {
     expect(articleRegion.headings).toEqual(["h3"]);
   });
 
-  it("handles custom ARIA heading elements, aria-level overrides, and aria-label fallbacks", () => {
+  it("handles custom ARIA heading elements, missing levels, aria-level overrides, levels greater than 6, and aria-label fallbacks", () => {
     const doc = parser.parseFromString(
       `
       <div role="main">
-        <div role="heading" aria-level="1" aria-label="Accessible Hero Title"></div>
+        <div
+          role="heading"
+          aria-level="1"
+          aria-label="Accessible Hero Title"
+        ></div>
+
+        <div role="heading">
+          Heading Without Explicit Level
+        </div>
+
+        <div role="heading" aria-level="7">
+          Seventh Level Heading
+        </div>
+
+        <div role="heading" aria-level="10" aria-label="Tenth Level Heading"></div>
+
         <div role="region">
-          <h2 aria-label="Accessible Section Heading">Explicit Visual Subtitle</h2>
+          <h2 aria-label="Accessible Section Heading">
+            Explicit Visual Subtitle
+          </h2>
+
+          <div role="heading" aria-level="8">
+            Eighth Level Section Heading
+          </div>
         </div>
       </div>
       `,
@@ -61,17 +82,40 @@ describe("drawRegion Low-Level DOM Parser", () => {
 
     expect(regionTree.tagName).toBe('div[role="main"]');
     expect(regionTree.detailedHeadings).toBeDefined();
-    expect(regionTree.detailedHeadings).toHaveLength(1);
+    expect(regionTree.detailedHeadings).toHaveLength(4);
+
+    expect(regionTree.headings).toEqual(["h1", "h2", "h7", "h10"]);
 
     const firstHeading = regionTree.detailedHeadings?.[0];
     expect(firstHeading?.level).toBe("h1");
     expect(firstHeading?.text).toBe("Accessible Hero Title");
 
+    const headingWithoutLevel = regionTree.detailedHeadings?.[1];
+    expect(headingWithoutLevel?.level).toBe("h2");
+    expect(headingWithoutLevel?.text).toBe("Heading Without Explicit Level");
+
+    const seventhLevelHeading = regionTree.detailedHeadings?.[2];
+    expect(seventhLevelHeading?.level).toBe("h7");
+    expect(seventhLevelHeading?.text).toBe("Seventh Level Heading");
+
+    const tenthLevelHeading = regionTree.detailedHeadings?.[3];
+    expect(tenthLevelHeading?.level).toBe("h10");
+    expect(tenthLevelHeading?.text).toBe("Tenth Level Heading");
+
     const childRegion = regionTree.children[0];
+
     expect(childRegion.tagName).toBe('div[role="region"]');
+    expect(childRegion.headings).toEqual(["h2", "h8"]);
+    expect(childRegion.detailedHeadings).toHaveLength(2);
+
     expect(childRegion.detailedHeadings?.[0].level).toBe("h2");
     expect(childRegion.detailedHeadings?.[0].text).toBe(
       "Explicit Visual Subtitle",
+    );
+
+    expect(childRegion.detailedHeadings?.[1].level).toBe("h8");
+    expect(childRegion.detailedHeadings?.[1].text).toBe(
+      "Eighth Level Section Heading",
     );
   });
 });

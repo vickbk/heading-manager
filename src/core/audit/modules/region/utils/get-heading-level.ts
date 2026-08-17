@@ -18,15 +18,15 @@ export function getHeadingLevel(heading: HTMLElement): string {
     const normalizedLevel = ariaLevel.trim();
 
     if (/^[1-9]\d*$/.test(normalizedLevel)) {
-      return `h${normalizedLevel}`;
+      return normalizedLevel;
     }
   }
 
   const nativeLevel = /^h([1-6])$/i.exec(heading.tagName);
 
   if (nativeLevel) {
-    return `h${nativeLevel[1]}`;
+    return nativeLevel[1];
   }
 
-  return "h2";
+  return "2";
 }

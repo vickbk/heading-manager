@@ -4,11 +4,36 @@
  * @description Captures level, accessible text content, and DOM element handle.
  */
 export type HeadingDetail = {
-  /** Tag string (e.g. "h2") or explicit numerical level (e.g. 2) */
-  level: string | number;
-  /** Visible inner text of the heading element (e.g. "Pricing Plans") */
-  text?: string;
-  /** Optional reference to the underlying DOM node or custom element context */
+  /**
+   * Normalized heading level represented in `hN` format.
+   *
+   * Examples: `h1`, `h2`, `h7`, `h10`.
+   *
+   * Kept as a string for backwards API compatibility.
+   */
+  level: string;
+
+  /**
+   * Normalized numeric heading level.
+   *
+   * This is the canonical value to use for heading hierarchy
+   * comparisons and validation.
+   *
+   * Examples: `1`, `2`, `7`, `10`.
+   */
+  numLevel: number;
+
+  /**
+   * Trimmed heading text, falling back to `aria-label`.
+   */
+  text: string;
+
+  /**
+   * Original DOM heading element.
+   *
+   * Can be inspected to distinguish native HTML headings
+   * (`h1`-`h6`) from ARIA headings (`role="heading"`).
+   */
   element?: unknown;
 };
 

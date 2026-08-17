@@ -31,10 +31,16 @@ describe("drawRegion", () => {
       expect(region.detailedHeadings).toEqual([
         {
           level: "h1",
+          numLevel: 1,
           text: "Main Heading Title",
           element: expect.any(HTMLElement),
         },
-        { level: "h2", text: "Subtitle", element: expect.any(HTMLElement) },
+        {
+          level: "h2",
+          numLevel: 2,
+          text: "Subtitle",
+          element: expect.any(HTMLElement),
+        },
       ]);
       expect(region.children).toHaveLength(0);
     });
@@ -446,6 +452,7 @@ describe("drawRegion", () => {
         expect(region.detailedHeadings).toHaveLength(1);
         expect(region.detailedHeadings![0]).toEqual({
           level: "h2",
+          numLevel: 2,
           text: "Custom ARIA Heading",
           element: mainEl.querySelector('[role="heading"]'),
         });

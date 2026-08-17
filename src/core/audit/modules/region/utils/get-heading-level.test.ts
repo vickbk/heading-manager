@@ -20,20 +20,20 @@ describe("getHeadingLevel", () => {
       (tagName) => {
         const heading = createHeading(`<${tagName}>Heading</${tagName}>`);
 
-        expect(getHeadingLevel(heading)).toBe(tagName);
+        expect(getHeadingLevel(heading)).toBe(tagName.replace("h", ""));
       },
     );
   });
 
   describe("valid aria-level", () => {
     it.each([
-      ["1", "h1"],
-      ["2", "h2"],
-      ["3", "h3"],
-      ["6", "h6"],
-      ["7", "h7"],
-      ["10", "h10"],
-      ["100", "h100"],
+      ["1", "1"],
+      ["2", "2"],
+      ["3", "3"],
+      ["6", "6"],
+      ["7", "7"],
+      ["10", "10"],
+      ["100", "100"],
     ])("normalizes aria-level=%s to %s", (ariaLevel, expected) => {
       const heading = createHeading(`
         <div role="heading" aria-level="${ariaLevel}">
@@ -49,7 +49,7 @@ describe("getHeadingLevel", () => {
         <h2 aria-level="4">Heading</h2>
       `);
 
-      expect(getHeadingLevel(heading)).toBe("h4");
+      expect(getHeadingLevel(heading)).toBe("4");
     });
 
     it("trims whitespace around aria-level", () => {
@@ -59,7 +59,7 @@ describe("getHeadingLevel", () => {
         </div>
       `);
 
-      expect(getHeadingLevel(heading)).toBe("h3");
+      expect(getHeadingLevel(heading)).toBe("3");
     });
   });
 
@@ -84,7 +84,7 @@ describe("getHeadingLevel", () => {
         </h3>
       `);
 
-      expect(getHeadingLevel(heading)).toBe("h3");
+      expect(getHeadingLevel(heading)).toBe("3");
     });
   });
 
@@ -96,7 +96,7 @@ describe("getHeadingLevel", () => {
         </div>
       `);
 
-      expect(getHeadingLevel(heading)).toBe("h2");
+      expect(getHeadingLevel(heading)).toBe("2");
     });
 
     it.each(["0", "-1", "abc", "1.5", "", " "])(
@@ -108,7 +108,7 @@ describe("getHeadingLevel", () => {
         </div>
       `);
 
-        expect(getHeadingLevel(heading)).toBe("h2");
+        expect(getHeadingLevel(heading)).toBe("2");
       },
     );
   });
@@ -119,7 +119,7 @@ describe("getHeadingLevel", () => {
         <H3>Heading</H3>
       `);
 
-      expect(getHeadingLevel(heading)).toBe("h3");
+      expect(getHeadingLevel(heading)).toBe("3");
     });
   });
 });

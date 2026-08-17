@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { HeadingOrderError, type RegionMapping } from "../types";
+import { RegionMapping } from "../modules/region";
+import { HeadingOrderError } from "../types";
 import {
   checkHeadingOrder,
   checkHeadingOrderReport,
@@ -13,12 +14,16 @@ describe("checkHeadingOrderReport", () => {
     it("validates a sequential hierarchy using rich detailedHeadings", () => {
       const tree: RegionMapping = {
         tagName: "main",
-        detailedHeadings: [{ level: "h1", text: "Welcome to Dashboard" }],
+        detailedHeadings: [
+          { level: "h1", numLevel: 1, text: "Welcome to Dashboard" },
+        ],
         headings: ["h1"],
         children: [
           {
             tagName: "section",
-            detailedHeadings: [{ level: "h2", text: "Analytics Overview" }],
+            detailedHeadings: [
+              { level: "h2", numLevel: 2, text: "Analytics Overview" },
+            ],
             children: [],
             headings: ["h2"],
           },
@@ -34,12 +39,14 @@ describe("checkHeadingOrderReport", () => {
     it("supports numerical level values in detailedHeadings (e.g., level: 2)", () => {
       const tree: RegionMapping = {
         tagName: "main",
-        detailedHeadings: [{ level: 1, text: "Main Title" }],
+        detailedHeadings: [{ level: "h1", numLevel: 1, text: "Main Title" }],
         headings: ["h1"],
         children: [
           {
             tagName: "section",
-            detailedHeadings: [{ level: 2, text: "Sub Section" }],
+            detailedHeadings: [
+              { level: "h2", numLevel: 2, text: "Sub Section" },
+            ],
             children: [],
             headings: ["h2"],
           },
@@ -55,7 +62,7 @@ describe("checkHeadingOrderReport", () => {
 
       const tree: RegionMapping = {
         tagName: "main",
-        detailedHeadings: [{ level: "h1", text: "Hero Header" }],
+        detailedHeadings: [{ level: "h1", numLevel: 1, text: "Hero Header" }],
         headings: ["h1"],
         children: [
           {
@@ -63,6 +70,7 @@ describe("checkHeadingOrderReport", () => {
             detailedHeadings: [
               {
                 level: "h4",
+                numLevel: 4,
                 text: "Enterprise Features",
                 element: mockElement,
               },
@@ -96,10 +104,12 @@ describe("checkHeadingOrderReport", () => {
       const tree: RegionMapping = {
         tagName: "main",
         headings: ["h1"],
+        detailedHeadings: [],
         children: [
           {
             tagName: "section",
             headings: ["h2"],
+            detailedHeadings: [],
             children: [],
           },
         ],
@@ -113,7 +123,9 @@ describe("checkHeadingOrderReport", () => {
       const tree: RegionMapping = {
         tagName: "main",
         headings: ["h3"], // Invalid legacy level if used first
-        detailedHeadings: [{ level: "h1", text: "Priority Heading" }],
+        detailedHeadings: [
+          { level: "h1", numLevel: 1, text: "Priority Heading" },
+        ],
         children: [],
       };
 
@@ -130,12 +142,14 @@ describe("checkHeadingOrderReport", () => {
     it("formats skipped heading error with inner text label", () => {
       const tree: RegionMapping = {
         tagName: "main",
-        detailedHeadings: [{ level: "h1", text: "Page Title" }],
+        detailedHeadings: [{ level: "h1", numLevel: 1, text: "Page Title" }],
         headings: ["h1"],
         children: [
           {
             tagName: "section",
-            detailedHeadings: [{ level: "h3", text: "Skipped Section" }],
+            detailedHeadings: [
+              { level: "h3", numLevel: 3, text: "Skipped Section" },
+            ],
             children: [],
             headings: ["h3"],
           },
@@ -153,10 +167,12 @@ describe("checkHeadingOrderReport", () => {
       const tree: RegionMapping = {
         tagName: "main",
         headings: ["h1"],
+        detailedHeadings: [],
         children: [
           {
             tagName: "section",
             headings: ["h3"],
+            detailedHeadings: [],
             children: [],
           },
         ],
@@ -172,7 +188,9 @@ describe("checkHeadingOrderReport", () => {
     it("formats out-of-bounds error for H7+ with heading text", () => {
       const tree: RegionMapping = {
         tagName: "main",
-        detailedHeadings: [{ level: "h7", text: "Too Deep Title" }],
+        detailedHeadings: [
+          { level: "h7", numLevel: 7, text: "Too Deep Title" },
+        ],
         children: [],
         headings: ["h7"],
       };
@@ -196,6 +214,7 @@ describe("checkHeadingOrderReport", () => {
       const tree: RegionMapping = {
         tagName: "main",
         headings: ["invalid-tag"],
+        detailedHeadings: [],
         children: [],
       };
 
@@ -223,18 +242,19 @@ describe("checkHeadingOrderReport", () => {
       const tree: RegionMapping = {
         tagName: "main",
         headings: ["h1"],
+        detailedHeadings: [],
         children: [
           // Branch 1: Invalid skip H1 -> H3
           {
             tagName: "section",
-            detailedHeadings: [{ level: "h3", text: "Branch A" }],
+            detailedHeadings: [{ level: "h3", numLevel: 3, text: "Branch A" }],
             children: [],
             headings: ["h3"],
           },
           // Branch 2: Invalid skip H1 -> H4
           {
             tagName: "section",
-            detailedHeadings: [{ level: "h4", text: "Branch B" }],
+            detailedHeadings: [{ level: "h4", numLevel: 4, text: "Branch B" }],
             children: [],
             headings: ["h4"],
           },
@@ -253,14 +273,17 @@ describe("checkHeadingOrderReport", () => {
       const tree: RegionMapping = {
         tagName: "main",
         headings: ["h1"],
+        detailedHeadings: [],
         children: [
           {
             tagName: "section",
             headings: ["h2"],
+            detailedHeadings: [],
             children: [
               {
                 tagName: "article",
                 headings: ["h3"],
+                detailedHeadings: [],
                 children: [],
               },
             ],
@@ -269,6 +292,7 @@ describe("checkHeadingOrderReport", () => {
           {
             tagName: "section",
             headings: ["h2"],
+            detailedHeadings: [],
             children: [],
           },
         ],
@@ -282,13 +306,29 @@ describe("checkHeadingOrderReport", () => {
       const validTree: RegionMapping = {
         tagName: "main",
         headings: ["h1"],
-        children: [{ tagName: "section", headings: ["h2"], children: [] }],
+        detailedHeadings: [],
+        children: [
+          {
+            tagName: "section",
+            headings: ["h2"],
+            detailedHeadings: [],
+            children: [],
+          },
+        ],
       };
 
       const invalidTree: RegionMapping = {
         tagName: "main",
         headings: ["h1"],
-        children: [{ tagName: "section", headings: ["h4"], children: [] }],
+        detailedHeadings: [],
+        children: [
+          {
+            tagName: "section",
+            headings: ["h4"],
+            detailedHeadings: [],
+            children: [],
+          },
+        ],
       };
 
       expect(checkHeadingOrder(validTree)).toBe(true);

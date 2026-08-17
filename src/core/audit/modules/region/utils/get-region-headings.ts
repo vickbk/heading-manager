@@ -32,7 +32,8 @@ export function getRegionHeadings(
   for (const heading of directHeadings) {
     const level = getHeadingLevel(heading);
 
-    headings.push(level);
+    const strLevel = `h${level}`;
+    headings.push(strLevel);
 
     const text =
       heading.textContent?.trim() ||
@@ -40,7 +41,8 @@ export function getRegionHeadings(
       "";
 
     detailedHeadings.push({
-      level,
+      level: strLevel,
+      numLevel: Number(level),
       text,
       element: heading,
     });

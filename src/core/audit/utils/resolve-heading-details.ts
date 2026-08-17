@@ -1,4 +1,4 @@
-import { RegionMapping } from "../types";
+import { RegionMapping } from "../modules/region";
 import { parseHeadingLevel } from "./parse-heading-level";
 
 /**
