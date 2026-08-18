@@ -229,14 +229,14 @@ A bottom-up approach ensures that code-level TSDoc becomes the single source of 
 - [x] Validate all code blocks against actual `package.json` subpaths (`react-heading-manager`, `react-heading-manager/utils`, `react-heading-manager/testing/playwright`).
 - [x] Remove all legacy package references (`heading-manager`).
 
-- [ ] **Task 8: Normalize and Update CHANGELOG.md**
-- **Status**: 🔴 To Do
-- **Target**: 2026-08-20
+- [x] **Task 8: Normalize and Update CHANGELOG.md**
+- **Status**: ✅ Done
+- **Target**: 2026-08-18
 - **Description**: Clean up header formatting and record the architectural refactor following Keep a Changelog standards.
 - **Steps**:
-- [ ] Remove duplicate `# Changelog` top-level header.
-- [ ] Document the architectural refactor and new subpath exports under `[Unreleased]`.
-- [ ] Fix stale export paths in historical entries (e.g., update `react-heading-manager/testing` to `react-heading-manager/testing/playwright`).
+- [x] Remove duplicate `# Changelog` top-level header.
+- [x] Document the architectural refactor and new subpath exports under `[Unreleased]`.
+- [x] Fix stale export paths in historical entries (e.g., update `react-heading-manager/testing` to `react-heading-manager/testing/playwright`).
 
 ---
 
