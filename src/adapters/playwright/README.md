@@ -1,78 +1,65 @@
 # Playwright Adapter
 
-The Playwright adapter adds `toHaveValidHeadingHierarchy` to the Playwright `expect` assertion API without relying on side-effectful top-level imports. The matcher is registered explicitly using `registerPlaywright`, making it tree-shakable, bundler-safe, and compatible with isolated or multi-project Playwright setups.
+The Playwright adapter exposes a side-effect-free matcher registration flow for `react-heading-manager`. It is intentionally explicit: call `registerPlaywright(expect)` once in setup code, then use `toHaveValidHeadingHierarchy` against `Page` or `Locator` objects.
 
 ---
 
-## Installation & Setup
+## Dependency Rules
 
-Register the custom matcher once in your global setup file or spec helper:
+| Allowed imports | Forbidden imports       |
+| --------------- | ----------------------- |
+| `src/core/**`   | `src/adapters/react/**` |
+| `src/shared/**` | sibling adapter modules |
+
+The adapter may read the core engine and shared primitives, but it must not pull in React rendering concerns or other adapter implementations.
+
+---
+
+## Installation and setup
 
 ```ts
 import { expect } from "@playwright/test";
 import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
-// Register custom matchers on the default expect instance
 registerPlaywright(expect);
 ```
 
-To target a custom or extended `expect` instance, pass it directly to `registerPlaywright`:
+You can also pass a custom `expect` instance:
 
 ```ts
 import { expect as baseExpect } from "@playwright/test";
 import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
-const customExpect = baseExpect.extend({
-  /* other matchers */
-});
-
+const customExpect = baseExpect.extend({});
 registerPlaywright(customExpect);
 ```
 
 ---
 
-## API Reference
+## API
 
 ### `registerPlaywright(customExpect?)`
 
-Extends a Playwright `expect` instance with `react-heading-manager` assertion matchers.
+Adds the matcher to an existing Playwright `expect` instance.
 
 ```ts
 registerPlaywright(customExpect = expect): void
-
 ```
-
-| Parameter      | Type            | Default  | Description                                                      |
-| -------------- | --------------- | -------- | ---------------------------------------------------------------- |
-| `customExpect` | `typeof expect` | `expect` | Playwright `expect` instance to augment with heading assertions. |
-
----
 
 ### `toHaveValidHeadingHierarchy(initialLevel?: InitialHeading)`
 
-Audits the DOM tree of a Playwright `Page` or `Locator`, parses sectioning regions (`drawRegion`), and validates that heading progression complies with WCAG 2.1 SC 1.3.1 without skipped levels (e.g. `<h1>` → `<h3>`).
+Audits a `Page` or `Locator` for skipped heading levels and structural WCAG issues without requiring a React runtime.
 
 ```ts
-await expect(page).toHaveValidHeadingHierarchy(initialLevel?: InitialHeading): Promise<R>
-
+await expect(page).toHaveValidHeadingHierarchy();
+await expect(page.locator("main")).toHaveValidHeadingHierarchy(2);
 ```
 
-| Parameter      | Type | Default | Description |
-| -------------- | ---- | ------- | ----------- | --- | --- | --- | --- | ----------------------------------------------------------------------------- |
-| `initialLevel` | `1   | 2       | 3           | 4   | 5   | 6`  | `1` | Ambient starting heading level index (`1` for `<h1>` through `6` for `<h6>`). |
-
-#### Behavior
-
-- Extracts the `outerHTML` of the target `Page` or `Locator`.
-- Builds a semantic region tree using `drawRegion`.
-- Evaluates heading levels against normalized WCAG rules via `checkNormalizedHeadingReport`.
-- Supports custom hierarchy contexts (e.g., set `initialLevel = 2` when auditing an isolated component expected to sit inside an outer `<h2>` landmark).
+`initialLevel` is a 1-based heading context, ranging from `1` for `<h1>` through `6` for `<h6>`.
 
 ---
 
-## Usage Examples
-
-### Audit an Entire Page
+## Usage examples
 
 ```ts
 import { expect, test } from "@playwright/test";
@@ -80,35 +67,19 @@ import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
 registerPlaywright(expect);
 
-test("page contains a valid WCAG heading hierarchy", async ({ page }) => {
+test("page has a valid heading hierarchy", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveValidHeadingHierarchy();
 });
 ```
 
-### Audit a Specific Landmark Container
-
 ```ts
 import { expect, test } from "@playwright/test";
 import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
 registerPlaywright(expect);
 
-test("main section headings are valid", async ({ page }) => {
-  await page.goto("/blog");
-  await expect(page.locator("main")).toHaveValidHeadingHierarchy();
-});
-```
-
-### Audit a Sub-Component Starting at H2
-
-```ts
-import { expect, test } from "@playwright/test";
-import { registerPlaywright } from "react-heading-manager/testing/playwright";
-
-registerPlaywright(expect);
-
-test("sidebar card component headings start at H2", async ({ page }) => {
+test("sidebar content starts at H2", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("aside.sidebar")).toHaveValidHeadingHierarchy(2);
 });
@@ -116,9 +87,9 @@ test("sidebar card component headings start at H2", async ({ page }) => {
 
 ---
 
-## Diagnostic Violation Output
+## Diagnostic output
 
-When hierarchy errors are detected, the matcher produces a structured report detailing each violation:
+When a violation is found, the matcher returns a descriptive human-readable report:
 
 ```text
 Found 2 heading accessibility hierarchy violation(s):
@@ -130,12 +101,4 @@ Found 2 heading accessibility hierarchy violation(s):
 2. Path: root > main > aside
    Message: Heading level skipped from H2 to H4
    ("Related Posts") [Selector: aside > h4]
-
 ```
-
-Each diagnostic entry provides:
-
-- **Path:** The structural DOM/region hierarchy path where the violation occurred.
-- **Message:** Description of the WCAG level sequence jump.
-- **Text Snippet:** Inner text content of the offending heading element.
-- **Selector:** DOM selector pointing to the target heading node.

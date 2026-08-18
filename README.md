@@ -1,312 +1,282 @@
 # react-heading-manager
 
-**Automatic, context-driven WCAG-compliant heading hierarchy management for React.**
-
-Never manually track heading levels again — nest landmark components and let the library compute `<h1>`–`<h6>` tags for you.
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://img.shields.io/npm/v/react-heading-manager.svg)](https://www.npmjs.com/package/react-heading-manager)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/vickbk/heading-manager/ci.yml?branch=main)](https://github.com/vickbk/heading-manager/actions)
-[![Test Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen.svg)](https://github.com/vickbk/heading-manager)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/vickbk/heading-manager/lint-test.yml?branch=main)](https://github.com/vickbk/heading-manager/actions)
+[![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/vickbk/heading-manager)
+
+Automatic heading hierarchy management and accessibility auditing for React applications.
+
+`react-heading-manager` derives heading levels from your component and landmark structure, so you don't have to manually drill `h1` through `h6` through deeply nested component trees. It also provides a framework-agnostic audit engine and a Playwright matcher for validating heading hierarchy in tests.
+
+> **Build your UI. Let the document structure determine the heading level.
+> Verify the result automatically.**
 
 ---
 
-## Features
+## ⚡ Quick Start
 
-- 🧠 **Context-aware heading propagation** — `<Heading>` automatically renders `<h1>`–`<h6>` based on nesting depth, with zero manual props.
-- 🏗️ **Semantic landmark components** — `<Main>`, `<Section>`, `<Article>`, `<Header>`, `<Aside>`, and `<Legend>` each create an accessible HTML5 sectioning boundary.
-- 🔤 **`<Heading>` and `<HeadingFragment>`** — Semantic heading output plus virtual sectioning context providers that stay correct across deeply nested component trees.
-- 🔬 **DOM auditing utilities** — `drawRegion`, `checkHeadingOrderReport`, and friends available under `react-heading-manager/utils` for runtime and test-time analysis — zero impact on your component bundle.
-- 🧪 **First-class testing support** — `toHaveValidHeadingHierarchy` Playwright matcher ships under `react-heading-manager/testing/playwright` via the explicit `registerPlaywright(expect)` initializer.
-- ♿ **WCAG 2.1 SC 1.3.1 compliant** — The architecture structurally prevents skipped heading levels (e.g. H1 → H3), a common screen-reader navigation failure.
-- 📦 **Dual ESM + CJS output** — Full TypeScript declarations included.
-- 🌐 **Next.js App Router ready** — All components are marked `"use client"` and SSR-safe.
+Get automatic heading hierarchy management running in a few lines.
 
----
-
-## Installation
+### 1. Install
 
 ```bash
-# pnpm (recommended)
-pnpm add react-heading-manager
-
-# npm
 npm install react-heading-manager
-
-# yarn
-yarn add react-heading-manager
 ```
 
-### Optional peer dependencies
+### 2. Replace manually managed heading levels
 
-Install only what you use:
-
-```bash
-# For DOM auditing utilities and the Playwright matcher
-pnpm add -D @playwright/test happy-dom
-```
-
----
-
-## Quick Start
+Instead of manually deciding whether a component should render an `<h1>`,
+`<h2>`, `<h3>`, etc.:
 
 ```tsx
 import {
+  Heading,
+  HeadingFragment,
   Main,
   Section,
   Article,
-  Heading,
-  HeadingFragment,
 } from "react-heading-manager";
 
-export function BlogPage() {
+export function Page() {
   return (
     <Main>
-      {/* Renders <h1> — top of the heading context */}
-      <Heading>My Blog</Heading>
+      <Heading>Page Title</Heading>
 
       <Section>
-        {/* Renders <h2> — one level deeper */}
-        <Heading>Latest Posts</Heading>
+        <Heading>Features</Heading>
 
         <Article>
-          {/* Renders <h3> — two levels deeper */}
-          <Heading>Understanding WCAG 1.3.1</Heading>
-          <p>
-            Info and Relationships is one of the most impactful WCAG criteria...
-          </p>
-        </Article>
-
-        <Article>
-          {/* Renders <h3> — same sibling depth */}
-          <Heading>Building Accessible React Apps</Heading>
-
-          <Section>
-            {/* Renders <h4> — three levels deep */}
-            <Heading>Component Architecture</Heading>
-            {/* HeadingFragment: advances the virtual heading context without creating a DOM wrapper */}
-            <HeadingFragment>
-              {/* Renders <h5> — same nested section depth, but with an updated context */}
-              <Heading>Getting Started</Heading>
-            </HeadingFragment>
-          </Section>
+          <Heading>Release Notes</Heading>
         </Article>
       </Section>
+
+      <HeadingFragment>
+        <Heading>Related Content</Heading>
+      </HeadingFragment>
     </Main>
   );
 }
 ```
 
-**Output HTML (rendered):**
+The heading level is derived from the surrounding document structure:
 
 ```html
 <main>
-  <h1>My Blog</h1>
+  <h1>Page Title</h1>
+
   <section>
-    <h2>Latest Posts</h2>
+    <h2>Features</h2>
+
     <article>
-      <h3>Understanding WCAG 1.3.1</h3>
-      <p>
-        Info and Relationships is one of the most impactful WCAG criteria...
-      </p>
-    </article>
-    <article>
-      <h3>Building Accessible React Apps</h3>
-      <section>
-        <h4>Component Architecture</h4>
-        <h5>Getting Started</h5>
-      </section>
+      <h3>Release Notes</h3>
     </article>
   </section>
+
+  <h4>Related Content</h4>
 </main>
 ```
 
----
+No `level` prop. No `h1`/`h2` prop drilling. No shared heading-level state between components.
 
-## Core API Reference
+### 3. Verify the hierarchy in Playwright
 
-### Components
-
-All components accept all standard HTML attributes for their underlying element, plus `ref` forwarding.
-
-#### Landmark Region Components
-
-These landmark components render an HTML5 sectioning element and **increment the `HeadingCtx` level** for nested `<Heading>` children. `<HeadingFragment>` is a non-rendering sectioning provider that also updates the ambient `HeadingCtx` without emitting a wrapper element.
-
-| Component           | HTML Element                | Description                                                                                                             |
-| ------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `<Main>`            | `<main>`                    | Page-level content region. Resets context to H1. Use once per page.                                                     |
-| `<Section>`         | `<section>`                 | Generic sectioning boundary.                                                                                            |
-| `<Article>`         | `<article>`                 | Self-contained, independently distributable content.                                                                    |
-| `<Header>`          | `<header>`                  | Introductory or navigational header within a landmark.                                                                  |
-| `<Aside>`           | `<aside>`                   | Tangentially related content (e.g. sidebars).                                                                           |
-| `<Legend>`          | `<legend>`                  | Fieldset legend region.                                                                                                 |
-| `<HeadingFragment>` | `None` / `<React.Fragment>` | Non-rendering sectioning provider that increments or overrides ambient `HeadingCtx` without emitting a wrapper element. |
-
-```tsx
-import {
-  Main,
-  Section,
-  Article,
-  Header,
-  Aside,
-  Legend,
-} from "react-heading-manager";
-
-<Main aria-label="Main content">
-  <Header>
-    <Heading>Site Name</Heading>
-  </Header>
-  <Section aria-labelledby="blog-section">
-    <Heading id="blog-section">Blog</Heading>
-    <Aside aria-label="Related links">
-      <Heading>See Also</Heading>
-    </Aside>
-  </Section>
-</Main>;
+```bash
+npm install -D @playwright/test
 ```
 
-#### `<Heading>`
+```ts
+import { expect, test } from "@playwright/test";
+import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
-```tsx
-import { Heading } from "react-heading-manager";
+registerPlaywright(expect);
+
+test("page heading hierarchy is valid", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page).toHaveValidHeadingHierarchy();
+});
 ```
 
-Reads the ambient `HeadingCtx` and renders the matching `<h1>`–`<h6>` tag. Falls back to `<h6>` if the nesting depth exceeds H6.
+The matcher reports structural violations with enough context to identify the offending region and heading.
 
-| Prop       | Type                                 | Description                           |
-| ---------- | ------------------------------------ | ------------------------------------- |
-| `children` | `ReactNode`                          | Heading text or content               |
-| `ref`      | `Ref<HTMLHeadingElement>`            | Forwarded ref to the heading DOM node |
-| `...props` | `HTMLAttributes<HTMLHeadingElement>` | Any valid HTML heading attribute      |
+### 4. Or audit the DOM directly
 
-#### `<HeadingFragment>`
-
-```tsx
-import { HeadingFragment } from "react-heading-manager";
-```
-
-Provides a new `HeadingCtx` value to its children. If `level` is omitted, it increments the ambient heading level by one; otherwise it applies the explicit `HeadingLevel` override (`0` = H1, `1` = H2, ..., `5` = H6). It emits zero DOM nodes and does not render a wrapper element.
-
-| Prop       | Type                      | Description                                                  |
-| ---------- | ------------------------- | ------------------------------------------------------------ |
-| `children` | `ReactNode`               | Content rendered inside the updated heading context          |
-| `level`    | `HeadingLevel` (optional) | Explicit 0-based override: `0` = H1, `1` = H2, ..., `5` = H6 |
-
-#### `createRegion(Tag)`
-
-```tsx
-import { createRegion } from "react-heading-manager";
-
-// Create a custom landmark wrapper for any HTML element
-const Nav = createRegion<HTMLElement>("nav");
-```
-
-Factory function that creates a landmark wrapper component for any HTML element tag. The returned component increments `HeadingCtx` and forwards refs.
-
----
-
-### Hooks
-
-#### `useHeading(hasH1?)`
-
-```tsx
-import { useHeading, HeadingCtx } from "react-heading-manager";
-```
-
-Low-level hook that computes the next heading level from the current `HeadingCtx`. Used internally by all landmark components. Useful when building custom region wrappers.
-
-| Parameter | Type      | Default | Description                                  |
-| --------- | --------- | ------- | -------------------------------------------- |
-| `hasH1`   | `boolean` | `true`  | Whether an H1 already exists in this context |
-
-**Returns:** `HeadingLevel` (0-based index: `0`=H1 … `5`=H6)
-
-```tsx
-function CustomRegion({ children }: { children: React.ReactNode }) {
-  const nextLevel = useHeading();
-  return (
-    <div role="region">
-      <HeadingCtx.Provider value={nextLevel}>{children}</HeadingCtx.Provider>
-    </div>
-  );
-}
-```
-
----
-
-### Utilities — `react-heading-manager/utils`
-
-Framework-agnostic DOM parsing and WCAG compliance utilities. Zero React dependency — can run in Node.js, browser, or any test environment with a DOM implementation.
+The core audit engine can be used independently of React and Playwright:
 
 ```ts
 import {
   drawRegion,
-  checkHeadingOrderReport,
-  checkHeadingOrder,
-  calculateNextHeadingLevel,
-  parseHeadingLevel,
-  resolveHeadingDetail,
-  getRegionIdentifier,
+  checkNormalizedHeadingReport,
 } from "react-heading-manager/utils";
-```
 
-#### `drawRegion(root: Element): RegionMapping`
+const regionTree = drawRegion(document.body);
 
-Recursively parses a DOM subtree into a structured `RegionMapping` landmark tree. Recognizes all HTML5 sectioning elements and explicit ARIA landmark roles.
-
-```ts
-const regionTree = drawRegion(document.querySelector("main")!);
-// { tagName: 'main', headings: ['h1', 'h2'], detailedHeadings: [...], children: [...] }
-```
-
-#### `checkHeadingOrderReport(region, initialLevel?): HeadingOrderReport`
-
-Traverses a `RegionMapping` tree and returns a detailed report of all WCAG heading hierarchy violations (skipped levels).
-
-```ts
-const report = checkHeadingOrderReport(regionTree);
+const report = checkNormalizedHeadingReport({
+  region: regionTree,
+});
 
 if (!report.isValid) {
-  report.errors.forEach((err) => {
-    console.warn(`[${err.path}] ${err.message}`);
-    // [root > section] Heading level skipped from H1 to H3
-  });
+  console.warn(report.errors);
 }
 ```
 
-| Field     | Type                  | Description                                                      |
-| --------- | --------------------- | ---------------------------------------------------------------- |
-| `isValid` | `boolean`             | `true` if no violations found                                    |
-| `errors`  | `HeadingOrderError[]` | Detailed violation records with path, message, text, and element |
+This makes the audit engine useful for unit tests, custom tooling, accessibility audits, and other DOM-based workflows.
 
-#### `checkHeadingOrder(region, currentLevel?): boolean`
+> **That's it.** Use `Heading` components to manage hierarchy, then
+> use the audit utilities or Playwright matcher to verify the resulting document structure.
 
-Boolean shorthand — returns `true` if the heading hierarchy is fully valid.
+---
 
-#### `calculateNextHeadingLevel(parentLevel: number, requestedLevel: number): number`
+## Why react-heading-manager?
 
-Calculates the next valid heading depth while preventing skipped levels and clamping to the H6 maximum. This keeps nested regions compliant with WCAG heading sequencing and is used internally by `useHeading()`.
+Heading levels are often difficult to manage in component-based applications.
 
-#### `parseHeadingLevel(tagName: string): number | null`
+A component may be rendered:
 
-Parses `"h1"`–`"h6"` (case-insensitive) into a numeric level. Returns `null` for non-heading tags.
+- directly inside a page
+- inside several nested sections
+- inside reusable components
+- inside a dynamically composed layout
+- in a different location depending on application state
 
-#### `resolveHeadingDetail(node: RegionMapping, index?: number): { rawHeading: string; parsedLevel: number | null; text?: string; element?: unknown } | null`
+Manually passing heading levels through those component boundaries quickly becomes difficult to maintain:
 
-Extracts structured metadata from a heading entry inside a `RegionMapping` tree. It prioritizes rich `detailedHeadings` metadata and falls back to the legacy string heading list when needed.
+```tsx
+<Heading level={2}>...</Heading>
+```
 
-```ts
-const regionTree = drawRegion(document.querySelector("main")!);
-const details = resolveHeadingDetail(regionTree, 0);
-// { rawHeading: 'h1', parsedLevel: 1, text: 'My Blog', ... }
+With `react-heading-manager`, the heading level is derived from the document
+structure instead:
+
+```tsx
+<Section>
+  <Heading>Section title</Heading>
+
+  <Article>
+    <Heading>Article title</Heading>
+  </Article>
+</Section>
+```
+
+The same components can therefore be composed without manually coordinating heading levels across the component tree.
+
+---
+
+## Key Features
+
+- **Automatic heading level tracking** without manual `h1`–`h6` prop drilling
+- **Semantic landmark awareness** for `main`, `section`, `article`, and ARIA landmark regions
+- **Framework-agnostic audit engine** for DOM parsing and hierarchy analysis
+- **Normalized heading analysis** using deterministic numeric heading levels
+- **Legacy-compatible heading analysis** for existing `RegionMapping` data
+- **Playwright integration** for explicit E2E accessibility assertions
+- **Detailed diagnostics** including heading paths, levels, text, and DOM references
+- **TypeScript support** with typed public APIs and Playwright matcher augmentation
+- **Zero-side-effect initialization**
+- **Tree-shakable module structure**
+
+---
+
+## Installation
+
+### npm
+
+```bash
+npm install react-heading-manager
+```
+
+### yarn
+
+```bash
+yarn add react-heading-manager
+```
+
+### pnpm
+
+```bash
+pnpm add react-heading-manager
+```
+
+### bun
+
+```bash
+bun add react-heading-manager
+```
+
+### Test utilities
+
+If you use the testing integrations:
+
+```bash
+npm install -D @playwright/test happy-dom
+```
+
+Or:
+
+```bash
+pnpm add -D @playwright/test happy-dom
 ```
 
 ---
 
-### Testing — `react-heading-manager/testing/playwright`
+## Usage
 
-Explicit Playwright matcher registration for end-to-end and integration accessibility auditing.
+### React Application
+
+The React adapter provides the components and hooks used to build heading-aware document structures.
+
+```tsx
+import {
+  Heading,
+  HeadingFragment,
+  Main,
+  Section,
+  Article,
+} from "react-heading-manager";
+
+export function ProductPage() {
+  return (
+    <Main>
+      <Heading>Products</Heading>
+
+      <Section>
+        <Heading>Featured Products</Heading>
+
+        <Article>
+          <Heading>Product Details</Heading>
+        </Article>
+      </Section>
+
+      <HeadingFragment>
+        <Heading>Related Products</Heading>
+      </HeadingFragment>
+    </Main>
+  );
+}
+```
+
+The resulting structure follows the surrounding landmark hierarchy:
+
+```html
+<main>
+  <h1>Products</h1>
+
+  <section>
+    <h2>Featured Products</h2>
+
+    <article>
+      <h3>Product Details</h3>
+    </article>
+  </section>
+
+  <h4>Related Products</h4>
+</main>
+```
+
+### Playwright E2E Testing
+
+Register the matcher once in your Playwright setup:
 
 ```ts
 import { expect } from "@playwright/test";
@@ -315,126 +285,270 @@ import { registerPlaywright } from "react-heading-manager/testing/playwright";
 registerPlaywright(expect);
 ```
 
-This initializer binds `toHaveValidHeadingHierarchy` to the provided Playwright `expect` instance without relying on a tree-shakable side-effect import.
-
-#### `toHaveValidHeadingHierarchy(initialLevel?)`
-
-Audits a `Page` or `Locator` for skipped or invalid heading hierarchy levels. Internally uses `drawRegion` + `checkHeadingOrderReport`.
-
-| Parameter      | Type     | Default | Description                                                                 |
-| -------------- | -------- | ------- | --------------------------------------------------------------------------- |
-| `initialLevel` | `number` | `1`     | Starting heading level. Use `2` for sub-components expected to start at H2. |
-
-The matcher accepts an optional custom starting level for sub-regions, and its failure output is formatted as a numbered diagnostic with the offending path, message, optional heading text, and selector.
-
-**TypeScript augmentation** is included for Playwright's `Matchers<R, T = unknown>` interface when you import the dedicated subpath.
-
----
-
-## Automated Testing Guide
-
-### Playwright Setup
+Then use the matcher in your tests:
 
 ```ts
-// playwright.config.ts
-import { defineConfig, expect } from "@playwright/test";
-import { registerPlaywright } from "react-heading-manager/testing/playwright";
-
-registerPlaywright(expect);
-
-export default defineConfig({
-  // ... your config
-});
-```
-
-```ts
-// tests/accessibility.spec.ts
 import { expect, test } from "@playwright/test";
-import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
-registerPlaywright(expect);
-
-test("home page has a valid heading hierarchy", async ({ page }) => {
+test("heading hierarchy is valid", async ({ page }) => {
   await page.goto("/");
+
   await expect(page).toHaveValidHeadingHierarchy();
 });
+```
 
-test("main content region headings are valid", async ({ page }) => {
-  await page.goto("/blog");
+You can also scope the check to a specific landmark:
+
+```ts
+test("main content has a valid heading hierarchy", async ({ page }) => {
+  await page.goto("/");
+
   await expect(page.locator("main")).toHaveValidHeadingHierarchy();
 });
-
-test("sidebar headings start at H2", async ({ page }) => {
-  await page.goto("/");
-  // Sidebar is expected to start with H2, not H1
-  await expect(page.locator("aside")).toHaveValidHeadingHierarchy(2);
-});
 ```
 
-> In a custom or multi-project Playwright setup, pass a specific `expect` instance to `registerPlaywright(customExpect)` instead of the global default.
+### Standalone Core Utilities
 
-### Vitest / Integration Testing
+The audit engine does not depend on React.
 
-```tsx
-// src/components/__tests__/my-page.test.tsx
-import { render } from "@testing-library/react";
+```ts
 import {
   drawRegion,
-  checkHeadingOrderReport,
+  checkNormalizedHeadingReport,
 } from "react-heading-manager/utils";
-import { MyPage } from "../MyPage";
 
-test("MyPage heading hierarchy is WCAG compliant", () => {
-  const { container } = render(<MyPage />);
-  const regionTree = drawRegion(container.firstElementChild as Element);
-  const report = checkHeadingOrderReport(regionTree);
+const regionTree = drawRegion(document.body);
 
-  expect(report.isValid).toBe(true);
-  expect(report.errors).toHaveLength(0);
+const report = checkNormalizedHeadingReport({
+  region: regionTree,
 });
+
+if (!report.isValid) {
+  console.warn(report.errors);
+}
 ```
 
-**On failure**, `toHaveValidHeadingHierarchy` produces a detailed diagnostic:
+The audit pipeline is intentionally split into two stages:
 
+```text
+DOM
+ │
+ ▼
+drawRegion()
+ │
+ ▼
+RegionMapping
+ │
+ ▼
+checkNormalizedHeadingReport()
+ │
+ ▼
+HeadingOrderReport
 ```
-Found 2 heading accessibility hierarchy violation(s):
 
-1. Path: root > main > section
-   Message: Heading level skipped from H1 to H3
-   ("Features") [Selector: section > h3:first-of-type]
+This allows DOM extraction and hierarchy validation to be tested and used independently.
 
-2. Path: root > main > aside
-   Message: Heading level skipped from H2 to H4
-   ("Related Posts") [Selector: aside > h4]
+---
+
+## Diagnostics
+
+When a heading hierarchy violation is detected, the audit engine produces structured diagnostic information.
+
+For example:
+
+```text
+Heading level skipped at main[0] > section[0]:
+context level is H1, expected maximum H2, but found H3.
+```
+
+A `HeadingOrderError` contains information such as:
+
+- region path
+- region tag name
+- heading level
+- normalized numeric level
+- heading text
+- DOM element reference
+- expected maximum level
+- actual level
+- human-readable error message
+
+This allows integrations to provide useful diagnostics rather than simply returning `true` or `false`.
+
+For example:
+
+```ts
+const report = checkNormalizedHeadingReport({
+  region: regionTree,
+});
+
+for (const error of report.errors) {
+  console.error({
+    path: error.path,
+    heading: error.heading,
+    actualLevel: error.actualLevel,
+    expectedMaxLevel: error.expectedMaxLevel,
+    text: error.text,
+  });
+}
 ```
 
 ---
 
-## Accessibility & Architecture Notes
+## Heading Hierarchy Model
 
-### How Context Isolation Works
+The normalized audit engine evaluates heading levels numerically.
 
-Each landmark component (`<Section>`, `<Article>`, etc.) calls `useHeading()` internally, which reads the current `HeadingCtx` and computes the **next level** using `calculateNextHeadingLevel`. It then renders `HeadingCtx.Provider` with the incremented value, establishing a new context boundary for all children.
+A heading may:
 
+- remain at the same level
+- decrease to a lower level
+- increase by exactly one level
+
+An increase of more than one level is reported as a hierarchy violation.
+
+For example:
+
+```text
+H1 → H2   ✓
+H2 → H3   ✓
+H3 → H3   ✓
+H3 → H2   ✓
+H2 → H4   ✗
 ```
-HeadingCtx (default: 0 → H1)
-  └─ <Main>               provides 0 (H1)
-       └─ <Section>       reads 0, computes 1, provides 1 (H2)
-            └─ <Article>  reads 1, computes 2, provides 2 (H3)
-                 └─ <Heading> → renders <h3>
+
+The normalized engine uses `HeadingDetail.numLevel` as its canonical numeric representation.
+
+This also means normalized levels greater than H6 can be represented and validated deterministically:
+
+```text
+H6 → H7   ✓
+H7 → H8   ✓
+H6 → H8   ✗
+H7 → H10  ✗
 ```
 
-This means heading levels are **structurally enforced** by the component tree — it is impossible to accidentally render an `<h3>` after an `<h1>` simply by composing components correctly.
+The normalized implementation intentionally does not reinterpret or clamp these values.
 
-### Why This Matters for Screen Reader Users
+> The sequential heading-level rule is an accessibility auditing heuristic.
+> A reported heading-level jump should not be interpreted by itself as a definitive WCAG conformance determination.
 
-Screen readers expose document heading structure as a navigational landmark. Users can jump between headings with keyboard shortcuts (e.g. `H` in NVDA, JAWS). A skipped heading level (H1 → H3) breaks the mental model — a user navigating by heading would experience a gap in the outline, making it impossible to determine whether content was missed.
+---
 
-WCAG 2.1 Success Criterion 1.3.1 (Info and Relationships) requires that structural relationships conveyed visually are also available programmatically. Heading levels are a primary mechanism for communicating document structure to assistive technologies.
+## Entry Points & Import Subpaths
 
-### Modular Component Trees
+The package exposes separate entry points for the React adapter, core
+utilities, and Playwright integration.
 
-Because heading level is derived from context rather than hardcoded, components are **location-independent**: you can reuse the same `<Card>` component inside a `<Section>` (rendering `<h3>`) or inside an `<Article>` inside a `<Section>` (rendering `<h4>`) without any prop changes.
+| Subpath                                    | Target module        | Usage                                                                                 |
+| ------------------------------------------ | -------------------- | ------------------------------------------------------------------------------------- |
+| `react-heading-manager`                    | React adapter        | Render `<Heading>`, `<Main>`, `<Section>`, `<Article>`, hooks, and related components |
+| `react-heading-manager/utils`              | Core + shared engine | DOM parsing, normalized heading audits, and hierarchy checks                          |
+| `react-heading-manager/testing/playwright` | Playwright adapter   | Register and use the custom heading hierarchy matcher                                 |
+
+### Playwright import
+
+The supported Playwright entry point is:
+
+```ts
+import { registerPlaywright } from "react-heading-manager/testing/playwright";
+```
+
+⚠️ Avoid stale imports targeting the older path:
+
+```ts
+react - heading - manager / playwright;
+```
+
+---
+
+## Architecture & Module Isolation Policy
+
+The package is organized into four layers with a strict dependency direction:
+
+```text
+shared
+   ↓
+core
+   ↓
+adapters
+   ↓
+main
+```
+
+| Layer          | Purpose                              | Can import                 | Must not import                            |
+| -------------- | ------------------------------------ | -------------------------- | ------------------------------------------ |
+| `src/shared`   | Pure DOM primitives and shared types | Nothing higher-level       | `src/core`, `src/adapters`, `src/main`     |
+| `src/core`     | Audit engine and DOM algorithms      | `src/shared`               | `src/adapters`, sibling `src/core` modules |
+| `src/adapters` | React and Playwright integrations    | `src/core`, `src/shared`   | Sibling adapters                           |
+| `src/main`     | Public re-export routers             | `src/adapters`, `src/core` | Business logic                             |
+
+This isolation keeps the runtime surface clean and prevents framework-specific implementations from leaking into the framework-agnostic engine.
+
+---
+
+## TypeScript Support
+
+The package provides typed public APIs throughout the React, core, and testing layers.
+
+Playwright matcher types are also augmented automatically.
+
+```ts
+import { expect } from "@playwright/test";
+import { registerPlaywright } from "react-heading-manager/testing/playwright";
+
+registerPlaywright(expect);
+
+await expect(page).toHaveValidHeadingHierarchy();
+```
+
+No manual declaration merging is required.
+
+---
+
+## Accessibility
+
+`react-heading-manager` is designed to support accessibility auditing around document structure and heading relationships.
+
+The core audit functionality considers:
+
+- native heading elements
+- ARIA heading roles
+- `aria-level`
+- HTML and ARIA landmark regions
+- heading relationships across nested regions
+
+The package's audit rules are intended to help identify structural issues
+during development and testing.
+
+They should be treated as **auditing heuristics rather than a complete WCAG conformance engine**.
+
+---
+
+## Testing
+
+The project maintains unit and integration coverage across:
+
+- DOM region extraction
+- heading normalization
+- legacy heading resolution
+- heading hierarchy processing
+- nested region traversal
+- normalized heading validation
+- Playwright matcher integration
+- edge cases involving ARIA headings and levels beyond H6
+
+Run the test suite with:
+
+```bash
+npm test
+```
+
+Run linting with:
+
+```bash
+npm run lint
+```
 
 ---
 
@@ -442,4 +556,4 @@ Because heading level is derived from context rather than hardcoded, components 
 
 MIT © [Vick Bake](https://github.com/vickbk)
 
-See [LICENSE](./LICENSE) for full text.
+See [LICENSE](./LICENSE) for the full license text.

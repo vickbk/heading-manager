@@ -220,14 +220,14 @@ A bottom-up approach ensures that code-level TSDoc becomes the single source of 
 
 ### Phase 3: Root Documentation & Changelog Synthesis (Package Level)
 
-- [ ] **Task 7: Synthesize Root README from Refined Sub-Layers**
-- **Status**: 🔴 To Do
-- **Target**: 2026-08-20
+- [x] **Task 7: Synthesize Root README from Refined Sub-Layers**
+- **Status**: ✅ Done
+- **Target**: 2026-08-18
 - **Description**: Rewrite root `README.md` using complementary data from layer READMEs and public TSDoc examples.
 - **Steps**:
-- [ ] Document the Hexagonal Architecture breakdown using verified layer READMEs as source material.
-- [ ] Validate all code blocks against actual `package.json` subpaths (`react-heading-manager`, `react-heading-manager/utils`, `react-heading-manager/testing/playwright`).
-- [ ] Remove all legacy package references (`heading-manager`).
+- [x] Document the Hexagonal Architecture breakdown using verified layer READMEs as source material.
+- [x] Validate all code blocks against actual `package.json` subpaths (`react-heading-manager`, `react-heading-manager/utils`, `react-heading-manager/testing/playwright`).
+- [x] Remove all legacy package references (`heading-manager`).
 
 - [ ] **Task 8: Normalize and Update CHANGELOG.md**
 - **Status**: 🔴 To Do

@@ -1,40 +1,34 @@
-# Adapters Architecture & Dependency Policies
+# Adapters Layer
 
-The `adapters` directory contains environment-specific integrations, framework components, and testing utilities (e.g., React components like `<Heading>` and `<Main>`, Playwright extensions like `toHaveValidHeadingHierarchy`).
-
-Adapters translate domain rules and engine logic into target ecosystems without leaking framework dependencies across environments.
+The `src/adapters` layer contains environment-specific integrations for consumer runtimes. It translates the pure audit engine into concrete interfaces for React applications and Playwright testing.
 
 ---
 
 ## Folder Responsibilities
 
-Each sub-module inside `adapters/` serves a distinct execution environment:
-
-- **UI Framework Adapters** (e.g., `react`): Provide context providers, hooks, and layout components for UI rendering.
-- **Testing & Assertion Adapters** (e.g., `playwright`, `vitest`): Provide custom matchers, setup functions, and runner integrations.
-
----
+- `src/adapters/react/`: React components, context providers, and hooks
+- `src/adapters/playwright/`: Playwright matcher registration and assertion extension
 
 ## Dependency Rules
 
-| Allowed Imports | Forbidden Imports                                                   |
-| :-------------- | :------------------------------------------------------------------ |
-| ✅ `shared/*`   | ❌ Sibling `adapters/*` (e.g., `react` importing from `playwright`) |
-| ✅ `core/*`     |                                                                     |
+| Allowed imports | Forbidden imports                          |
+| --------------- | ------------------------------------------ |
+| `src/shared/**` | `src/adapters/**` siblings                 |
+| `src/core/**`   | direct framework coupling between adapters |
 
-### Boundary Guidelines
+The boundary is strict:
 
-- **Strict Isolation Between Environments:** Adapters must remain completely decoupled from one another. A consumer using `adapters/react` must never pull in testing frameworks like Playwright or Vitest into their runtime bundle.
+- React code cannot import Playwright matcher code.
+- Playwright code cannot import from the React adapter.
+- Both adapters may read from `src/core` and `src/shared`, but nothing on the same layer should cross into a sibling adapter.
 
 ---
 
-## Import Examples
+## Public Adapters
 
 ```ts
-// ✅ VALID: Importing domain logic from core or shared primitives
-import { ... } from "../core";
-import { ... } from "../shared";
-
-// ❌ FORBIDDEN: Cross-adapter coupling
-import { ... } from "../adapters/playwright"; // Never import sibling adapters
+import { Heading, Main } from "react-heading-manager";
+import { registerPlaywright } from "react-heading-manager/testing/playwright";
 ```
+
+These two public surfaces correspond to the package entry points `.` and `./testing/playwright` respectively, while the shared core engine is exposed via `./utils`.

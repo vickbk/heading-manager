@@ -1,5 +1,5 @@
 /**
- * Zero-based heading depth level index mapping to HTML heading levels H1 through H6.
+ * Zero-based heading depth index used by the ambient heading context.
  *
  * - `0` = H1
  * - `1` = H2
@@ -13,7 +13,7 @@
  * @example
  * ```ts
  * const rootLevel: HeadingLevel = 0; // H1
- * const subLevel: HeadingLevel = 1;  // H2
+ * const subLevel: HeadingLevel = 1; // H2
  * ```
  */
-export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 0;
+export type HeadingLevel = 0 | 1 | 2 | 3 | 4 | 5;

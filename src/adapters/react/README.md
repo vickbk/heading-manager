@@ -1,63 +1,64 @@
-# `src/adapters/react`
+# React Adapter
 
-React adapter for `react-heading-manager` that automatically manages heading levels via React Context. Landmark wrappers render an HTML sectioning element and increment the ambient `HeadingCtx` for nested `<Heading>` children. `<HeadingFragment>` is a non-rendering provider that updates the context without creating a DOM wrapper, while `useHeading` allows direct consumption of the current level.
-
----
-
-## Exports
-
-| Export            | Type             | HTML Element / Return       | Description                                                              |
-| ----------------- | ---------------- | --------------------------- | ------------------------------------------------------------------------ |
-| `createRegion`    | Factory Function | _(configurable)_            | HOC that creates a landmark wrapper component for any HTML tag           |
-| `Main`            | Component        | `<main>`                    | Page-level main content region — resets heading context to H1            |
-| `Section`         | Component        | `<section>`                 | Generic sectioning region                                                |
-| `Article`         | Component        | `<article>`                 | Self-contained article region                                            |
-| `Header`          | Component        | `<header>`                  | Introductory or navigational region                                      |
-| `Aside`           | Component        | `<aside>`                   | Tangentially related content region                                      |
-| `Legend`          | Component        | `<legend>`                  | Fieldset legend region                                                   |
-| `Heading`         | Component        | `<h1>`–`<h6>`               | Heading rendered at the current context level                            |
-| `HeadingFragment` | Component        | `None` `(Context Provider)` | Non-rendering provider that increments or overrides ambient `HeadingCtx` |
-| `useHeading`      | Hook             | `HeadingLevel`              | Custom hook to calculate the next 0-based heading level index            |
-| `HeadingCtx`      | React Context    | `Context<HeadingLevel>`     | Ambient React Context holding the current 0-based heading level          |
+The `src/adapters/react` package provides the React UI binding for `react-heading-manager`. It manages ambient heading context, renders semantic landmarks, and automatically resolves descendant `<Heading>` elements to the correct native heading level.
 
 ---
 
-## Core Concept: `createRegion`
+## Dependency Rules
 
-`createRegion<T>(Tag)` is a higher-order factory function located in `src/adapters/react/components/create-region.tsx` that:
+| Allowed imports | Forbidden imports                               |
+| --------------- | ----------------------------------------------- |
+| `src/shared/**` | `src/adapters/playwright/**`                    |
+| `src/core/**`   | sibling adapter modules outside the React layer |
 
-1. Calls `useHeading()` to compute the next heading level from the current `HeadingCtx`.
-2. Renders `Tag` as the HTML landmark wrapper.
-3. Provides an incremented `HeadingCtx.Provider` value to all children.
+This layer is the only place where React-specific rendering concerns are allowed to live.
 
-```tsx
-import { createRegion } from "react-heading-manager/react";
+---
 
-const Nav = createRegion<HTMLElement>("nav");
+## Public API
+
+```ts
+import {
+  Article,
+  Aside,
+  Header,
+  Heading,
+  HeadingCtx,
+  HeadingFragment,
+  Legend,
+  Main,
+  Section,
+  createRegion,
+  useHeading,
+} from "react-heading-manager";
 ```
 
+### Primary exports
+
+- `Main`: root page landmark and heading-context initializer
+- `Section`, `Article`, `Header`, `Aside`, `Legend`: HTML landmark wrappers
+- `Heading`: context-aware heading component
+- `HeadingFragment`: zero-DOM context bridge
+- `createRegion`: custom landmark factory
+- `HeadingCtx`, `useHeading`: low-level context API
+
 ---
 
-## Usage Examples
-
-### Basic Page Structure
+## Usage example
 
 ```tsx
-import { Main, Section, Article, Heading } from "react-heading-manager/react";
+import { Heading, Main, Section, Article } from "react-heading-manager";
 
 export function Page() {
   return (
     <Main>
-      {/* <Heading> renders as <h1> — top of context */}
-      <Heading>Page Title</Heading>
+      <Heading>Page title</Heading>
 
       <Section>
-        {/* <Heading> renders as <h2> — one level deeper */}
-        <Heading>Section Heading</Heading>
+        <Heading>Features</Heading>
 
         <Article>
-          {/* <Heading> renders as <h3> — two levels deeper */}
-          <Heading>Article Heading</Heading>
+          <Heading>Release Notes</Heading>
         </Article>
       </Section>
     </Main>
@@ -65,88 +66,21 @@ export function Page() {
 }
 ```
 
-### Forwarded Refs
-
-All landmark components support `ref` forwarding:
-
-```tsx
-import { useRef } from "react";
-import { Section, Heading } from "react-heading-manager/react";
-
-const ref = useRef<HTMLElement>(null);
-
-<Section ref={ref} aria-label="Featured content">
-  <Heading>Featured</Heading>
-</Section>;
-```
-
-### Direct Hook Consumption
-
-```ts
-import { HeadingCtx, useHeading } from "react-heading-manager/react";
-
-export function CustomCardRegion({ children }: { children: React.ReactNode }) {
-  const nextLevel = useHeading(); // Returns 0-based integer index (0..5)
-
-  return (
-    <div className="card-region">
-      <HeadingCtx.Provider value={nextLevel}>
-        {children}
-      </HeadingCtx.Provider>
-    </div>
-  );
-}
-```
+This renders sequential heading levels without manual `h1`-`h6` drilling.
 
 ---
 
-## Component & Hook API
+## Accessibility behavior
 
-### `<Main>`
-
-Renders a `<main>` element. By default (`pageHasH1 = false`), the first `<Heading>` inside renders as `<h1>`. Set `pageHasH1={true}` only when a global `<h1>` already exists outside this landmark boundary (e.g., in a site-wide global header).
-
-| Prop        | Type                          | Default | Description                                                                                                                   |
-| ----------- | ----------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `pageHasH1` | `boolean`                     | `false` | Set to `true` when an `<h1>` already exists **outside** this `<Main>` landmark. First `<Heading>` will then render as `<h2>`. |
-| `children`  | `ReactNode`                   | —       | Content to render inside `<main>`.                                                                                            |
-| `ref`       | `Ref<HTMLElement>`            | —       | Forwarded ref to the `<main>` DOM node.                                                                                       |
-| `...props`  | `HTMLAttributes<HTMLElement>` | —       | Any valid HTML attribute for `<main>`.                                                                                        |
-
-### `<Heading>`
-
-Renders the correct heading level (`<h1>`–`<h6>`) based on `HeadingCtx`. Automatically clamps to `<h6>` when context level exceeds 5.
-
-| Prop       | Type                                 | Default | Description                            |
-| ---------- | ------------------------------------ | ------- | -------------------------------------- |
-| `children` | `ReactNode`                          | —       | Heading text or content.               |
-| `ref`      | `Ref<HTMLHeadingElement>`            | —       | Forwarded ref to the heading DOM node. |
-| `...props` | `HTMLAttributes<HTMLHeadingElement>` | —       | Any valid HTML heading attribute.      |
-
-### `<HeadingFragment>`
-
-Provides a new `HeadingCtx` value to its children. When `level` is omitted, it increments the ambient heading level by `1`; when supplied, it overrides the context to the explicit `HeadingLevel` (`0` = H1, `1` = H2, ..., `5` = H6). It renders zero DOM nodes.
-
-| Prop       | Type           | Default     | Description                                                          |
-| ---------- | -------------- | ----------- | -------------------------------------------------------------------- |
-| `children` | `ReactNode`    | —           | React nodes rendered within the updated heading context.             |
-| `level`    | `HeadingLevel` | `undefined` | Optional 0-based level override (`0` = H1, `1` = H2, ..., `5` = H6). |
-
-### `useHeading()`
-
-Calculates the next 0-based heading level index (`0` for H1, `1` for H2, ..., `5` for H6) based on ambient `HeadingCtx`.
-
-| Parameter | Type      | Default | Description                                                                                                      |
-| --------- | --------- | ------- | ---------------------------------------------------------------------------------------------------------------- |
-| `hasH1`   | `boolean` | `true`  | Whether an H1 heading already exists in the current section hierarchy scope. When `false`, returns `0` (`<h1>`). |
-
-- **Returns:** `HeadingLevel` (`number` between `0` and `5`)
+- `Main` initializes the root heading scope.
+- `Section`, `Article`, `Header`, `Aside`, and `Legend` all increment the active heading context.
+- `Heading` resolves to `<h1>` through `<h6>` based on the active context and clamps at `h6`.
+- `HeadingFragment` updates context without creating a wrapper element.
 
 ---
 
-## Accessibility Notes
+## Rules for contributors
 
-- **WCAG 2.1 SC 1.3.1 (Info and Relationships):** Heading levels are computed automatically to avoid skipped levels (e.g., H1 → H3).
-- **Sectioning elements** (`<section>`, `<article>`, `<aside>`) are recognized as ARIA landmark regions by screen readers when labelled with `aria-label` or `aria-labelledby`.
-- The `<main>` landmark must appear **once per page** and receive focus on skip-link activation.
-- `<legend>` inside `<fieldset>` semantically labels the group for screen readers.
+- Keep this folder React-only and free of Playwright/test runner code.
+- Reuse `src/core` logic for hierarchy evaluation instead of re-implementing it here.
+- Prefer explicit provider-based context and typed props over hidden runtime side effects.
