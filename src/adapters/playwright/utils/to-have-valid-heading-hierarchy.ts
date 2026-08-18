@@ -7,24 +7,25 @@ const w = new Window();
 const parser = new w.DOMParser();
 
 /**
- * Custom Playwright matcher that audits the heading hierarchy of a Page or Locator target.
+ * Custom Playwright matcher that audits the heading hierarchy of a `Page` or `Locator` target.
  *
- * It extracts the DOM tree, builds a region mapping using `drawRegion`, and verifies
- * sequential heading rules (`H1` to `H6`) using `checkHeadingOrderReport`.
+ * Extracts the DOM tree from the target, constructs a semantic region hierarchy using `drawRegion`,
+ * and validates heading levels against normalized WCAG accessibility rules via `checkNormalizedHeadingReport`.
  *
  * @param target - The Playwright `Page` or `Locator` instance to audit.
- * @param initialLevel - Optional starting heading level context (default: 1).
- *                       Useful when auditing sub-components expected to fit inside a parent H2 or H3.
+ * @param initialLevel - Starting heading level context (default: `1`).
+ *                       Set higher (e.g. `2` or `3`) when auditing isolated components/widgets
+ *                       expected to sit within a parent sectioning container.
  *
- * @returns An assertion result object with pass status and formatted failure messages.
+ * @returns Playwright assertion result object with pass/fail status and formatted violation reports.
  *
  * @example
- * // Audit an entire page
+ * // Audit full page starting at H1
  * await expect(page).toHaveValidHeadingHierarchy();
  *
  * @example
- * // Audit a specific landmark or container starting with header level 2
- * await expect(page.locator('main[role="main"]')).toHaveValidHeadingHierarchy(2);
+ * // Audit an isolated card or section container assuming ambient level H2
+ * await expect(page.locator("main section.widget")).toHaveValidHeadingHierarchy(2);
  */
 export async function toHaveValidHeadingHierarchy(
   target: Page | Locator,
@@ -35,18 +36,20 @@ export async function toHaveValidHeadingHierarchy(
 
   if (!elementHandle) {
     return {
-      message: () => "Failed to find element to audit heading hierarchy.",
+      message: () => "Failed to locate DOM element to audit heading hierarchy.",
       pass: false,
     };
   }
 
   const html = await elementHandle.evaluate((e) => e.outerHTML);
 
-  if (!html)
+  if (!html) {
     return {
-      message: () => "HTML Failed to find element to audit heading hierarchy.",
+      message: () =>
+        "Failed to extract outer HTML for heading hierarchy audit.",
       pass: false,
     };
+  }
 
   const content = parser.parseFromString(html, "text/html");
   const rootElement = content.body.firstElementChild || content.body;
@@ -59,7 +62,7 @@ export async function toHaveValidHeadingHierarchy(
 
   if (report.isValid) {
     return {
-      message: () => "No violation found in heading hieararchy",
+      message: () => "No violations found in heading hierarchy.",
       pass: true,
     };
   }

@@ -1,26 +1,31 @@
 # Playwright Adapter
 
-The Playwright adapter adds `toHaveValidHeadingHierarchy` to the Playwright `expect` API without relying on a side-effectful top-level import. The matcher is registered explicitly through the `registerPlaywright` initializer, which makes it safe for bundlers and easy to use in isolated or multi-project Playwright setups.
+The Playwright adapter adds `toHaveValidHeadingHierarchy` to the Playwright `expect` assertion API without relying on side-effectful top-level imports. The matcher is registered explicitly using `registerPlaywright`, making it tree-shakable, bundler-safe, and compatible with isolated or multi-project Playwright setups.
 
 ---
 
-## Installation and Setup
+## Installation & Setup
+
+Register the custom matcher once in your global setup file or spec helper:
 
 ```ts
 import { expect } from "@playwright/test";
 import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
-// Register the custom matcher
+// Register custom matchers on the default expect instance
 registerPlaywright(expect);
 ```
 
-This binds `toHaveValidHeadingHierarchy` to the provided Playwright `expect` instance. If you want to target a custom instance rather than the default global `expect`, pass that instance into `registerPlaywright(customExpect)`.
+To target a custom or extended `expect` instance, pass it directly to `registerPlaywright`:
 
 ```ts
 import { expect as baseExpect } from "@playwright/test";
 import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
-const customExpect = baseExpect;
+const customExpect = baseExpect.extend({
+  /* other matchers */
+});
+
 registerPlaywright(customExpect);
 ```
 
@@ -30,37 +35,38 @@ registerPlaywright(customExpect);
 
 ### `registerPlaywright(customExpect?)`
 
-Registers the matcher on a Playwright `expect` object.
+Extends a Playwright `expect` instance with `react-heading-manager` assertion matchers.
 
 ```ts
 registerPlaywright(customExpect = expect): void
+
 ```
 
-Parameters:
+| Parameter      | Type            | Default  | Description                                                      |
+| -------------- | --------------- | -------- | ---------------------------------------------------------------- |
+| `customExpect` | `typeof expect` | `expect` | Playwright `expect` instance to augment with heading assertions. |
 
-- `customExpect` (optional): A Playwright `expect` instance to augment. When omitted, the default imported `expect` from `@playwright/test` is used.
+---
 
-Use this when:
+### `toHaveValidHeadingHierarchy(initialLevel?: InitialHeading)`
 
-- You want explicit initialization in a config or test file.
-- You are working in isolated or multi-project Playwright setups.
-- You want to avoid implicit side-effect registration and tree-shaking issues.
-
-### `toHaveValidHeadingHierarchy(initialLevel?: number)`
-
-The matcher audits a Playwright `Page` or `Locator` and checks whether heading levels are sequential without skipping values.
+Audits the DOM tree of a Playwright `Page` or `Locator`, parses sectioning regions (`drawRegion`), and validates that heading progression complies with WCAG 2.1 SC 1.3.1 without skipped levels (e.g. `<h1>` → `<h3>`).
 
 ```ts
-await expect(page).toHaveValidHeadingHierarchy();
-await expect(page.locator("main[role='main']")).toHaveValidHeadingHierarchy(2);
+await expect(page).toHaveValidHeadingHierarchy(initialLevel?: InitialHeading): Promise<R>
+
 ```
 
-Behavior:
+| Parameter      | Type | Default | Description |
+| -------------- | ---- | ------- | ----------- | --- | --- | --- | --- | ----------------------------------------------------------------------------- |
+| `initialLevel` | `1   | 2       | 3           | 4   | 5   | 6`  | `1` | Ambient starting heading level index (`1` for `<h1>` through `6` for `<h6>`). |
 
-- Targets a `Page` or `Locator`.
-- Uses the DOM from the selected element and validates the heading structure.
-- Defaults to `initialLevel = 1` when no explicit value is provided.
-- Supports custom hierarchy contexts, for example when a component is expected to begin at H2 instead of H1.
+#### Behavior
+
+- Extracts the `outerHTML` of the target `Page` or `Locator`.
+- Builds a semantic region tree using `drawRegion`.
+- Evaluates heading levels against normalized WCAG rules via `checkNormalizedHeadingReport`.
+- Supports custom hierarchy contexts (e.g., set `initialLevel = 2` when auditing an isolated component expected to sit inside an outer `<h2>` landmark).
 
 ---
 
@@ -74,13 +80,13 @@ import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
 registerPlaywright(expect);
 
-test("page has a valid heading hierarchy", async ({ page }) => {
+test("page contains a valid WCAG heading hierarchy", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveValidHeadingHierarchy();
 });
 ```
 
-### Audit a Specific Landmark or Container
+### Audit a Specific Landmark Container
 
 ```ts
 import { expect, test } from "@playwright/test";
@@ -102,17 +108,17 @@ import { registerPlaywright } from "react-heading-manager/testing/playwright";
 
 registerPlaywright(expect);
 
-test("sidebar headings start at H2", async ({ page }) => {
+test("sidebar card component headings start at H2", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("aside")).toHaveValidHeadingHierarchy(2);
+  await expect(page.locator("aside.sidebar")).toHaveValidHeadingHierarchy(2);
 });
 ```
 
 ---
 
-## Failure Output
+## Diagnostic Violation Output
 
-When the hierarchy is invalid, the matcher returns a numbered diagnostic describing each violation.
+When hierarchy errors are detected, the matcher produces a structured report detailing each violation:
 
 ```text
 Found 2 heading accessibility hierarchy violation(s):
@@ -124,35 +130,12 @@ Found 2 heading accessibility hierarchy violation(s):
 2. Path: root > main > aside
    Message: Heading level skipped from H2 to H4
    ("Related Posts") [Selector: aside > h4]
+
 ```
 
-The output includes:
+Each diagnostic entry provides:
 
-- the violation path
-- the descriptive error message
-- the offending heading text, when available
-- the selector for the failing element
-
----
-
-## TypeScript Setup and Matchers Augmentation
-
-The adapter augments Playwright's matcher typings so TypeScript understands the custom assertion on the `expect` instance.
-
-```ts
-import { expect } from "@playwright/test";
-import { registerPlaywright } from "react-heading-manager/testing/playwright";
-
-registerPlaywright(expect);
-
-await expect(page).toHaveValidHeadingHierarchy();
-```
-
-This is implemented with the Playwright augmentation pattern for `PlaywrightTest.Matchers<R, T = {}>`, so autocompletion and type checking work for the extended matcher API without requiring a side-effect import.
-
----
-
-## Related
-
-- [../README.md](../README.md) — testing architecture overview and adapter index
-- [../../utils/README.md](../../utils/README.md) — DOM parsing and heading-order validation utilities
+- **Path:** The structural DOM/region hierarchy path where the violation occurred.
+- **Message:** Description of the WCAG level sequence jump.
+- **Text Snippet:** Inner text content of the offending heading element.
+- **Selector:** DOM selector pointing to the target heading node.

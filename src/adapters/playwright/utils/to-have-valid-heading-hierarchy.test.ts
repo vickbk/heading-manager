@@ -47,7 +47,9 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
     const result = await toHaveValidHeadingHierarchy(mockTarget);
 
     expect(result.pass).toBe(true);
-    expect(result.message()).toContain("No violation found");
+    expect(result.message()).toContain(
+      "No violations found in heading hierarchy.",
+    );
   });
 
   it("returns pass: false and formatted error output when heading level is skipped (e.g. H1 -> H3)", async () => {
@@ -168,7 +170,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
 
           expect(result.pass).toBe(false);
           expect(result.message()).toBe(
-            "Failed to find element to audit heading hierarchy.",
+            "Failed to locate DOM element to audit heading hierarchy.",
           );
           expect(mockDrawRegion).not.toHaveBeenCalled();
         });
@@ -187,7 +189,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
 
           expect(result.pass).toBe(false);
           expect(result.message()).toBe(
-            "HTML Failed to find element to audit heading hierarchy.",
+            "Failed to extract outer HTML for heading hierarchy audit.",
           );
           expect(mockDrawRegion).not.toHaveBeenCalled();
         });
@@ -301,7 +303,7 @@ describe("toHaveValidHeadingHierarchy Playwright Matcher", () => {
 
           expect(result.pass).toBe(true);
           expect(result.message()).toBe(
-            "No violation found in heading hieararchy",
+            "No violations found in heading hierarchy.",
           );
         });
 

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createRegion, Heading, HeadingFragment, Main } from "../components";
+import { createRegion, Heading, HeadingFragment, Main } from "../index";
 
 const Section = createRegion<HTMLElement>("section");
 const Article = createRegion<HTMLElement>("article");

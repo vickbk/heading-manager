@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 // Types
 
 // Core Components & Context
-import { createRegion, Heading, HeadingFragment, Main } from "../components";
+import { createRegion, Heading, HeadingFragment, Main } from "../index";
 
 // Verification Helpers
 import {
