@@ -174,18 +174,18 @@ A bottom-up approach ensures that code-level TSDoc becomes the single source of 
 - **Target**: 2026-08-18
 - **Description**: Standardize TSDoc annotations across `src/core/auditor/` to reflect pure, framework-agnostic WCAG auditing logic.
 - **Steps**:
-- [x] Audit all core auditing functions (`auditHeadingHierarchy`, DOM node processors, and rule validators).
-- [x] Ensure complete TSDoc metadata (`@description`, `@param`, `@returns`, `@throws`) across every exported core module.
-- [x] Verify core TSDoc examples do not import React or Playwright dependencies.
+  - [x] Audit all core auditing functions (`auditHeadingHierarchy`, DOM node processors, and rule validators).
+  - [x] Ensure complete TSDoc metadata (`@description`, `@param`, `@returns`, `@throws`) across every exported core module.
+  - [x] Verify core TSDoc examples do not import React or Playwright dependencies.
 
 - [ ] **Task 3: Audit & Standardize TSDoc for Adapters & Public Routers**
 - **Status**: 🔴 To Do
 - **Target**: 2026-08-18
 - **Description**: Refactor TSDoc for React UI elements, Playwright matchers, and `src/main/` subpath entrypoints.
 - **Steps**:
-- [ ] Add `@param` and `@returns` tags to `<Heading>` (`heading.tsx`) and `<Main>` (`main.tsx`).
+- [x] Add `@param` and `@returns` tags to `<Heading>` (`heading.tsx`) and `<Main>` (`main.tsx`).
 - [ ] Add complete JSDoc headers to Playwright utility `registerPlaywright` (`register.ts`).
-- [ ] Standardize TSDoc tags for `landmarks.ts` and all public subpath router files in `src/main/`.
+- [x] Standardize TSDoc tags for `landmarks.ts` and all public subpath router files in `src/main/`.
 
 ---
 

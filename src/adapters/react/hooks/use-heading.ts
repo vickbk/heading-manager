@@ -13,16 +13,19 @@ export const HeadingCtx = createContext<HeadingLevel>(0);
 /**
  * Custom hook to calculate the next 0-based heading level index for a nested section.
  *
- * @description Reads current `HeadingCtx` and computes the next level using `calculateNextHeadingLevel`.
+ * @param hasH1 - Whether an H1 heading already exists in the current section hierarchy scope. Defaults to `true`.
+ * @returns The calculated next 0-based `HeadingLevel` integer (`0` through `5`).
  *
- * @param hasH1 - Whether the current section or page already contains an H1 heading (defaults to `true`).
- * @returns The next 0-based `HeadingLevel` index (`0` through `5`).
+ * @remarks
+ * **Heading Level Computation:**
+ * Reads the ambient `HeadingCtx` value and uses `calculateNextHeadingLevel` to compute the incremented
+ * child context level (clamping at `5` for `<h6>`).
  *
  * @example
  * ```tsx
  * function CustomRegion({ children }: { children: React.ReactNode }) {
  *   const nextLevel = useHeading();
- *   return <HeadingCtx.Provider value={nextLevel}>{children}</HeadingCtx.Provider>;
+ *   return <HeadingCtx.Provider value="{nextLevel}">{children}</HeadingCtx.Provider>;
  * }
  * ```
  *

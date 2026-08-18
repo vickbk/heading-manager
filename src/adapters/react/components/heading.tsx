@@ -6,19 +6,32 @@ import { HeadingCtx } from "../hooks/use-heading";
 const HEADING_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
 
 /**
- * Context-aware HTML heading element that automatically resolves its DOM tag (`<h1>` - `<h6>`) based on ambient `HeadingCtx`.
+ * Context-aware React component that resolves its native HTML heading tag (`<h1>`–`<h6>`)
+ * dynamically based on ambient `HeadingCtx`.
  *
- * @description Reads the current 0-based heading level from `HeadingCtx` and renders the matching HTML tag (`h1` for 0, `h2` for 1, up to `h6` for 5).
- * Falls back safely to `<h6>` if context exceeds level 5.
+ * @param props - Standard HTML heading attributes passed to the underlying heading tag.
+ * @param ref - Forwarded ref attached to the rendered HTML heading element.
+ * @returns Context-resolved HTML heading element (`<h1>` through `<h6>`).
+ *
+ * @remarks
+ * **Level Resolution & Clamping:**
+ * - Reads a zero-based integer level from `HeadingCtx` (e.g., `0` $\rightarrow$ `<h1>`, `1` $\rightarrow$ `<h2>`).
+ * - Clamps at `<h6>` for nesting depths of 5 or greater to align with native HTML element boundaries (`<h1>` through `<h6>`).
+ *
+ * **Accessibility Audit Note:**
+ * Promotes deterministic, sequential heading hierarchy throughout component trees without manual level hardcoding.
+ * Supports WCAG 2.1 SC 1.3.1 (Info and Relationships) best practices for structural markup.
  *
  * @example
  * ```tsx
  * <Section>
- *   <Heading>Automatically renders as H2 inside Section</Heading>
+ *   // Automatically renders as <h2> if contained within a level-1 context
+ *   <Heading>Section Title</Heading>
  * </Section>
  * ```
  *
- * @a11y Guarantees sequential heading tags without manual level hardcoding, conforming to WCAG 2.1 SC 1.3.1.
+ * @a11y Dynamically resolves heading levels based on landmark section nesting.
+ * HTML native tags clamp at `<h6>` for depth values $\ge 5$.
  */
 export const Heading = forwardRef<
   HTMLHeadingElement,
