@@ -178,43 +178,43 @@ A bottom-up approach ensures that code-level TSDoc becomes the single source of 
   - [x] Ensure complete TSDoc metadata (`@description`, `@param`, `@returns`, `@throws`) across every exported core module.
   - [x] Verify core TSDoc examples do not import React or Playwright dependencies.
 
-- [ ] **Task 3: Audit & Standardize TSDoc for Adapters & Public Routers**
-- **Status**: 🔴 To Do
+- [x] **Task 3: Audit & Standardize TSDoc for Adapters & Public Routers**
+- **Status**: ✅ Done
 - **Target**: 2026-08-18
 - **Description**: Refactor TSDoc for React UI elements, Playwright matchers, and `src/main/` subpath entrypoints.
 - **Steps**:
 - [x] Add `@param` and `@returns` tags to `<Heading>` (`heading.tsx`) and `<Main>` (`main.tsx`).
-- [ ] Add complete JSDoc headers to Playwright utility `registerPlaywright` (`register.ts`).
+- [x] Add complete JSDoc headers to Playwright utility `registerPlaywright` (`register.ts`).
 - [x] Standardize TSDoc tags for `landmarks.ts` and all public subpath router files in `src/main/`.
 
 ---
 
 ### Phase 2: Sub-Directory Architecture READMEs (Layer Level)
 
-- [ ] **Task 4: Author Shared Layer README**
-- **Status**: 🔴 To Do
+- [x] **Task 4: Author Shared Layer README**
+- **Status**: ✅ Done
 - **Target**: 2026-08-19
 - **Description**: Create `src/shared/README.md` based on verified TSDoc primitives to document zero-dependency layer rules.
 - **Steps**:
-- [ ] Document domain types, AST helpers, and primitive utilities directly from completed TSDoc annotations.
-- [ ] Expressly define the zero-import policy (`shared` cannot import from `core`, `adapters`, or `main`).
+- [x] Document domain types, AST helpers, and primitive utilities directly from completed TSDoc annotations.
+- [x] Expressly define the zero-import policy (`shared` cannot import from `core`, `adapters`, or `main`).
 
-- [ ] **Task 5: Author Core Engine Architecture README**
-- **Status**: 🔴 To Do
-- **Target**: 2026-08-19
-- **Description**: Create `src/core/heading-auditor/README.md` summarizing the core auditing boundary and API surface.
+- [x] **Task 5: Author Core Engine Architecture README**
+- **Status**: ✅ Done
+- **Target**: 2026-08-18
+- **Description**: Create `src/core/auditor/README.md` summarizing the core auditing boundary and API surface.
 - **Steps**:
-- [ ] Aggregate public core functions documented in Phase 1 into a coherent layer README.
-- [ ] Define framework-agnostic architectural constraints and WCAG compliance scope.
+- [x] Aggregate public core functions documented in Phase 1 into a coherent layer README.
+- [x] Define framework-agnostic architectural constraints and WCAG compliance scope.
 
-- [ ] **Task 6: Author Adapters Architecture READMEs**
-- **Status**: 🔴 To Do
-- **Target**: 2026-08-19
+- [x] **Task 6: Author Adapters Architecture READMEs**
+- **Status**: ✅ Done
+- **Target**: 2026-08-18
 - **Description**: Create `src/adapters/react/README.md` and `src/adapters/playwright/README.md` to document framework bindings.
 - **Steps**:
-- [ ] Replace legacy file paths (`src/components`, `src/hooks`, `src/utils`) with correct subpaths in React adapter docs.
-- [ ] Update Playwright adapter docs to reflect subpath export `react-heading-manager/testing/playwright`.
-- [ ] Document strict uni-directional dependencies (`adapters` -> `core` / `shared`).
+- [x] Replace legacy file paths (`src/components`, `src/hooks`, `src/utils`) with correct subpaths in React adapter docs.
+- [x] Update Playwright adapter docs to reflect subpath export `react-heading-manager/testing/playwright`.
+- [x] Document strict uni-directional dependencies (`adapters` -> `core` / `shared`).
 
 ---
 
