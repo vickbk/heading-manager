@@ -7,4 +7,7 @@
  *
  * @module react-heading-manager/testing/playwright
  */
-export * from "@/src/adapters/playwright";
+export {
+  registerPlaywright,
+  toHaveValidHeadingHierarchy,
+} from "@/src/adapters/playwright";
