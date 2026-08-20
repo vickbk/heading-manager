@@ -35,3 +35,4 @@ export { Main } from "./components/main";
  * Ambient React Context (`HeadingCtx`) and custom hook (`useHeading`) for consuming or initializing heading levels.
  */
 export { HeadingCtx, useHeading } from "./hooks/use-heading";
+export { HeadingLevelCtx, useHeadingLevel } from "./hooks/use-heading-level";

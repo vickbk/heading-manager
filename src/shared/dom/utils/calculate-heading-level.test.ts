@@ -94,4 +94,94 @@ describe("calculateNextHeadingLevel", () => {
       },
     );
   });
+
+  describe("calculateNextHeadingLevel - h6Clamp", () => {
+    describe("default behavior", () => {
+      it("clamps H6 when h6Clamp is omitted", () => {
+        expect(calculateNextHeadingLevel(5, true)).toBe(5);
+      });
+
+      it("preserves the default clamp behavior for a level below H6", () => {
+        expect(calculateNextHeadingLevel(4, true)).toBe(5);
+      });
+    });
+
+    describe("h6Clamp=true", () => {
+      it("clamps H6 when the current level is H6", () => {
+        expect(calculateNextHeadingLevel(5, true, true)).toBe(5);
+      });
+
+      it("does not clamp levels below H6", () => {
+        expect(calculateNextHeadingLevel(0, true, true)).toBe(1);
+        expect(calculateNextHeadingLevel(1, true, true)).toBe(2);
+        expect(calculateNextHeadingLevel(2, true, true)).toBe(3);
+        expect(calculateNextHeadingLevel(3, true, true)).toBe(4);
+        expect(calculateNextHeadingLevel(4, true, true)).toBe(5);
+      });
+
+      it("does not alter the first-heading behavior", () => {
+        expect(calculateNextHeadingLevel(0, false, true)).toBe(0);
+      });
+    });
+
+    describe("h6Clamp=false", () => {
+      it("allows the normalized level to advance beyond H6", () => {
+        expect(calculateNextHeadingLevel(5, true, false)).toBe(6);
+      });
+
+      it("allows the normalized level to continue beyond H7", () => {
+        expect(calculateNextHeadingLevel(6, true, false)).toBe(7);
+      });
+
+      it("allows arbitrary normalized levels beyond H6", () => {
+        expect(calculateNextHeadingLevel(7, true, false)).toBe(8);
+        expect(calculateNextHeadingLevel(8, true, false)).toBe(9);
+        expect(calculateNextHeadingLevel(9, true, false)).toBe(10);
+      });
+
+      it("does not clamp any level when disabled", () => {
+        for (const currentLevel of [5, 6, 7, 8, 9, 10]) {
+          expect(calculateNextHeadingLevel(currentLevel, true, false)).toBe(
+            currentLevel + 1,
+          );
+        }
+      });
+
+      it("does not alter the first-heading behavior", () => {
+        expect(calculateNextHeadingLevel(0, false, false)).toBe(0);
+      });
+    });
+
+    describe("h6Clamp boundary", () => {
+      it("distinguishes H6 clamping from normalized H7", () => {
+        expect(calculateNextHeadingLevel(5, true, true)).toBe(5);
+        expect(calculateNextHeadingLevel(5, true, false)).toBe(6);
+      });
+
+      it("only applies the clamp at level 5", () => {
+        expect(calculateNextHeadingLevel(4, true, true)).toBe(5);
+        expect(calculateNextHeadingLevel(4, true, false)).toBe(5);
+      });
+
+      it("does not repeatedly clamp already-beyond-H6 normalized levels", () => {
+        expect(calculateNextHeadingLevel(6, true, true)).toBe(7);
+        expect(calculateNextHeadingLevel(7, true, true)).toBe(8);
+      });
+    });
+
+    describe("h6Clamp and hasH1 interaction", () => {
+      it("returns H1 for the first heading regardless of h6Clamp", () => {
+        expect(calculateNextHeadingLevel(0, false, true)).toBe(0);
+        expect(calculateNextHeadingLevel(0, false, false)).toBe(0);
+      });
+
+      it("advances normally from H1 when h6Clamp is enabled", () => {
+        expect(calculateNextHeadingLevel(0, true, true)).toBe(1);
+      });
+
+      it("advances normally from H1 when h6Clamp is disabled", () => {
+        expect(calculateNextHeadingLevel(0, true, false)).toBe(1);
+      });
+    });
+  });
 });
