@@ -256,7 +256,7 @@ export function ProductPage() {
 }
 ```
 
-The resulting structure follows the surrounding landmark hierarchy:
+The resulting structure follows the surrounding heading hierarchy:
 
 ```html
 <main>
@@ -273,6 +273,26 @@ The resulting structure follows the surrounding landmark hierarchy:
   <h4>Related Products</h4>
 </main>
 ```
+
+When `h6Clamp` is disabled (default behavior), normalized heading levels can continue beyond the
+native HTML H1–H6 range. For example, a normalized H7 is represented as:
+
+```html
+<h6 role="heading" aria-level="7">Deep Heading</h6>
+```
+
+Set `h6Clamp` to `true` when heading levels should remain within the native
+H1–H6 range:
+
+```tsx
+<Main h6Clamp>
+  <Heading>Page Title</Heading>
+  {/* Heading levels are capped at H6 */}
+</Main>
+```
+
+The `h6Clamp` setting is inherited by nested regions and can be overridden
+where needed.
 
 ### Playwright E2E Testing
 
