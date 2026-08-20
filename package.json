@@ -1,6 +1,6 @@
 {
   "name": "react-heading-manager",
-  "version": "0.2.1-test",
+  "version": "0.3.0",
   "description": "Accessible automatic heading hierarchy and ARIA region landmark manager for React",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -83,6 +83,7 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.4",
     "@vitest/coverage-v8": "^4.1.10",
+    "eslint-plugin-boundaries": "^7.2.0",
     "eslint": "^10.8.1",
     "tsdown": "^0.22.14",
     "tsx": "^4.23.12",
