@@ -1,4 +1,3 @@
-import { HeadingLevel } from "@/src/shared/dom";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { createRef, useState } from "react";
 import { describe, expect, it, test, vi } from "vitest";
@@ -319,7 +318,7 @@ describe("Heading Component", () => {
   describe("dynamic updates and re-rendering", () => {
     it("updates the DOM element tag dynamically when parent HeadingLevelCtx changes", () => {
       function DynamicProviderWrapper() {
-        const [level, setLevel] = useState<HeadingLevel>(0);
+        const [level, setLevel] = useState(0);
 
         return (
           <HeadingLevelCtx.Provider value={{ level }}>

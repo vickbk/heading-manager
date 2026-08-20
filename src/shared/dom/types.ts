@@ -1,6 +1,7 @@
 /**
  * Zero-based heading depth index used by the ambient heading context.
  *
+ * @deprecated Use `number` for normalized heading levels.
  * - `0` = H1
  * - `1` = H2
  * - `2` = H3

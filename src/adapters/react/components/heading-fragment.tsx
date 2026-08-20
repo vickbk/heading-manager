@@ -1,6 +1,5 @@
 "use client";
 
-import { HeadingLevel } from "@/src/shared/dom";
 import React from "react";
 import { HeadingLevelCtx, useHeadingLevel } from "../hooks/use-heading-level";
 
@@ -128,7 +127,7 @@ export function HeadingFragment({
   h6Clamp,
 }: {
   children: React.ReactNode;
-  level?: HeadingLevel;
+  level?: number;
   h6Clamp?: boolean;
 }) {
   const { level: parentLevel, h6Clamp: parentClamp } = useHeadingLevel();

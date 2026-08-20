@@ -6,10 +6,10 @@ The Playwright adapter exposes a side-effect-free matcher registration flow for 
 
 ## Dependency Rules
 
-| Allowed imports | Forbidden imports       |
-| --------------- | ----------------------- |
-| `src/core/**`   | `src/adapters/react/**` |
-| `src/shared/**` | sibling adapter modules |
+| Allowed imports | Forbidden imports             |
+| --------------- | ----------------------------- |
+| `src/core/**`   | `src/adapters/!playwright/**` |
+| `src/shared/**` | sibling adapter modules       |
 
 The adapter may read the core engine and shared primitives, but it must not pull in React rendering concerns or other adapter implementations.
 
@@ -55,7 +55,7 @@ await expect(page).toHaveValidHeadingHierarchy();
 await expect(page.locator("main")).toHaveValidHeadingHierarchy(2);
 ```
 
-`initialLevel` is a 1-based heading context, ranging from `1` for `<h1>` through `6` for `<h6>`.
+`initialLevel` is a 1-based heading context, ranging from `1` for `<h1>` going up.
 
 ---
 

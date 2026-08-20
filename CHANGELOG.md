@@ -31,6 +31,13 @@ The format is based on [Keep a Changelog], and this project adheres to
   - Updated `Heading` rendering to support normalized heading levels beyond H6 through ARIA semantics.
   - Added normalized heading hierarchy auditing and support for levels greater than H6.
   - Expanded test coverage for heading-level calculation, context propagation, H6 clamping, and normalized hierarchy validation.
+- playwright test `InitialHeading` type has been relaxed to number to support headings greater than 6.
+
+### Deprecated
+
+- **`HeadingLevel`** (`shared/dom`): Deprecated in favor of `number` for normalized heading levels, allowing heading hierarchies to extend beyond the native H1–H6 range.
+- **`HeadingCtx`** (`react`): Deprecated in favor of `HeadingLevelCtx`, which supports normalized heading levels and the configurable `h6Clamp` policy.
+- **`useHeading`** (`react`): Deprecated in favor of `useHeadingLevel`, which returns the resolved normalized heading level together with the inherited `h6Clamp` policy.
 
 ## [0.2.1-test] - 2026-08-15
 

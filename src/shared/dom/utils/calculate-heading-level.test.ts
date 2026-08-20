@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { HeadingLevel } from "../types";
 import { calculateNextHeadingLevel } from "./calculate-heading-level";
 
 describe("calculateNextHeadingLevel", () => {
@@ -7,7 +6,7 @@ describe("calculateNextHeadingLevel", () => {
   // 1. STANDARD PROGRESSION (hasH1 = true)
   // ==========================================
   describe("standard progression when hasH1 is true", () => {
-    it.each<[HeadingLevel, HeadingLevel]>([
+    it.each([
       [0, 1], // h1 -> h2
       [1, 2], // h2 -> h3
       [2, 3], // h3 -> h4
@@ -51,7 +50,7 @@ describe("calculateNextHeadingLevel", () => {
       expect(calculateNextHeadingLevel(0, false)).toBe(0);
     });
 
-    it.each<[HeadingLevel]>([[1], [2], [3], [4]])(
+    it.each([[1], [2], [3], [4]])(
       "retains current index %i without incrementing when inside nested sections where hasH1 is false",
       (level) => {
         expect(calculateNextHeadingLevel(level, false)).toBe(level + 1);
@@ -64,9 +63,9 @@ describe("calculateNextHeadingLevel", () => {
   // ==========================================
   describe("exhaustive input-to-output matrix test", () => {
     const testCases: Array<{
-      currentLevel: HeadingLevel;
+      currentLevel: number;
       hasH1: boolean;
-      expected: HeadingLevel;
+      expected: number;
     }> = [
       // Root context (currentLevel = 0)
       { currentLevel: 0, hasH1: true, expected: 1 },

@@ -1,4 +1,3 @@
-import { HeadingLevel } from "@/src/shared/dom";
 import { render, screen } from "@testing-library/react";
 import { useState } from "react";
 import { describe, expect, it } from "vitest";
@@ -262,7 +261,7 @@ describe("HeadingFragment Component", () => {
   // =========================================================================
   describe("Dynamic Re-rendering", () => {
     function DynamicHeadingTree() {
-      const [overrideLevel, setOverrideLevel] = useState<HeadingLevel>(1);
+      const [overrideLevel, setOverrideLevel] = useState(1);
 
       return (
         <div>

@@ -1,12 +1,15 @@
 import "@playwright/test";
 
 /**
- * Valid 1-based HTML heading levels (`1` for `<h1>` through `6` for `<h6>`).
+ * Valid 1-based normalized heading level.
  *
- * Denotes the starting heading level context when evaluating a page or isolated
- * sectioning scope for accessibility hierarchy compliance.
+ * `1` represents `<h1>`, `2` represents `<h2>`, and so on.
+ * Normalized heading levels are not limited to the native HTML H1–H6 range.
+ *
+ * @remarks
+ * Values must be positive integers (`>= 1`). There is no upper bound.
  */
-export type InitialHeading = 1 | 2 | 3 | 4 | 5 | 6;
+export type InitialHeading = number;
 
 declare global {
   namespace PlaywrightTest {
