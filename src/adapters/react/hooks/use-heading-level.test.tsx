@@ -72,19 +72,19 @@ describe("useHeadingLevel", () => {
     it("starts at H2 when hasH1 is true", () => {
       const { result } = renderHook(() => useHeadingLevel());
 
-      expect(result.current).toBe(1);
+      expect(result.current.level).toBe(1);
     });
 
     it("returns H1 when hasH1 is false", () => {
       const { result } = renderHook(() => useHeadingLevel(false));
 
-      expect(result.current).toBe(0);
+      expect(result.current.level).toBe(0);
     });
 
     it("uses the default h6Clamp=false behavior", () => {
       const { result } = renderHook(() => useHeadingLevel());
 
-      expect(result.current).toBe(1);
+      expect(result.current.level).toBe(1);
     });
   });
 
@@ -100,7 +100,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(3);
+      expect(result.current.level).toBe(3);
     });
 
     it("returns H1 when the inherited level is zero and hasH1 is false", () => {
@@ -114,7 +114,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(0);
+      expect(result.current.level).toBe(0);
     });
 
     it("does not modify the inherited context level", () => {
@@ -133,7 +133,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(4);
+      expect(result.current.level).toBe(4);
       expect(context).toEqual({
         level: 3,
         h6Clamp: false,
@@ -153,7 +153,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(5);
+      expect(result.current.level).toBe(5);
     });
 
     it("clamps H6 instead of producing normalized H7", () => {
@@ -167,7 +167,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(5);
+      expect(result.current.level).toBe(5);
     });
 
     it("still returns H1 for the first heading", () => {
@@ -181,7 +181,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(0);
+      expect(result.current.level).toBe(0);
     });
 
     it("does not clamp levels already beyond H6", () => {
@@ -195,7 +195,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(7);
+      expect(result.current.level).toBe(7);
     });
   });
 
@@ -211,7 +211,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(6);
+      expect(result.current.level).toBe(6);
     });
 
     it("allows normalized H7 to advance to H8", () => {
@@ -225,7 +225,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(7);
+      expect(result.current.level).toBe(7);
     });
 
     it("allows arbitrary normalized levels beyond H6", () => {
@@ -239,7 +239,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(11);
+      expect(result.current.level).toBe(11);
     });
   });
 
@@ -255,7 +255,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(1);
+      expect(result.current.level).toBe(1);
     });
 
     it("returns the current level when starting at zero without an H1", () => {
@@ -269,7 +269,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(0);
+      expect(result.current.level).toBe(0);
     });
 
     it("does not reset a non-zero context level when hasH1 is false", () => {
@@ -283,7 +283,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(4);
+      expect(result.current.level).toBe(4);
     });
 
     it("combines hasH1=false with h6Clamp=true", () => {
@@ -297,7 +297,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(5);
+      expect(result.current.level).toBe(5);
     });
 
     it("combines hasH1=false with h6Clamp=false", () => {
@@ -311,7 +311,7 @@ describe("useHeadingLevel", () => {
         wrapper,
       });
 
-      expect(result.current).toBe(6);
+      expect(result.current.level).toBe(6);
     });
   });
 
@@ -323,15 +323,18 @@ describe("useHeadingLevel", () => {
         </HeadingLevelCtx.Provider>
       );
 
-      const { result, rerender } = renderHook(() => useHeadingLevel(), {
+      const { result } = renderHook(() => useHeadingLevel(), {
         wrapper,
       });
 
-      expect(result.current).toBe(3);
+      expect(result.current).toStrictEqual({
+        h6Clamp: false,
+        level: 3,
+      });
 
       // This verifies the hook responds to provider updates when the wrapper
       // implementation is replaced with a dynamic provider.
-      expect(result.current).toBe(3);
+      // expect(result.current.level).toBe(3);
     });
   });
 });

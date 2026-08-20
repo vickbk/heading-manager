@@ -10,6 +10,7 @@ import { createRegion, Heading, HeadingFragment, Main } from "../index";
 import {
   checkHeadingOrder,
   checkHeadingOrderReport,
+  checkNormalizedHeadingReport,
   drawRegion,
 } from "@/src/core/audit/utils";
 
@@ -272,7 +273,7 @@ describe("Heading System Integration Test Suite", () => {
 
       const mainEl = screen.getByTestId("root-main");
       const mapping = drawRegion(mainEl);
-      const report = checkHeadingOrderReport(mapping);
+      const report = checkNormalizedHeadingReport({ region: mapping });
 
       // Going H6 -> H6 is valid (diff is 0 <= 1)
       expect(report.isValid).toBe(true);

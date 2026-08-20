@@ -3,62 +3,64 @@
 import { createRegion } from "./create-region";
 
 /**
- * `<section>` HTML landmark region wrapper component.
+ * `<section>` HTML sectioning region wrapper.
  *
- * @param props - Standard HTML attributes for the `<section>` element.
- * @param ref - Forwarded ref attached to the underlying `<section>` DOM element.
- * @returns Context-providing `<section>` landmark element that increments ambient `HeadingCtx`.
+ * Provides a nested `HeadingLevelCtx` to descendants, automatically advancing
+ * the normalized heading level for nested `<Heading>` components.
  *
- * @remarks
- * **Heading Context Behavior:**
- * Automatically increments ambient `HeadingCtx` by `1` for all descendant components, ensuring
- * child `<Heading>` elements render at the next nested sequential heading level.
+ * @param props - Standard `<section>` attributes plus the optional `h6Clamp`
+ *   heading-level policy.
+ * @param props.h6Clamp - Overrides the inherited H6 clamping policy.
+ *   When omitted, the parent context policy is inherited.
+ * @param ref - Forwarded ref attached to the underlying `<section>` element.
  *
  * @example
  * ```tsx
- * <Section>
+ * <Section h6Clamp={false}>
  *   <Heading>Section Heading</Heading>
  * </Section>
  * ```
  *
- * @a11y Maps to the HTML5 `<section>` element and establishes a scoped landmark region per WCAG 2.1 SC 1.3.1.
+ * @a11y Maps to the semantic HTML `<section>` element and establishes a
+ * scoped heading hierarchy for accessibility-oriented document structure.
  */
 export const Section = createRegion<HTMLElement>("section");
 
 /**
- * `<article>` HTML landmark region wrapper component.
+ * `<article>` HTML self-contained content region wrapper.
  *
- * @param props - Standard HTML attributes for the `<article>` element.
- * @param ref - Forwarded ref attached to the underlying `<article>` DOM element.
- * @returns Context-providing `<article>` landmark element that increments ambient `HeadingCtx`.
+ * Provides a nested `HeadingLevelCtx` to descendants, automatically advancing
+ * the normalized heading level for nested `<Heading>` components.
  *
- * @remarks
- * **Heading Context Behavior:**
- * Automatically increments ambient `HeadingCtx` by `1` for all descendant components, ensuring
- * child `<Heading>` elements render at the next nested sequential heading level.
+ * @param props - Standard `<article>` attributes plus the optional `h6Clamp`
+ *   heading-level policy.
+ * @param props.h6Clamp - Overrides the inherited H6 clamping policy.
+ *   When omitted, the parent context policy is inherited.
+ * @param ref - Forwarded ref attached to the underlying `<article>` element.
  *
  * @example
  * ```tsx
- * <Article>
+ * <Article h6Clamp>
  *   <Heading>Article Title</Heading>
  * </Article>
  * ```
  *
- * @a11y Maps to the HTML5 `<article>` element representing a self-contained content region per WCAG 2.1 SC 1.3.1.
+ * @a11y Maps to the semantic HTML `<article>` element and establishes a
+ * scoped heading hierarchy for self-contained content.
  */
 export const Article = createRegion<HTMLElement>("article");
 
 /**
- * `<header>` HTML landmark region wrapper component.
+ * `<header>` introductory content region wrapper.
  *
- * @param props - Standard HTML attributes for the `<header>` element.
- * @param ref - Forwarded ref attached to the underlying `<header>` DOM element.
- * @returns Context-providing `<header>` landmark element that increments ambient `HeadingCtx`.
+ * Provides a nested `HeadingLevelCtx` to descendants, automatically advancing
+ * the normalized heading level for nested `<Heading>` components.
  *
- * @remarks
- * **Heading Context Behavior:**
- * Automatically increments ambient `HeadingCtx` by `1` for all descendant components, ensuring
- * child `<Heading>` elements render at the next nested sequential heading level.
+ * @param props - Standard `<header>` attributes plus the optional `h6Clamp`
+ *   heading-level policy.
+ * @param props.h6Clamp - Overrides the inherited H6 clamping policy.
+ *   When omitted, the parent context policy is inherited.
+ * @param ref - Forwarded ref attached to the underlying `<header>` element.
  *
  * @example
  * ```tsx
@@ -67,47 +69,50 @@ export const Article = createRegion<HTMLElement>("article");
  * </Header>
  * ```
  *
- * @a11y Maps to the HTML5 `<header>` element representing introductory or navigational context per WCAG 2.1 SC 1.3.1.
+ * @a11y Maps to the semantic HTML `<header>` element for introductory or
+ * navigational content.
  */
 export const Header = createRegion<HTMLElement>("header");
 
 /**
- * `<aside>` HTML landmark region wrapper component.
+ * `<aside>` complementary content region wrapper.
  *
- * @param props - Standard HTML attributes for the `<aside>` element.
- * @param ref - Forwarded ref attached to the underlying `<aside>` DOM element.
- * @returns Context-providing `<aside>` landmark element that increments ambient `HeadingCtx`.
+ * Provides a nested `HeadingLevelCtx` to descendants, automatically advancing
+ * the normalized heading level for nested `<Heading>` components.
  *
- * @remarks
- * **Heading Context Behavior:**
- * Automatically increments ambient `HeadingCtx` by `1` for all descendant components, ensuring
- * child `<Heading>` elements render at the next nested sequential heading level.
+ * @param props - Standard `<aside>` attributes plus the optional `h6Clamp`
+ *   heading-level policy.
+ * @param props.h6Clamp - Overrides the inherited H6 clamping policy.
+ *   When omitted, the parent context policy is inherited.
+ * @param ref - Forwarded ref attached to the underlying `<aside>` element.
  *
  * @example
  * ```tsx
- * <Aside>
- *   <Heading>Sidebar Title</Heading>
+ * <Aside h6Clamp={false}>
+ *   <Heading>Related Content</Heading>
  * </Aside>
  * ```
  *
- * @a11y Maps to the HTML5 `<aside>` element representing complementary content regions per WCAG 2.1 SC 1.3.1.
+ * @a11y Maps to the semantic HTML `<aside>` element for complementary
+ * content.
  */
 export const Aside = createRegion<HTMLElement>("aside");
 
 /**
- * `<legend>` HTML fieldset caption wrapper component.
+ * `<legend>` fieldset caption wrapper.
  *
- * @param props - Standard HTML attributes for the `<legend>` element.
- * @param ref - Forwarded ref attached to the underlying `<legend>` DOM element.
- * @returns Context-providing `<legend>` element that increments ambient `HeadingCtx`.
+ * Provides a nested `HeadingLevelCtx` to descendants, automatically advancing
+ * the normalized heading level for nested `<Heading>` components.
+ *
+ * @param props - Standard `<legend>` attributes plus the optional `h6Clamp`
+ *   heading-level policy.
+ * @param props.h6Clamp - Overrides the inherited H6 clamping policy.
+ *   When omitted, the parent context policy is inherited.
+ * @param ref - Forwarded ref attached to the underlying `<legend>` element.
  *
  * @remarks
- * **Heading Context Behavior:**
- * Automatically increments ambient `HeadingCtx` by `1` for nested heading components contained
- * within form `<fieldset>` controls.
- *
- * **Precaution:**
- * Should be used only in fieldsets and should not contain other landmarks
+ * Should be used within a `<fieldset>` to provide its programmatic caption.
+ * A `<legend>` should not be used as a general-purpose landmark wrapper.
  *
  * @example
  * ```tsx
@@ -118,6 +123,7 @@ export const Aside = createRegion<HTMLElement>("aside");
  * </fieldset>
  * ```
  *
- * @a11y Maps to the HTML `<legend>` element providing programmatic captions for form control groups per WCAG 2.1 SC 1.3.1.
+ * @a11y Maps to the semantic HTML `<legend>` element for providing a
+ * programmatic caption for a form-control group.
  */
 export const Legend = createRegion<HTMLLegendElement>("legend");

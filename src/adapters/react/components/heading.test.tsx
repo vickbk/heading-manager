@@ -2,7 +2,7 @@ import { HeadingLevel } from "@/src/shared/dom";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { createRef, useState } from "react";
 import { describe, expect, it, test, vi } from "vitest";
-import { HeadingCtx } from "../hooks/use-heading";
+import { HeadingLevelCtx } from "../hooks/use-heading-level";
 import { Heading } from "./heading";
 import { Section } from "./landmarks";
 import { Main } from "./main";
@@ -109,13 +109,13 @@ describe("Heading Level Manager", () => {
 });
 
 describe("Heading Component", () => {
-  // Helper to render <Heading> wrapped inside a HeadingCtx provider
+  // Helper to render <Heading> wrapped inside a HeadingLevelCtx provider
   function renderHeadingWithCtx(ui: React.ReactNode, levelValue?: number) {
     return render(
       levelValue !== undefined ? (
-        <HeadingCtx.Provider value={levelValue as HeadingLevel}>
+        <HeadingLevelCtx.Provider value={{ level: levelValue }}>
           {ui}
-        </HeadingCtx.Provider>
+        </HeadingLevelCtx.Provider>
       ) : (
         ui
       ),
@@ -146,7 +146,7 @@ describe("Heading Component", () => {
       },
     );
 
-    it("renders <h1> by default when no HeadingCtx provider is present (default context level = 0)", () => {
+    it("renders <h1> by default when no HeadingLevelCtx provider is present (default context level = 0)", () => {
       renderHeadingWithCtx(<Heading>Default Heading</Heading>);
 
       const heading = screen.getByRole("heading", { level: 1 });
@@ -159,24 +159,25 @@ describe("Heading Component", () => {
   // ==========================================
   describe("out-of-bounds context safeguards and edge cases", () => {
     it.each([
-      [6, "upper limit overflow (level 6)"],
-      [10, "extreme positive limit (level 10)"],
       [-1, "negative index (level -1)"],
       [-99, "extreme negative index (level -99)"],
       [3.14, "floating point index (level 3.14)"],
       [NaN, "NaN index"],
-    ])("falls back safely to <h6> when HeadingCtx is %s", (invalidLevel) => {
-      renderHeadingWithCtx(
-        <Heading data-testid="fallback-heading">Edge Case Heading</Heading>,
-        invalidLevel,
-      );
+    ])(
+      "falls back safely to <h6> when HeadingLevelCtx is %s",
+      (invalidLevel) => {
+        renderHeadingWithCtx(
+          <Heading data-testid="fallback-heading">Edge Case Heading</Heading>,
+          invalidLevel,
+        );
 
-      const heading = screen.getByTestId("fallback-heading");
-      expect(heading.tagName.toLowerCase()).toBe("h6");
+        const heading = screen.getByTestId("fallback-heading");
+        expect(heading.tagName.toLowerCase()).toBe("h6");
 
-      // Verify it remains an accessible H6 landmark
-      expect(screen.getByRole("heading", { level: 6 })).toBe(heading);
-    });
+        // Verify it remains an accessible H6 landmark
+        expect(screen.getByRole("heading", { level: 6 })).toBe(heading);
+      },
+    );
   });
 
   // ==========================================
@@ -316,15 +317,15 @@ describe("Heading Component", () => {
   // 6. DYNAMIC CONTEXT RE-RENDERING
   // ==========================================
   describe("dynamic updates and re-rendering", () => {
-    it("updates the DOM element tag dynamically when parent HeadingCtx changes", () => {
+    it("updates the DOM element tag dynamically when parent HeadingLevelCtx changes", () => {
       function DynamicProviderWrapper() {
         const [level, setLevel] = useState<HeadingLevel>(0);
 
         return (
-          <HeadingCtx.Provider value={level}>
+          <HeadingLevelCtx.Provider value={{ level }}>
             <button onClick={() => setLevel(2)}>Change Level</button>
             <Heading data-testid="dynamic-heading">Dynamic Heading</Heading>
-          </HeadingCtx.Provider>
+          </HeadingLevelCtx.Provider>
         );
       }
 

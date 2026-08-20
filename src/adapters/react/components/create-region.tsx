@@ -1,40 +1,66 @@
 "use client";
 
 import { forwardRef, HTMLAttributes, JSX } from "react";
-import { HeadingCtx, useHeading } from "../hooks/use-heading";
+import { HeadingLevelCtx, useHeadingLevel } from "../hooks/use-heading-level";
 
 /**
- * Higher-order factory helper to create accessible landmark region wrapper components cleanly.
+ * Creates a React landmark region component that establishes a nested
+ * heading-level context for its descendants.
  *
- * @description Automatically increments the nested heading context level for any nested `<Heading>` components
- * and wraps children in the specified HTML landmark element (`<section>`, `<article>`, `<aside>`, etc.).
+ * The generated component renders the specified HTML landmark element and
+ * automatically advances the normalized heading level through
+ * `useHeadingLevel()`.
  *
- * @param Tag - HTML intrinsic element tag name to render as the landmark wrapper element.
- * @returns A forwardRef React component that provides updated `HeadingCtx` context to its children.
+ * @param Tag - HTML intrinsic element used as the region wrapper
+ *   (for example, `section`, `article`, or `aside`).
+ * @returns A forward-ref React component that provides the updated
+ *   `HeadingLevelCtx` to its descendants.
+ *
+ * @remarks
+ * The optional `h6Clamp` prop overrides the inherited H6 clamping policy.
+ * When omitted, the parent context policy is preserved.
+ *
+ * Normalized levels may continue beyond H6 when clamping is disabled.
  *
  * @example
  * ```tsx
  * const Section = createRegion<HTMLElement>("section");
- * 
+ *
  * <Section>
  *   <Heading>Section Title</Heading>
  * </Section>
  * ```
  *
- * @a11y Ensures screen readers perceive structural sectioning boundaries per WCAG 2.1 SC 1.3.1.
+ * @example
+ * ```tsx
+ * // Allow normalized heading levels beyond H6.
+ * const Section = createRegion<HTMLElement>("section");
+ *
+ * <Section h6Clamp={false}>
+ *   <Heading>Nested Heading</Heading>
+ * </Section>
+ * ```
+ *
+ * @a11y
+ * Establishes a semantic landmark boundary while maintaining deterministic
+ * heading hierarchy context for accessibility-oriented document structure.
  */
 export function createRegion<T extends HTMLElement>(
   Tag: keyof JSX.IntrinsicElements,
 ) {
-  const Component = forwardRef<T, HTMLAttributes<T>>(
-    ({ children, ...props }, ref) => {
-      const level = useHeading();
+  const Component = forwardRef<T, HTMLAttributes<T> & { h6Clamp?: boolean }>(
+    ({ children, h6Clamp, ...props }, ref) => {
       // To avoid ts error use a section tag wrapper to clear the legend type mismatch
       const SectionTag = Tag as "section";
 
+      const { level, h6Clamp: parentClamp } = useHeadingLevel();
       return (
         <SectionTag {...props} ref={ref}>
-          <HeadingCtx.Provider value={level}>{children}</HeadingCtx.Provider>
+          <HeadingLevelCtx.Provider
+            value={{ level, h6Clamp: h6Clamp ?? parentClamp }}
+          >
+            {children}
+          </HeadingLevelCtx.Provider>
         </SectionTag>
       );
     },

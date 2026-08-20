@@ -39,80 +39,117 @@ export const HeadingLevelCtx = createContext<HeadingLevelContext>({
 });
 
 /**
- * Resolves the next normalized heading level from the current heading context.
+ * Resolves the next normalized heading-level context from the current
+ * `HeadingLevelCtx`.
  *
- * The hook reads the current zero-based heading level and H6 clamping policy
- * from `HeadingLvlCtx`, then delegates the level calculation to
+ * The hook reads the current zero-based normalized heading level and the
+ * inherited H6 clamping policy, then calculates the next heading level using
  * `calculateNextHeadingLevel()`.
  *
- * The returned value is a zero-based normalized level rather than a native
- * HTML heading tag:
+ * The returned context contains:
+ *
+ * - `level` — the next zero-based normalized heading level.
+ * - `h6Clamp` — the inherited H6 clamping policy, preserved so it can be
+ *   passed to a child heading-level context.
+ *
+ * The normalized `level` is represented as:
  *
  * ```text
  * 0 → H1
  * 1 → H2
+ * 2 → H3
  * ...
  * 5 → H6
  * 6 → H7
  * 7 → H8
  * ```
  *
- * When `h6Clamp` is enabled in the inherited context, the result is capped
- * at `5` (H6). When it is disabled, normalized levels may continue beyond
- * H6.
+ * When `h6Clamp` is enabled, the transition from H6 to H7 is clamped:
+ *
+ * ```text
+ * H5 → H6
+ * H6 → H6
+ * ```
+ *
+ * When `h6Clamp` is disabled, the normalized hierarchy may continue beyond
+ * the native HTML H6 boundary:
+ *
+ * ```text
+ * H5 → H6
+ * H6 → H7
+ * H7 → H8
+ * ```
  *
  * @param hasH1 - Indicates whether an H1 already exists in the current
  *   section context. Defaults to `true`, meaning the next heading normally
  *   advances from the current context level.
  *
- * @returns The next zero-based normalized heading level.
+ * @returns An object containing the next normalized heading level and the
+ *   inherited H6 clamping policy.
  *
  * @remarks
  * This hook does not render or determine the HTML heading element itself.
- * The returned normalized level can subsequently be mapped to a native
- * `<h1>`–`<h6>` element or, when levels greater than H6 are permitted,
- * represented using an H6 element with an explicit ARIA heading level.
+ * The returned `level` represents the normalized semantic hierarchy and can
+ * subsequently be mapped to a native `<h1>`–`<h6>` element. When normalized
+ * levels greater than H6 are permitted, they may be represented using an
+ * `<h6>` element with an explicit `role="heading"` and `aria-level`.
+ *
+ * The returned `h6Clamp` value is intentionally preserved from the current
+ * context so that callers creating nested heading contexts can propagate the
+ * same rendering policy to their descendants.
  *
  * @example
  * ```tsx
- * function Heading() {
- *   const level = useHeadingLevel();
+ * function Section() {
+ *   const headingContext = useHeadingLevel();
  *
- *   // level is the normalized level to render.
+ *   return (
+ *     <HeadingLevelCtx.Provider value={headingContext}>
+ *       {children}
+ *     </HeadingLevelCtx.Provider>
+ *   );
  * }
  * ```
  *
  * @example
  * ```tsx
  * // With the default context:
- * // level = 0, h6Clamp = false
- * const level = useHeadingLevel();
- * // → 1 (H2)
+ * // { level: 0, h6Clamp: false }
+ * const context = useHeadingLevel();
+ *
+ * // → { level: 1, h6Clamp: false }
  * ```
  *
  * @example
  * ```tsx
  * // With:
  * // { level: 5, h6Clamp: false }
- * const level = useHeadingLevel();
- * // → 6 (normalized H7)
+ * const context = useHeadingLevel();
+ *
+ * // → { level: 6, h6Clamp: false }
+ * //    normalized H7
  * ```
  *
  * @example
  * ```tsx
  * // With:
  * // { level: 5, h6Clamp: true }
- * const level = useHeadingLevel();
- * // → 5 (clamped H6)
+ * const context = useHeadingLevel();
+ *
+ * // → { level: 5, h6Clamp: true }
+ * //    clamped at H6
  * ```
  *
  * @a11y
- * Supports deterministic heading hierarchy management by deriving heading
- * levels from ambient context rather than requiring individual components to
- * hard-code their heading level.
+ * Supports deterministic heading hierarchy management by deriving the next
+ * normalized heading level from ambient context while preserving the
+ * inherited H6 rendering policy for nested heading contexts.
  */
-export function useHeadingLevel(hasH1 = true): number {
+export function useHeadingLevel(hasH1 = true): HeadingLevelContext {
   const { level, h6Clamp = false } = useContext(HeadingLevelCtx);
 
-  return calculateNextHeadingLevel(level, hasH1, h6Clamp);
+  return {
+    level: calculateNextHeadingLevel(level, hasH1, h6Clamp),
+    h6Clamp,
+  };
 }

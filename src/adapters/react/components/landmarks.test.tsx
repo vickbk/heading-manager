@@ -1,13 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import { createRef, useContext } from "react";
 import { describe, expect, it } from "vitest";
-import { HeadingCtx } from "../hooks/use-heading";
+import { HeadingLevelCtx } from "../hooks/use-heading-level";
 import { Heading } from "./heading";
 import { Article, Aside, Header, Legend } from "./landmarks";
 
-// Helper component to read the current HeadingCtx level directly
+// Helper component to read the current HeadingLevelCtx level directly
 function LevelConsumer() {
-  const level = useContext(HeadingCtx);
+  const { level } = useContext(HeadingLevelCtx);
   return <span data-testid="level">{level}</span>;
 }
 
@@ -69,9 +69,9 @@ describe("Landmark Components (Article, Header, Aside, Legend)", () => {
   });
 
   // ==========================================
-  // 2. HEADING CONTEXT (HeadingCtx) PROPAGATION
+  // 2. HEADING CONTEXT (HeadingLevelCtx) PROPAGATION
   // ==========================================
-  describe("HeadingCtx calculation and cascading", () => {
+  describe("HeadingLevelCtx calculation and cascading", () => {
     it("increments heading context level inside <Article>", () => {
       render(
         <Article>

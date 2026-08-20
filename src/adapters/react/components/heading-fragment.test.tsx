@@ -119,7 +119,7 @@ describe("HeadingFragment Component", () => {
     it("clamps at h6 (level index 5) when nested beyond maximum HTML heading depth", () => {
       render(
         <div>
-          <HeadingFragment level={5}>
+          <HeadingFragment level={5} h6Clamp>
             <Heading>Explicit Level 6</Heading>
             <HeadingFragment>
               <Heading>Overflow Level 1</Heading>

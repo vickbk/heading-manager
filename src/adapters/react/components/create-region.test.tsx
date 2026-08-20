@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { createRef, useContext } from "react";
 import { describe, expect, it } from "vitest";
-import { HeadingCtx } from "../hooks/use-heading";
+import { HeadingLevelCtx } from "../hooks/use-heading-level";
 import { createRegion } from "./create-region";
 
-// Helper component to read and render current HeadingCtx level
+// Helper component to read and render current HeadingLevelCtx level
 function LevelConsumer() {
-  const level = useContext(HeadingCtx);
+  const { level } = useContext(HeadingLevelCtx);
   return <span data-testid="heading-level">{level}</span>;
 }
 
@@ -88,9 +88,9 @@ describe("createRegion", () => {
   });
 
   // ==========================================
-  // 3. HEADING CONTEXT (HeadingCtx) PROPAGATION
+  // 3. HEADING CONTEXT (HeadingLevelCtx) PROPAGATION
   // ==========================================
-  describe("HeadingCtx context provider integration", () => {
+  describe("HeadingLevelCtx context provider integration", () => {
     it("calculates and provides the next heading level to nested children", () => {
       render(
         <SectionRegion>
@@ -119,13 +119,13 @@ describe("createRegion", () => {
       expect(screen.getByTestId("heading-level")).toHaveTextContent("3");
     });
 
-    it("uses surrounding HeadingCtx value when nested inside a Provider", () => {
+    it("uses surrounding HeadingLevelCtx value when nested inside a Provider", () => {
       render(
-        <HeadingCtx.Provider value={2}>
+        <HeadingLevelCtx.Provider value={{ level: 2 }}>
           <SectionRegion>
             <LevelConsumer />
           </SectionRegion>
-        </HeadingCtx.Provider>,
+        </HeadingLevelCtx.Provider>,
       );
 
       // Parent level is 2 -> Section Region calculates 3

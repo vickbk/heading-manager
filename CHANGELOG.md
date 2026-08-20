@@ -11,12 +11,26 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - Added deterministic normalized heading hierarchy auditing based on `HeadingDetail.numLevel`.
 - Added `checkNormalizedHeadingReport()` and `checkNormalizedHeading()`.
+- **Heading level context and hook**
+  - Added `HeadingLevelCtx` with normalized heading-level state.
+  - Added `useHeadingLevel()` for resolving the next heading level from context.
+  - Added optional `h6Clamp` support, defaulting to `false`, allowing normalized levels beyond H6.
 
 ### Changed
 
 - Extended `HeadingDetail` with `numLevel` as the canonical numeric heading representation.
 - Preserved the existing heading-order APIs for backward compatibility.
 - Deprecated `checkHeadingOrderReport` and `checkHeadingOrder` along with their respectiveutilities in favor of `checkNormalizedHeadingReport` and `checkNormalizedHeading`.
+- **`calculateNextHeadingLevel()`**
+  - Added the optional `h6Clamp` parameter.
+  - Preserves H6 clamping when enabled while allowing levels beyond H6 when disabled.
+- **Heading hierarchy context**
+  - Refactored heading-level propagation around `HeadingLevelCtx` and `useHeadingLevel()`.
+  - Added optional `h6Clamp` support, allowing applications to either clamp native headings at H6 or preserve normalized levels beyond H6.
+  - Updated `Main`, `HeadingFragment`, and generated landmark regions (`Section`, `Article`, `Header`, `Aside`, and `Legend`) to inherit and optionally override the H6 clamping policy.
+  - Updated `Heading` rendering to support normalized heading levels beyond H6 through ARIA semantics.
+  - Added normalized heading hierarchy auditing and support for levels greater than H6.
+  - Expanded test coverage for heading-level calculation, context propagation, H6 clamping, and normalized hierarchy validation.
 
 ## [0.2.1-test] - 2026-08-15
 

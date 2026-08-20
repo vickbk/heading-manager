@@ -1,14 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import { createRef, useContext } from "react";
 import { describe, expect, it } from "vitest";
-import { HeadingCtx } from "../hooks/use-heading";
+import { HeadingLevelCtx } from "../hooks/use-heading-level";
 import { Heading } from "./heading";
 import { Section } from "./landmarks";
 import { Main } from "./main";
 
-// Helper component to inspect the resolved HeadingCtx value directly
+// Helper component to inspect the resolved HeadingLevelCtx value directly
 function LevelConsumer() {
-  const level = useContext(HeadingCtx);
+  const { level } = useContext(HeadingLevelCtx);
   return <span data-testid="resolved-level">{level}</span>;
 }
 
@@ -75,7 +75,7 @@ describe("Main Landmark Component", () => {
   // ==========================================
   // 3. HEADING CONTEXT & pageHasH1 PROP BEHAVIOR
   // ==========================================
-  describe("HeadingCtx calculation and pageHasH1 prop handling", () => {
+  describe("HeadingLevelCtx calculation and pageHasH1 prop handling", () => {
     it("defaults pageHasH1 to false when omitted, providing level 0 (H1) at root context", () => {
       render(
         <Main>
@@ -108,14 +108,14 @@ describe("Main Landmark Component", () => {
       expect(screen.getByTestId("resolved-level")).toHaveTextContent("0");
     });
 
-    it("ignores pageHasH1=false when nested inside a non-zero parent HeadingCtx", () => {
+    it("ignores pageHasH1=false when nested inside a non-zero parent HeadingLevelCtx", () => {
       render(
-        <HeadingCtx.Provider value={1}>
+        <HeadingLevelCtx.Provider value={{ level: 1 }}>
           {/* Even with pageHasH1=false, non-zero parent (1) always increments to 2 */}
           <Main pageHasH1={false}>
             <LevelConsumer />
           </Main>
-        </HeadingCtx.Provider>,
+        </HeadingLevelCtx.Provider>,
       );
 
       expect(screen.getByTestId("resolved-level")).toHaveTextContent("2");
