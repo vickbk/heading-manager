@@ -135,7 +135,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 - Added Next.js App Router compatibility.
 - Added comprehensive automated tests and accessibility-oriented auditing.
 
-[Unreleased]: https://github.com/vickbk/heading-manager/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/vickbk/heading-manager/compare/v0.3.0...HEAD
 [0.3.0]: https://github.com/vickbk/heading-manager/releases/tag/v0.3.0
 [0.2.1-test]: https://github.com/vickbk/heading-manager/releases/tag/v0.2.1-test
 [0.2.1]: https://github.com/vickbk/heading-manager/releases/tag/v0.2.1
