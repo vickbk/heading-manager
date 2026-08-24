@@ -1,3 +1,4 @@
+import "eslint-import-resolver-typescript";
 import boundaries from "eslint-plugin-boundaries";
 import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
