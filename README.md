@@ -73,7 +73,7 @@ The heading level is derived from the surrounding document structure:
     </article>
   </section>
 
-  <h4>Related Content</h4>
+  <h2>Related Content</h2>
 </main>
 ```
 
