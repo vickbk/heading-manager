@@ -1,8 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import * as isCodeFenceModule from "./is-code-fence";
 import { parseReadmeHeadings } from "./parse-readme-headings";
 
 describe("parseReadmeHeadings", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
   it("extracts H1 through H6 headings and preserves metadata", () => {
     const readme = [
       "# Project Title",
@@ -89,5 +93,32 @@ describe("parseReadmeHeadings", () => {
       "features",
       "installation",
     ]);
+  });
+
+  it("ignores headings whose cleaned text collapses to empty after markdown stripping", () => {
+    const headings = parseReadmeHeadings("### **\n## ` `\n# Project Title");
+
+    expect(headings).toEqual([
+      expect.objectContaining({
+        text: "Project Title",
+        normalizedText: "project title",
+        line: 3,
+      }),
+    ]);
+  });
+
+  it("handles synthetic false-positive fence detection without crashing or leaking headings", () => {
+    vi.spyOn(isCodeFenceModule, "isCodeFence").mockImplementation((line) =>
+      line.startsWith("###"),
+    );
+
+    expect(parseReadmeHeadings("### synthetic fence\n## Real Section")).toEqual(
+      [
+        expect.objectContaining({
+          text: "Real Section",
+          normalizedText: "real section",
+        }),
+      ],
+    );
   });
 });

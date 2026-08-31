@@ -27,10 +27,11 @@ describe("extractHeadingMatch", () => {
     });
   });
 
-  it("rejects invalid heading syntax and H7+ headings", () => {
+  it("rejects invalid heading syntax, empty text, and H7+ headings", () => {
     expect(extractHeadingMatch("#NotAHeading")).toBeNull();
     expect(extractHeadingMatch("title")).toBeNull();
     expect(extractHeadingMatch("####### Too Deep")).toBeNull();
+    expect(extractHeadingMatch("##\u00A0")).toBeNull();
   });
 
   it("allows trailing closing hashes and whitespace", () => {

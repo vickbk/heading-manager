@@ -109,6 +109,74 @@ describe("findOrderingViolationDiagnostics", () => {
     );
   });
 
+  it("ignores sections whose IDs are missing from the preferred order and covers the undefined-index continue branch", () => {
+    const matchedSections = [
+      {
+        id: "custom-section",
+        level: 2,
+        text: "Custom Section",
+        normalizedText: "custom section",
+        line: 3,
+        raw: "## Custom Section",
+      },
+      {
+        id: "quick-start",
+        level: 2,
+        text: "Quick Start",
+        normalizedText: "quick start",
+        line: 5,
+        raw: "## Quick Start",
+      },
+    ];
+
+    expect(
+      findOrderingViolationDiagnostics(matchedSections, {
+        ...contract,
+        preferredSectionOrder: ["identity", "quick-start"],
+      }),
+    ).toEqual([]);
+  });
+
+  it("falls back to section IDs when the contract has no heading metadata for a mismatched section", () => {
+    const matchedSections = [
+      {
+        id: "identity",
+        level: 1,
+        text: "Project Title",
+        normalizedText: "project title",
+        line: 1,
+        raw: "# Project Title",
+      },
+      {
+        id: "ghost-section",
+        level: 2,
+        text: "Ghost Section",
+        normalizedText: "ghost section",
+        line: 3,
+        raw: "## Ghost Section",
+      },
+    ];
+
+    const diagnostics = findOrderingViolationDiagnostics(matchedSections, {
+      ...contract,
+      preferredSectionOrder: ["ghost-section", "identity"],
+      sections: contract.sections.filter(
+        (section) => section.id === "identity",
+      ),
+    });
+
+    expect(diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: "ordering-violation",
+        sectionId: "ghost-section",
+        expectedHeading: "Project Title",
+        actualHeading: "ghost-section",
+        message:
+          'README section ordering is out of contract order: "ghost-section" appears before "Project Title".',
+      }),
+    );
+  });
+
   it("leaves the provided section list and contract ordering unchanged", () => {
     const matchedSections = [
       {

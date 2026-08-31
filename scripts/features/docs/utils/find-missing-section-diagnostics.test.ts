@@ -61,6 +61,30 @@ describe("findMissingSectionDiagnostics", () => {
     expect(diagnostics).toEqual([]);
   });
 
+  it("falls back to the required section ID when the contract definition is missing", () => {
+    const missingDefinitionContract: DocumentationContract = {
+      ...contract,
+      requiredSectionIds: ["identity", "missing-section"],
+      sections: contract.sections.filter(
+        (section) => section.id !== "missing-section",
+      ),
+    };
+
+    const diagnostics = findMissingSectionDiagnostics(
+      ["identity"],
+      missingDefinitionContract,
+    );
+
+    expect(diagnostics).toEqual([
+      {
+        code: "missing-required-section",
+        sectionId: "missing-section",
+        expectedHeading: "missing-section",
+        message: 'Required README section "missing-section" is missing.',
+      },
+    ]);
+  });
+
   it("does not mutate the input arrays or contract data", () => {
     const foundSectionIds = ["identity"];
     const snapshot = JSON.parse(JSON.stringify({ foundSectionIds, contract }));

@@ -95,6 +95,18 @@ describe("readTextFile", () => {
       await expect(promise).rejects.toHaveProperty("cause", rawStringError);
     });
 
+    it("should safely format non-Error object rejections and attach the original object", async () => {
+      const objectError = { code: "EUNKNOWN", detail: "object failure" };
+      vi.spyOn(fs, "readFile").mockRejectedValue(objectError);
+
+      const promise = readTextFile("test.txt");
+
+      await expect(promise).rejects.toThrow(
+        '[IO Error] Failed to read "test.txt": [object Object]',
+      );
+      await expect(promise).rejects.toHaveProperty("cause", objectError);
+    });
+
     it("should safely format null rejections and attach null cause", async () => {
       vi.spyOn(fs, "readFile").mockRejectedValue(null);
 
