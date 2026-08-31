@@ -5,6 +5,16 @@ import type {
 } from "../../../types";
 import { getContractSection } from "../contract";
 
+/**
+ * Detects ordering violations between matched README sections and the contract.
+ *
+ * @param {MatchedReadmeSection[]} matchedSections - The matched headings in file
+ * order.
+ * @param {DocumentationContract} contract - The contract defining the preferred
+ * section sequence.
+ * @returns {ReadmeSectionDiagnostic[]} Diagnostics describing any out-of-order
+ * headings.
+ */
 export function findOrderingViolationDiagnostics(
   matchedSections: MatchedReadmeSection[],
   contract: DocumentationContract,

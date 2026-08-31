@@ -1,3 +1,9 @@
+/**
+ * Creates a stateful fence tracker for README parsing.
+ *
+ * @returns {{ shouldSkipLine: (line: string) => boolean }} An object that marks
+ * whether the parser should ignore a line while inside a fenced code block.
+ */
 export function createCodeFenceTracker() {
   let inFence = false;
   let fenceCharacter: "`" | "~" | null = null;

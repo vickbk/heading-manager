@@ -3,7 +3,11 @@ import { createCodeFenceTracker } from "./parse-code-fence";
 import { parseHeadingFromLine } from "./parse-heading-line";
 
 /**
- * Extract markdown headings while ignoring headings inside fenced code blocks.
+ * Extracts all section headings from a README while ignoring fenced code blocks.
+ *
+ * @param {string} readme - The raw README content.
+ * @returns {ParsedReadmeHeading[]} The parsed headings in file order, including
+ * the normalized comparison form and source line metadata.
  */
 export function parseReadmeHeadings(readme: string): ParsedReadmeHeading[] {
   const lines = readme.split(/\r?\n/);

@@ -3,6 +3,15 @@ import type { MatchedReadmeSection } from "../../types";
 import { matchHeadingToSection } from "./contract";
 import { parseReadmeHeadings } from "./headings/parse-readme-headings";
 
+/**
+ * Finds the README headings that match the documentation contract.
+ *
+ * @param {string} readme - The raw README content.
+ * @param {DocumentationContract} contract - The documentation contract to match
+ * against.
+ * @returns {MatchedReadmeSection[]} The matched H1/H2 headings with their section
+ * ids and original source metadata.
+ */
 export function getMatchedReadmeSections(
   readme: string,
   contract: DocumentationContract,

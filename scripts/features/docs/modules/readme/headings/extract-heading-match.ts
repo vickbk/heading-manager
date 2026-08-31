@@ -1,3 +1,10 @@
+/**
+ * Detects whether a line is a markdown heading and extracts its level and text.
+ *
+ * @param {string} line - The source line to inspect.
+ * @returns {{ level: number; text: string } | null} The heading metadata when the
+ * line is a valid heading, otherwise null.
+ */
 export function extractHeadingMatch(
   line: string,
 ): { level: number; text: string } | null {

@@ -6,6 +6,15 @@ import {
   findOrderingViolationDiagnostics,
 } from "./sections";
 
+/**
+ * Validates a README body against a documentation contract.
+ *
+ * @param {string} readme - The README content to validate.
+ * @param {DocumentationContract} documentationContract - The contract defining the
+ * required and preferred sections.
+ * @returns {ReadmeSectionValidationResult} The aggregated validation result,
+ * including diagnostics, found ids, and section summaries.
+ */
 export function checkReadmeSections(
   readme: string,
   documentationContract: DocumentationContract,

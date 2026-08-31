@@ -1,6 +1,9 @@
 /**
- * Normalize markdown heading text to a stable value suitable for matching against
- * the documentation contract, while avoiding overly aggressive fuzzy matching.
+ * Normalizes a heading label into a stable comparison key for contract matching.
+ *
+ * @param {string} value - The heading text to normalize.
+ * @returns {string} A lowercase, punctuation-normalized label suitable for
+ * comparing section names and aliases.
  */
 export function normalizeHeadingText(value: string): string {
   return value
