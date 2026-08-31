@@ -40,3 +40,5 @@ export type FileValidationResult = {
   result?: ReadmeSectionValidationResult;
   error?: string;
 };
+
+export type MatchedReadmeSection = ParsedReadmeHeading & { id: string };

@@ -1,4 +1,7 @@
 import { ParsedReadmeHeading } from "../types";
+import { cleanHeadingText } from "./clean-heading-text";
+import { extractHeadingMatch } from "./extract-heading-match";
+import { isCodeFence } from "./is-code-fence";
 import { normalizeHeadingText } from "./normalize-heading-text";
 
 /**
@@ -7,17 +10,22 @@ import { normalizeHeadingText } from "./normalize-heading-text";
 export function parseReadmeHeadings(readme: string): ParsedReadmeHeading[] {
   const lines = readme.split(/\r?\n/);
   const headings: ParsedReadmeHeading[] = [];
-
   let inFence = false;
   let fenceCharacter: "`" | "~" | null = null;
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
     const trimmed = line.trimStart();
-    const fenceMatch = trimmed.match(/^(`{3,}|~{3,})/);
 
-    if (fenceMatch) {
-      const marker = fenceMatch[1].charAt(0) as "`" | "~";
+    if (isCodeFence(trimmed)) {
+      const marker = trimmed.match(/^(`{3,}|~{3,})/)?.[1]?.charAt(0) as
+        | "`"
+        | "~"
+        | undefined;
+
+      if (!marker) {
+        continue;
+      }
 
       if (!inFence) {
         inFence = true;
@@ -34,21 +42,21 @@ export function parseReadmeHeadings(readme: string): ParsedReadmeHeading[] {
       continue;
     }
 
-    const headingMatch = trimmed.match(/^(#{1,6})\s+(.*?)\s*#*\s*$/);
+    const headingMatch = extractHeadingMatch(trimmed);
     if (!headingMatch) {
       continue;
     }
 
-    const rawText = headingMatch[2].trim();
-    const normalizedText = normalizeHeadingText(rawText);
+    const text = cleanHeadingText(headingMatch.text);
+    const normalizedText = normalizeHeadingText(text);
 
     if (!normalizedText) {
       continue;
     }
 
     headings.push({
-      level: headingMatch[1].length,
-      text: rawText,
+      level: headingMatch.level,
+      text,
       normalizedText,
       line: index + 1,
       raw: line,

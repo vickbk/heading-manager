@@ -2,6 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DocumentationContract } from "@/docs/types";
 import { checkReadmeSections } from "./check-readme-sections";
+import { findMissingSectionDiagnostics } from "./find-missing-section-diagnostics";
+import { findOrderingViolationDiagnostics } from "./find-ordering-violation-diagnostics";
+import { getMatchedReadmeSections } from "./get-matched-readme-sections";
 
 const contract: DocumentationContract = {
   packageName: "demo-package",
@@ -56,6 +59,99 @@ const contract: DocumentationContract = {
     "changelog",
   ],
 };
+
+describe("getMatchedReadmeSections", () => {
+  it("parses and matches only level 1 and 2 headings to the contract", () => {
+    const readme = [
+      "# Project Title",
+      "",
+      "## Quick Start",
+      "",
+      "### Installation",
+      "",
+      "## Features",
+      "",
+      "```md",
+      "## Fake Section",
+      "```",
+    ].join("\n");
+
+    const matched = getMatchedReadmeSections(readme, contract);
+
+    expect(matched.map((section) => section.id)).toEqual([
+      "identity",
+      "quick-start",
+      "features",
+    ]);
+    expect(matched[0].line).toBe(1);
+    expect(matched[1].line).toBe(3);
+  });
+});
+
+describe("findMissingSectionDiagnostics", () => {
+  it("returns missing-required-section diagnostics for absent contract sections", () => {
+    const diagnostics = findMissingSectionDiagnostics(
+      ["identity", "quick-start"],
+      contract,
+    );
+
+    expect(diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: "missing-required-section",
+        sectionId: "features",
+        expectedHeading: "Features",
+      }),
+    );
+    expect(diagnostics[0]).toMatchObject({
+      message: 'Required README section "Features" is missing.',
+    });
+  });
+});
+
+describe("findOrderingViolationDiagnostics", () => {
+  it("detects sequential ordering violations using the preferred contract order", () => {
+    const matched = [
+      {
+        id: "identity",
+        level: 1,
+        text: "Project Title",
+        normalizedText: "project title",
+        line: 1,
+        raw: "# Project Title",
+      },
+      {
+        id: "license",
+        level: 2,
+        text: "License",
+        normalizedText: "license",
+        line: 3,
+        raw: "## License",
+      },
+      {
+        id: "quick-start",
+        level: 2,
+        text: "Quick Start",
+        normalizedText: "quick start",
+        line: 5,
+        raw: "## Quick Start",
+      },
+    ];
+
+    const diagnostics = findOrderingViolationDiagnostics(matched, contract);
+
+    expect(diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: "ordering-violation",
+        sectionId: "quick-start",
+        line: 5,
+      }),
+    );
+    expect(diagnostics[0]).toMatchObject({
+      message:
+        'README section ordering is out of contract order: "Quick Start" appears before "License".',
+    });
+  });
+});
 
 describe("checkReadmeSections", () => {
   beforeEach(() => {
