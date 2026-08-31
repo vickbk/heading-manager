@@ -4,6 +4,7 @@ type DocumentationRequirement = {
   publicEntryPoints?: boolean;
   wcagReference?: boolean;
 };
+
 type DocumentationSection = {
   id: string;
   heading: string;
