@@ -1,7 +1,7 @@
 import { DocumentationContract } from "@/docs/types";
-import { MatchedReadmeSection } from "../types";
-import { matchHeadingToSection } from "./match-heading-to-section";
-import { parseReadmeHeadings } from "./parse-readme-headings";
+import type { MatchedReadmeSection } from "../../types";
+import { matchHeadingToSection } from "./contract";
+import { parseReadmeHeadings } from "./headings/parse-readme-headings";
 
 export function getMatchedReadmeSections(
   readme: string,

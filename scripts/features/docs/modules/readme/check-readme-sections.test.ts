@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DocumentationContract } from "@/docs/types";
 import { checkReadmeSections } from "./check-readme-sections";
-import { findMissingSectionDiagnostics } from "./find-missing-section-diagnostics";
-import { findOrderingViolationDiagnostics } from "./find-ordering-violation-diagnostics";
 import { getMatchedReadmeSections } from "./get-matched-readme-sections";
+import { findMissingSectionDiagnostics } from "./sections/find-missing-section-diagnostics";
+import { findOrderingViolationDiagnostics } from "./sections/find-ordering-violation-diagnostics";
 
 const contract: DocumentationContract = {
   packageName: "demo-package",

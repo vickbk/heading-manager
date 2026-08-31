@@ -1,4 +1,4 @@
-import type { ParsedReadmeHeading } from "../types";
+import type { ParsedReadmeHeading } from "../../../types";
 import { cleanHeadingText } from "./clean-heading-text";
 import { extractHeadingMatch } from "./extract-heading-match";
 import { normalizeHeadingText } from "./normalize-heading-text";

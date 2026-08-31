@@ -1,8 +1,10 @@
 import { DocumentationContract } from "@/docs/types";
-import type { ReadmeSectionValidationResult } from "../types";
-import { findMissingSectionDiagnostics } from "./find-missing-section-diagnostics";
-import { findOrderingViolationDiagnostics } from "./find-ordering-violation-diagnostics";
+import type { ReadmeSectionValidationResult } from "../../types";
 import { getMatchedReadmeSections } from "./get-matched-readme-sections";
+import {
+  findMissingSectionDiagnostics,
+  findOrderingViolationDiagnostics,
+} from "./sections";
 
 export function checkReadmeSections(
   readme: string,

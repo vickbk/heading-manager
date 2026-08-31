@@ -1,5 +1,5 @@
 import { DocumentationContract } from "@/docs/types";
-import { normalizeHeadingText } from "./normalize-heading-text";
+import { normalizeHeadingText } from "../headings/normalize-heading-text";
 
 export function matchHeadingToSection(
   headingText: string,

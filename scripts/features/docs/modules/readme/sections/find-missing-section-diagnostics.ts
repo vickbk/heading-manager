@@ -1,6 +1,6 @@
 import { DocumentationContract } from "@/docs/types";
-import { ReadmeSectionDiagnostic } from "../types";
-import { getContractSection } from "./get-contract-section";
+import type { ReadmeSectionDiagnostic } from "../../../types";
+import { getContractSection } from "../contract";
 
 export function findMissingSectionDiagnostics(
   foundSectionIds: string[],

@@ -1,6 +1,9 @@
 import { DocumentationContract } from "@/docs/types";
-import { MatchedReadmeSection, ReadmeSectionDiagnostic } from "../types";
-import { getContractSection } from "./get-contract-section";
+import type {
+  MatchedReadmeSection,
+  ReadmeSectionDiagnostic,
+} from "../../../types";
+import { getContractSection } from "../contract";
 
 export function findOrderingViolationDiagnostics(
   matchedSections: MatchedReadmeSection[],
