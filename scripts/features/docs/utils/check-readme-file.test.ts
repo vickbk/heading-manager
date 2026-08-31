@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import * as filesModule from "@/scripts/core/files";
 import type { DocumentationContract } from "@/docs/types";
+import * as filesModule from "@/scripts/core/files";
 import { checkReadmeFile } from "./check-readme-file";
 import { checkReadmeFiles } from "./check-readme-files";
 
@@ -102,7 +102,9 @@ describe("checkReadmeFile", () => {
   it("propagates filesystem errors with the original cause intact", async () => {
     const promise = checkReadmeFile({ path: "./missing.md", contract });
 
-    await expect(promise).rejects.toThrow(/\[IO Error\] Failed to read ".*missing\.md": ENOENT: no such file or directory/);
+    await expect(promise).rejects.toThrow(
+      /\[IO Error\] Failed to read ".*missing\.md": ENOENT: no such file or directory/,
+    );
     await expect(promise).rejects.toHaveProperty("cause");
   });
 });
@@ -133,11 +135,13 @@ describe("checkReadmeFiles", () => {
       "## License",
     ].join("\n");
 
-    vi.spyOn(filesModule, "readTextFile").mockImplementation(async (filePath) => {
-      if (filePath === "./README-1.md") return validReadme;
-      if (filePath === "./README-2.md") return validReadme;
-      throw new Error(`Unexpected path: ${filePath}`);
-    });
+    vi.spyOn(filesModule, "readTextFile").mockImplementation(
+      async (filePath) => {
+        if (filePath === "./README-1.md") return validReadme;
+        if (filePath === "./README-2.md") return validReadme;
+        throw new Error(`Unexpected path: ${filePath}`);
+      },
+    );
 
     const results = await checkReadmeFiles(
       { path: "./README-1.md", contract },

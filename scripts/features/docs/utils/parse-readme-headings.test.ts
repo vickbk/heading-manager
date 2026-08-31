@@ -16,7 +16,9 @@ describe("parseReadmeHeadings", () => {
     const headings = parseReadmeHeadings(readme);
 
     expect(headings).toHaveLength(6);
-    expect(headings.map((heading) => heading.level)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(headings.map((heading) => heading.level)).toEqual([
+      1, 2, 3, 4, 5, 6,
+    ]);
     expect(headings[0]).toMatchObject({
       text: "Project Title",
       normalizedText: "project title",
@@ -53,32 +55,33 @@ describe("parseReadmeHeadings", () => {
 
     const headings = parseReadmeHeadings(readme);
 
-    expect(headings.map((heading) => heading.text)).toEqual(["Project Title", "Quick Start"]);
+    expect(headings.map((heading) => heading.text)).toEqual([
+      "Project Title",
+      "Quick Start",
+    ]);
   });
 
   it("supports both CRLF and LF line endings", () => {
     const lfReadme = ["# Title", "## Section", "### Subsection"].join("\n");
     const crlfReadme = ["# Title", "## Section", "### Subsection"].join("\r\n");
 
-    expect(parseReadmeHeadings(lfReadme).map((heading) => heading.text)).toEqual([
-      "Title",
-      "Section",
-      "Subsection",
-    ]);
-    expect(parseReadmeHeadings(crlfReadme).map((heading) => heading.text)).toEqual([
-      "Title",
-      "Section",
-      "Subsection",
-    ]);
+    expect(
+      parseReadmeHeadings(lfReadme).map((heading) => heading.text),
+    ).toEqual(["Title", "Section", "Subsection"]);
+    expect(
+      parseReadmeHeadings(crlfReadme).map((heading) => heading.text),
+    ).toEqual(["Title", "Section", "Subsection"]);
   });
 
   it("accepts headings with markdown emphasis, links, and inline code", () => {
-    const headings = parseReadmeHeadings([
-      "# Project Title",
-      "## **Quick Start**",
-      "## [Features](#features)",
-      "## `Installation`",
-    ].join("\n"));
+    const headings = parseReadmeHeadings(
+      [
+        "# Project Title",
+        "## **Quick Start**",
+        "## [Features](#features)",
+        "## `Installation`",
+      ].join("\n"),
+    );
 
     expect(headings.map((heading) => heading.normalizedText)).toEqual([
       "project title",
