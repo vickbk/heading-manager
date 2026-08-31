@@ -1,4 +1,4 @@
-import type { ParsedReadmeHeading } from "../../../types";
+import type { ParsedReadmeHeading } from "../types";
 import { createCodeFenceTracker } from "./parse-code-fence";
 import { parseHeadingFromLine } from "./parse-heading-line";
 

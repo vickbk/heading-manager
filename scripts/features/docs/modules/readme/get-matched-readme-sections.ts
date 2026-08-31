@@ -1,7 +1,7 @@
 import { DocumentationContract } from "@/docs/types";
-import type { MatchedReadmeSection } from "../../types";
 import { matchHeadingToSection } from "./contract";
 import { parseReadmeHeadings } from "./headings/parse-readme-headings";
+import type { MatchedReadmeSection } from "./types";
 
 /**
  * Finds the README headings that match the documentation contract.

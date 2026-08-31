@@ -1,9 +1,6 @@
 import { DocumentationContract } from "@/docs/types";
-import type {
-  MatchedReadmeSection,
-  ReadmeSectionDiagnostic,
-} from "../../../types";
 import { getContractSection } from "../contract";
+import type { MatchedReadmeSection, ReadmeSectionDiagnostic } from "../types";
 
 /**
  * Detects ordering violations between matched README sections and the contract.

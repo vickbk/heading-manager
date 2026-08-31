@@ -1,6 +1,6 @@
 import { DocumentationContract } from "@/docs/types";
-import type { ReadmeSectionDiagnostic } from "../../../types";
 import { getContractSection } from "../contract";
+import type { ReadmeSectionDiagnostic } from "../types";
 
 /**
  * Produces diagnostics for any required section missing from the README.
