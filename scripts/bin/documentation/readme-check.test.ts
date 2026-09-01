@@ -6,10 +6,12 @@ import { shutConsole } from "@/tests/setup/console";
 
 const docsModuleMock = vi.hoisted(() => ({
   checkReadmeFiles: vi.fn(),
+  handleReadmeCliError: vi.fn(),
 }));
 
-vi.mock("@/scripts/features/docs", () => ({
+vi.mock("@/scripts/features/docs", async () => ({
   checkReadmeFiles: docsModuleMock.checkReadmeFiles,
+  handleReadmeCliError: docsModuleMock.handleReadmeCliError,
 }));
 
 describe("bin/documentation/readme-check entrypoint", () => {
@@ -17,17 +19,14 @@ describe("bin/documentation/readme-check entrypoint", () => {
 
   beforeEach(() => {
     vi.resetModules();
-    vi.restoreAllMocks();
+    vi.resetAllMocks();
     process.argv = [...originalArgv];
     shutConsole();
     vi.spyOn(process, "exit").mockImplementation((() => undefined) as never);
-
-    docsModuleMock.checkReadmeFiles.mockReset();
   });
 
   afterEach(() => {
     process.argv = [...originalArgv];
-    vi.restoreAllMocks();
   });
 
   it("should run the README validation task when the script matches the entrypoint", async () => {
@@ -41,8 +40,7 @@ describe("bin/documentation/readme-check entrypoint", () => {
 
     expect(docsModuleMock.checkReadmeFiles).toHaveBeenCalledTimes(1);
     expect(docsModuleMock.checkReadmeFiles).toHaveBeenCalledWith({
-      path: "./README.md",
-      contract: documentationContract,
+      "./README.md": documentationContract,
     });
     expect(console.error).not.toHaveBeenCalled();
   });
@@ -55,7 +53,7 @@ describe("bin/documentation/readme-check entrypoint", () => {
     expect(docsModuleMock.checkReadmeFiles).not.toHaveBeenCalled();
   });
 
-  it("should catch fatal validation errors and keep the default README task prefix", async () => {
+  it("should pass handleReadmeCliError to runTask and handle fatal errors correctly", async () => {
     process.argv = [
       "node",
       "/workspace/scripts/bin/documentation/readme-check.ts",
@@ -63,20 +61,20 @@ describe("bin/documentation/readme-check entrypoint", () => {
 
     const validationError = new Error("README is missing required sections");
     docsModuleMock.checkReadmeFiles.mockRejectedValue(validationError);
+    docsModuleMock.handleReadmeCliError.mockReturnValue("MOCK_FORMATTED_ERROR");
 
     await import("./readme-check");
 
-    expect(console.error).toHaveBeenCalledTimes(1);
-    expect(console.error).toHaveBeenCalledWith(
-      "❌ [Readme Check] Fatal Error: README is missing required sections",
+    expect(docsModuleMock.handleReadmeCliError).toHaveBeenCalledWith(
+      validationError,
     );
+    expect(console.error).toHaveBeenCalledWith("MOCK_FORMATTED_ERROR");
     expect(process.exit).toHaveBeenCalledWith(1);
   });
 
-  it("should pass the default README task prefix to runTask for the fatal error boundary", async () => {
+  it("should pass 'readme-check' as the task name to runTask", async () => {
     const errorsModule = await import("@/scripts/core/errors");
     const runTaskSpy = vi.spyOn(errorsModule, "runTask");
-
     process.argv = [
       "node",
       "/workspace/scripts/bin/documentation/readme-check.ts",
@@ -88,7 +86,7 @@ describe("bin/documentation/readme-check entrypoint", () => {
     expect(runTaskSpy).toHaveBeenCalledWith(
       "readme-check",
       expect.any(Function),
-      "❌ [Readme Check] Fatal Error",
+      docsModuleMock.handleReadmeCliError,
     );
   });
 });

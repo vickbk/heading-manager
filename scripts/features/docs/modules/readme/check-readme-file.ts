@@ -1,21 +1,33 @@
+// scripts/features/docs/utils/orchestration/check-readme-file.ts
 import { readTextFile } from "@/scripts/core/files";
 import { checkReadmeSections } from "./check-readme-sections";
+import { ReadmeValidationError } from "./errors/readme-validation-error";
 import type { FileValidationResult, ReadmeTarget } from "./types";
 
 /**
  * Validates a single README file against its assigned documentation contract.
  *
  * @param {ReadmeTarget} target - The file path and contract pair to validate.
- * @returns {Promise<FileValidationResult>} The file-level validation result,
- * including the resolved README output or validation errors.
+ * @returns {Promise<FileValidationResult>} The file-level validation result.
+ * @throws {ReadmeValidationError} If the README section validation fails contract checks.
  */
-export async function checkReadmeFile(
-  target: ReadmeTarget,
-): Promise<FileValidationResult> {
-  const { path, contract } = target;
+export async function checkReadmeFile({
+  path,
+  contract,
+}: ReadmeTarget): Promise<FileValidationResult> {
+  try {
+    const content: string = await readTextFile(path);
+    const result = checkReadmeSections(content, contract);
 
-  const content: string = await readTextFile(path);
+    if (!result.isValid) {
+      throw new ReadmeValidationError(path, result);
+    }
 
-  const result = checkReadmeSections(content, contract);
-  return { path, result };
+    return { path, result };
+  } catch (error) {
+    return {
+      path,
+      error,
+    };
+  }
 }

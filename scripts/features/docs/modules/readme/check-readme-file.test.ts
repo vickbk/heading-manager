@@ -3,60 +3,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { DocumentationContract } from "@/docs/types";
 import * as filesModule from "@/scripts/core/files";
 import { checkReadmeFile } from "./check-readme-file";
-import { checkReadmeFiles } from "./check-readme-files";
+import { ReadmeValidationError } from "./errors/readme-validation-error";
 
-const contract: DocumentationContract = {
+const mockContract: DocumentationContract = {
   packageName: "demo-package",
   sections: [
     { id: "identity", heading: "Project Title", required: true },
     { id: "quick-start", heading: "Quick Start", required: true },
-    { id: "features", heading: "Features", required: true },
-    { id: "installation", heading: "Installation", required: true },
-    { id: "usage", heading: "Usage", required: true },
-    { id: "api", heading: "API & Entry Points", required: true },
-    { id: "accessibility", heading: "Accessibility", required: true },
-    { id: "diagnostics", heading: "Diagnostics", required: false },
-    { id: "typescript", heading: "TypeScript Support", required: true },
-    { id: "testing", heading: "Testing", required: false },
-    { id: "architecture", heading: "Architecture", required: false },
-    { id: "contributing", heading: "Contributing", required: false },
-    { id: "changelog", heading: "Changelog", required: false },
     { id: "license", heading: "License", required: true },
   ],
-  preferredSectionOrder: [
-    "identity",
-    "quick-start",
-    "features",
-    "installation",
-    "usage",
-    "api",
-    "accessibility",
-    "diagnostics",
-    "typescript",
-    "testing",
-    "architecture",
-    "contributing",
-    "changelog",
-    "license",
-  ],
-  requiredSectionIds: [
-    "identity",
-    "quick-start",
-    "features",
-    "installation",
-    "usage",
-    "api",
-    "accessibility",
-    "typescript",
-    "license",
-  ],
-  recommendedSectionIds: [
-    "diagnostics",
-    "testing",
-    "architecture",
-    "contributing",
-    "changelog",
-  ],
+  preferredSectionOrder: ["identity", "quick-start", "license"],
+  requiredSectionIds: ["identity", "quick-start", "license"],
+  recommendedSectionIds: [],
 };
 
 describe("checkReadmeFile", () => {
@@ -64,98 +22,146 @@ describe("checkReadmeFile", () => {
     vi.restoreAllMocks();
   });
 
-  it("reads the README and hands the content to checkReadmeSections", async () => {
-    const readme = [
-      "# Project Title",
-      "",
-      "## Quick Start",
-      "",
-      "## Features",
-      "",
-      "## Installation",
-      "",
-      "## Usage",
-      "",
-      "## API & Entry Points",
-      "",
-      "## Accessibility",
-      "",
-      "## TypeScript Support",
-      "",
-      "## License",
-    ].join("\n");
+  describe("Valid README Files (Success Path)", () => {
+    it("returns { path, result } with isValid: true when all required sections exist", async () => {
+      const validMarkdown = [
+        "# Project Title",
+        "",
+        "## Quick Start",
+        "",
+        "## License",
+      ].join("\n");
 
-    const spy = vi.spyOn(filesModule, "readTextFile").mockResolvedValue(readme);
+      const spy = vi
+        .spyOn(filesModule, "readTextFile")
+        .mockResolvedValue(validMarkdown);
 
-    const result = await checkReadmeFile({ path: "./README.md", contract });
+      const response = await checkReadmeFile({
+        path: "./README.md",
+        contract: mockContract,
+      });
 
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith("./README.md");
-    expect(result).toEqual({
-      path: "./README.md",
-      result: expect.objectContaining({
-        isValid: true,
-      }),
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledWith("./README.md");
+      expect(response.error).toBeUndefined();
+      expect(response).toEqual({
+        path: "./README.md",
+        result: expect.objectContaining({
+          isValid: true,
+          diagnostics: [],
+        }),
+      });
     });
   });
 
-  it("propagates filesystem errors with the original cause intact", async () => {
-    const promise = checkReadmeFile({ path: "./missing.md", contract });
+  describe("Validation Failures (ReadmeValidationError Path)", () => {
+    it("returns { path, error } with ReadmeValidationError when sections are missing", async () => {
+      const invalidMarkdown = "# Project Title\n\n## Quick Start";
 
-    await expect(promise).rejects.toThrow(
-      /\[IO Error\] Failed to read ".*missing\.md": ENOENT: no such file or directory/,
-    );
-    await expect(promise).rejects.toHaveProperty("cause");
-  });
-});
+      vi.spyOn(filesModule, "readTextFile").mockResolvedValue(invalidMarkdown);
 
-describe("checkReadmeFiles", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
+      const response = await checkReadmeFile({
+        path: "./README.md",
+        contract: mockContract,
+      });
 
-  it("validates multiple README targets in parallel and returns a mapped result array", async () => {
-    const validReadme = [
-      "# Project Title",
-      "",
-      "## Quick Start",
-      "",
-      "## Features",
-      "",
-      "## Installation",
-      "",
-      "## Usage",
-      "",
-      "## API & Entry Points",
-      "",
-      "## Accessibility",
-      "",
-      "## TypeScript Support",
-      "",
-      "## License",
-    ].join("\n");
+      expect(response.result).toBeUndefined();
+      expect(response.path).toBe("./README.md");
+      expect(response.error).toBeInstanceOf(ReadmeValidationError);
 
-    vi.spyOn(filesModule, "readTextFile").mockImplementation(
-      async (filePath) => {
-        if (filePath === "./README-1.md") return validReadme;
-        if (filePath === "./README-2.md") return validReadme;
-        throw new Error(`Unexpected path: ${filePath}`);
-      },
-    );
-
-    const results = await checkReadmeFiles(
-      { path: "./README-1.md", contract },
-      { path: "./README-2.md", contract },
-    );
-
-    expect(results).toHaveLength(2);
-    expect(results[0]).toEqual({
-      path: "./README-1.md",
-      result: expect.objectContaining({ isValid: true }),
+      const validationError = response.error as ReadmeValidationError;
+      expect(validationError.path).toBe("./README.md");
+      expect(validationError.result.isValid).toBe(false);
+      expect(validationError.result.missingRequiredSections).toContain(
+        "license",
+      );
+      expect(validationError.result.diagnostics).toHaveLength(1);
+      expect(validationError.result.diagnostics[0].code).toBe(
+        "missing-required-section",
+      );
     });
-    expect(results[1]).toEqual({
-      path: "./README-2.md",
-      result: expect.objectContaining({ isValid: true }),
+
+    it("returns { path, error } with ReadmeValidationError when section order is invalid", async () => {
+      const outOfOrderMarkdown = [
+        "# Project Title",
+        "",
+        "## License",
+        "",
+        "## Quick Start",
+      ].join("\n");
+
+      vi.spyOn(filesModule, "readTextFile").mockResolvedValue(
+        outOfOrderMarkdown,
+      );
+
+      const response = await checkReadmeFile({
+        path: "./README.md",
+        contract: mockContract,
+      });
+
+      expect(response.error).toBeInstanceOf(ReadmeValidationError);
+      const validationError = response.error as ReadmeValidationError;
+      expect(validationError.result.isValid).toBe(false);
+      expect(
+        validationError.result.diagnostics.some(
+          (d) => d.code === "ordering-violation",
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe("Filesystem & I/O Errors", () => {
+    it("captures thrown filesystem Error into the error property without rejecting", async () => {
+      const ioError = new Error(
+        '[IO Error] Failed to read "./missing.md": ENOENT: no such file or directory',
+      );
+      vi.spyOn(filesModule, "readTextFile").mockRejectedValue(ioError);
+
+      const response = await checkReadmeFile({
+        path: "./missing.md",
+        contract: mockContract,
+      });
+
+      expect(response).toEqual({
+        path: "./missing.md",
+        error: ioError,
+      });
+      expect(response.error).not.toBeInstanceOf(ReadmeValidationError);
+    });
+
+    it("captures non-Error primitive rejections into the error property", async () => {
+      vi.spyOn(filesModule, "readTextFile").mockRejectedValue(
+        "Disk read error",
+      );
+
+      const response = await checkReadmeFile({
+        path: "./corrupted.md",
+        contract: mockContract,
+      });
+
+      expect(response).toEqual({
+        path: "./corrupted.md",
+        error: "Disk read error",
+      });
+    });
+  });
+
+  describe("Edge Cases", () => {
+    it("handles completely empty file content by returning a ReadmeValidationError", async () => {
+      vi.spyOn(filesModule, "readTextFile").mockResolvedValue("");
+
+      const response = await checkReadmeFile({
+        path: "./EMPTY.md",
+        contract: mockContract,
+      });
+
+      expect(response.error).toBeInstanceOf(ReadmeValidationError);
+      const error = response.error as ReadmeValidationError;
+      expect(error.result.missingRequiredSections).toEqual([
+        "identity",
+        "quick-start",
+        "license",
+      ]);
     });
   });
 });

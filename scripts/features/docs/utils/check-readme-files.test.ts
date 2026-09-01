@@ -1,176 +1,257 @@
+// scripts/features/docs/utils/orchestration/check-readme-files.test.ts
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { DocumentationContract } from "@/docs/types";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { FileValidationResult, ReadmeTarget } from "../modules/readme";
-import { checkReadmeFile } from "../modules/readme";
+import * as filesModule from "@/scripts/core/files";
+import { ReadmeValidationError } from "../modules/readme";
 import { checkReadmeFiles } from "./check-readme-files";
 
-// Mock the single-file validator module dependency
-vi.mock("./check-readme-file", () => ({
-  checkReadmeFile: vi.fn(),
-}));
+const mockContractStrict: DocumentationContract = {
+  packageName: "strict-package",
+  sections: [
+    { id: "identity", heading: "Project Title", required: true },
+    { id: "quick-start", heading: "Quick Start", required: true },
+    { id: "license", heading: "License", required: true },
+  ],
+  preferredSectionOrder: ["identity", "quick-start", "license"],
+  requiredSectionIds: ["identity", "quick-start", "license"],
+  recommendedSectionIds: [],
+};
+
+const mockContractMinimal: DocumentationContract = {
+  packageName: "minimal-package",
+  sections: [{ id: "identity", heading: "Project Title", required: true }],
+  preferredSectionOrder: ["identity"],
+  requiredSectionIds: ["identity"],
+  recommendedSectionIds: [],
+};
 
 describe("checkReadmeFiles", () => {
-  const mockContract = {
-    requiredSectionIds: ["overview"],
-    preferredSectionOrder: ["overview"],
-  } as DocumentationContract;
-
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
+  describe("Success Scenarios & Order Preservation", () => {
+    it("returns results in the exact key insertion order regardless of async resolution speed", async () => {
+      // Simulate slow reading for the first file and fast reading for the second
+      vi.spyOn(filesModule, "readTextFile").mockImplementation(
+        async (filePath) => {
+          if (filePath.includes("first")) {
+            await new Promise((resolve) => setTimeout(resolve, 50));
+            return "# Project Title\n\n## Quick Start\n\n## License";
+          }
+          return "# Project Title\n\n## Quick Start\n\n## License";
+        },
+      );
 
-  describe("Variadic Argument Handling", () => {
-    it("should return an empty array when invoked with no arguments", async () => {
-      const results = await checkReadmeFiles();
+      const targets = {
+        "./first/README.md": mockContractStrict,
+        "./second/README.md": mockContractStrict,
+        "./third/README.md": mockContractMinimal,
+      };
+
+      const results = await checkReadmeFiles(targets);
+
+      expect(results).toHaveLength(3);
+      expect(results[0].path).toBe("./first/README.md");
+      expect(results[1].path).toBe("./second/README.md");
+      expect(results[2].path).toBe("./third/README.md");
+      expect(results.every((r) => r.result?.isValid === true)).toBe(true);
+    });
+
+    it("returns an empty array without calling readTextFile when passed an empty object", async () => {
+      const spy = vi.spyOn(filesModule, "readTextFile");
+      const results = await checkReadmeFiles({});
 
       expect(results).toEqual([]);
-      expect(checkReadmeFile).not.toHaveBeenCalled();
+      expect(spy).not.toHaveBeenCalled();
     });
 
-    it("should validate a single target when passed as a single argument", async () => {
-      const target: ReadmeTarget = {
-        path: "README.md",
-        contract: mockContract,
-      };
-
-      const expectedResult: FileValidationResult = {
-        path: "README.md",
-        result: {
-          isValid: true,
-          diagnostics: [],
-          foundSectionIds: ["overview"],
-          missingRequiredSections: [],
-          sections: [
-            { id: "overview", heading: "Overview", level: 1, line: 1 },
-          ],
+    it("handles multiple targets running against different contract requirements", async () => {
+      vi.spyOn(filesModule, "readTextFile").mockImplementation(
+        async (filePath) => {
+          if (filePath.includes("minimal")) {
+            return "# Project Title";
+          }
+          return "# Project Title\n\n## Quick Start\n\n## License";
         },
+      );
+
+      const targets = {
+        "./strict/README.md": mockContractStrict,
+        "./minimal/README.md": mockContractMinimal,
       };
 
-      vi.mocked(checkReadmeFile).mockResolvedValue(expectedResult);
+      const results = await checkReadmeFiles(targets);
 
-      const results = await checkReadmeFiles(target);
-
-      expect(results).toEqual([expectedResult]);
-      expect(checkReadmeFile).toHaveBeenCalledTimes(1);
-      expect(checkReadmeFile).toHaveBeenCalledWith(target);
+      expect(results).toHaveLength(2);
+      expect(results[0].result?.foundSectionIds).toEqual([
+        "identity",
+        "quick-start",
+        "license",
+      ]);
+      expect(results[1].result?.foundSectionIds).toEqual(["identity"]);
     });
   });
 
-  describe("Concurrent Execution & Result Ordering", () => {
-    it("should process multiple targets concurrently and preserve positional array order", async () => {
-      const target1: ReadmeTarget = {
-        path: "docs/A.md",
-        contract: mockContract,
-      };
-      const target2: ReadmeTarget = {
-        path: "docs/B.md",
-        contract: mockContract,
-      };
-      const target3: ReadmeTarget = {
-        path: "docs/C.md",
-        contract: mockContract,
+  describe("AggregateError Aggregation & Error Filtering", () => {
+    it("throws an AggregateError with a single error when exactly one target fails", async () => {
+      vi.spyOn(filesModule, "readTextFile").mockResolvedValue(
+        "# Project Title",
+      ); // Fails strict contract
+
+      const targets = {
+        "./README.md": mockContractStrict,
       };
 
-      const result1: FileValidationResult = {
-        path: "docs/A.md",
-        result: {
-          isValid: true,
-          diagnostics: [],
-          foundSectionIds: ["overview"],
-          missingRequiredSections: [],
-          sections: [],
+      const promise = checkReadmeFiles(targets);
+
+      await expect(promise).rejects.toThrow(AggregateError);
+      await expect(promise).rejects.toThrow(
+        "README validation failed for 1 target(s).",
+      );
+
+      try {
+        await promise;
+      } catch (err) {
+        expect(err).toBeInstanceOf(AggregateError);
+        const aggErr = err as AggregateError;
+        expect(aggErr.errors).toHaveLength(1);
+        expect(aggErr.errors[0]).toBeInstanceOf(ReadmeValidationError);
+      }
+    });
+
+    it("collects and aggregates every error when ALL targets fail validation", async () => {
+      vi.spyOn(filesModule, "readTextFile").mockResolvedValue(""); // Fails all contracts
+
+      const targets = {
+        "./pkg-1/README.md": mockContractStrict,
+        "./pkg-2/README.md": mockContractStrict,
+        "./pkg-3/README.md": mockContractMinimal,
+      };
+
+      try {
+        await checkReadmeFiles(targets);
+        expect.fail("Should have thrown an AggregateError");
+      } catch (err) {
+        expect(err).toBeInstanceOf(AggregateError);
+        const aggErr = err as AggregateError;
+
+        expect(aggErr.message).toBe(
+          "README validation failed for 3 target(s).",
+        );
+        expect(aggErr.errors).toHaveLength(3);
+        expect(
+          aggErr.errors.every((e) => e instanceof ReadmeValidationError),
+        ).toBe(true);
+
+        const pathsInErrors = (aggErr.errors as ReadmeValidationError[]).map(
+          (e) => e.path,
+        );
+        expect(pathsInErrors).toEqual([
+          "./pkg-1/README.md",
+          "./pkg-2/README.md",
+          "./pkg-3/README.md",
+        ]);
+      }
+    });
+
+    it("handles a combination of ReadmeValidationErrors, System I/O Errors, and primitive rejections", async () => {
+      vi.spyOn(filesModule, "readTextFile").mockImplementation(
+        async (filePath) => {
+          if (filePath.includes("missing")) {
+            throw new Error("ENOENT: file not found");
+          }
+          if (filePath.includes("invalid")) {
+            return "# Project Title"; // Missing required sections
+          }
+          if (filePath.includes("corrupted")) {
+            throw "Raw string error rejection";
+          }
+          return "# Project Title\n\n## Quick Start\n\n## License"; // Valid
         },
+      );
+
+      const targets = {
+        "./valid/README.md": mockContractStrict,
+        "./invalid/README.md": mockContractStrict,
+        "./missing/README.md": mockContractStrict,
+        "./corrupted/README.md": mockContractStrict,
       };
 
-      const result2: FileValidationResult = {
-        path: "docs/B.md",
-        result: {
-          isValid: false,
-          diagnostics: [
-            {
-              code: "missing-required-section",
-              sectionId: "overview",
-              expectedHeading: "Overview",
-              message: 'Required README section "Overview" is missing.',
-            },
-          ],
-          foundSectionIds: [],
-          missingRequiredSections: ["overview"],
-          sections: [],
-        },
-      };
+      try {
+        await checkReadmeFiles(targets);
+        expect.fail("Should have thrown an AggregateError");
+      } catch (err) {
+        expect(err).toBeInstanceOf(AggregateError);
+        const aggErr = err as AggregateError;
 
-      const result3: FileValidationResult = {
-        path: "docs/C.md",
-        result: {
-          isValid: true,
-          diagnostics: [],
-          foundSectionIds: ["overview"],
-          missingRequiredSections: [],
-          sections: [],
-        },
-      };
+        expect(aggErr.errors).toHaveLength(3); // 1 validation + 1 I/O Error + 1 primitive
 
-      // Simulate execution out of order to ensure Promise.all preserves positional array indices
-      vi.mocked(checkReadmeFile).mockImplementation(async (target) => {
-        if (target.path === "docs/A.md") {
-          return new Promise((resolve) =>
-            setTimeout(() => resolve(result1), 30),
-          );
-        }
-        if (target.path === "docs/B.md") {
-          return new Promise((resolve) =>
-            setTimeout(() => resolve(result2), 5),
-          );
-        }
-        return Promise.resolve(result3);
-      });
+        const validationErr = aggErr.errors.find(
+          (e) => e instanceof ReadmeValidationError,
+        ) as ReadmeValidationError;
+        const ioErr = aggErr.errors.find(
+          (e) => e instanceof Error && !(e instanceof ReadmeValidationError),
+        ) as Error;
+        const stringErr = aggErr.errors.find((e) => typeof e === "string");
 
-      const results = await checkReadmeFiles(target1, target2, target3);
-
-      expect(results).toEqual([result1, result2, result3]);
-      expect(checkReadmeFile).toHaveBeenCalledTimes(3);
-      expect(checkReadmeFile).toHaveBeenNthCalledWith(1, target1);
-      expect(checkReadmeFile).toHaveBeenNthCalledWith(2, target2);
-      expect(checkReadmeFile).toHaveBeenNthCalledWith(3, target3);
+        expect(validationErr?.path).toBe("./invalid/README.md");
+        expect(ioErr?.message).toBe("ENOENT: file not found");
+        expect(stringErr).toBe("Raw string error rejection");
+      }
     });
   });
 
-  describe("Error Propagation", () => {
-    it("should reject immediately if any target throws an I/O or parser error", async () => {
-      const target1: ReadmeTarget = {
-        path: "valid.md",
-        contract: mockContract,
+  describe("Edge Cases & Path Variations", () => {
+    it("handles target paths containing spaces, deep relative paths, or unicode characters", async () => {
+      const validContent = "# Project Title\n\n## Quick Start\n\n## License";
+      vi.spyOn(filesModule, "readTextFile").mockResolvedValue(validContent);
+
+      const targets = {
+        "./nested/folder with spaces/README.md": mockContractStrict,
+        "../parent-pkg/docs/README.md": mockContractStrict,
+        "./packages/🚀-app/README.md": mockContractStrict,
       };
-      const target2: ReadmeTarget = {
-        path: "missing.md",
-        contract: mockContract,
-      };
 
-      const ioError = new Error('[IO Error] Failed to read "missing.md"');
+      const results = await checkReadmeFiles(targets);
 
-      vi.mocked(checkReadmeFile).mockImplementation(async (target) => {
-        if (target.path === "missing.md") {
-          throw ioError;
-        }
-        return {
-          path: "valid.md",
-          result: {
-            isValid: true,
-            diagnostics: [],
-            foundSectionIds: [],
-            missingRequiredSections: [],
-            sections: [],
-          },
-        };
-      });
+      expect(results).toHaveLength(3);
+      expect(results[0].path).toBe("./nested/folder with spaces/README.md");
+      expect(results[1].path).toBe("../parent-pkg/docs/README.md");
+      expect(results[2].path).toBe("./packages/🚀-app/README.md");
+      expect(results.every((r) => r.result?.isValid === true)).toBe(true);
+    });
 
-      await expect(checkReadmeFiles(target1, target2)).rejects.toThrow(ioError);
-      expect(checkReadmeFile).toHaveBeenCalledTimes(2);
+    it("ensures that passing targets do not obscure failing targets in large batches", async () => {
+      const passingCount = 20;
+      const failingIndex = 12;
+
+      vi.spyOn(filesModule, "readTextFile").mockImplementation(
+        async (filePath) => {
+          if (filePath.includes(`pkg-${failingIndex}`)) {
+            return "# Project Title"; // Invalid
+          }
+          return "# Project Title\n\n## Quick Start\n\n## License"; // Valid
+        },
+      );
+
+      const targets: Record<string, DocumentationContract> = {};
+      for (let i = 0; i < passingCount; i += 1) {
+        targets[`./packages/pkg-${i}/README.md`] = mockContractStrict;
+      }
+
+      try {
+        await checkReadmeFiles(targets);
+        expect.fail("Should have thrown an AggregateError");
+      } catch (err) {
+        expect(err).toBeInstanceOf(AggregateError);
+        const aggErr = err as AggregateError;
+
+        expect(aggErr.errors).toHaveLength(1);
+        const error = aggErr.errors[0] as ReadmeValidationError;
+        expect(error.path).toBe(`./packages/pkg-${failingIndex}/README.md`);
+      }
     });
   });
 });

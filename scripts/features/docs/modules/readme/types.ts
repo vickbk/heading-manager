@@ -40,5 +40,5 @@ export type ReadmeTarget = {
 export type FileValidationResult = {
   path: string;
   result?: ReadmeSectionValidationResult;
-  error?: string;
+  error?: unknown;
 };

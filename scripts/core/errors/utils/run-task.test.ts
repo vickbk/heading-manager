@@ -157,7 +157,7 @@ describe("runTask CLI Entrypoint Guard", () => {
         .mockImplementation((() => {}) as never);
 
       const error = new Error("Changelog missing");
-      const customFormatter = (msg: string) => `❌ ${msg}`;
+      const customFormatter = (msg: unknown) => `❌ ${msg}`;
 
       await runTask(
         "extract-version-tag",
