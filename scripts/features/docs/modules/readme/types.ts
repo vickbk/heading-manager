@@ -1,3 +1,5 @@
+import { DocumentationContract } from "@/docs/types";
+
 export type ReadmeSectionDiagnostic = {
   code: "missing-required-section" | "ordering-violation";
   sectionId?: string;
@@ -29,3 +31,14 @@ export type ParsedReadmeHeading = {
 };
 
 export type MatchedReadmeSection = ParsedReadmeHeading & { id: string };
+
+export type ReadmeTarget = {
+  path: string;
+  contract: DocumentationContract;
+};
+
+export type FileValidationResult = {
+  path: string;
+  result?: ReadmeSectionValidationResult;
+  error?: string;
+};

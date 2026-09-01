@@ -1,5 +1,5 @@
-import type { FileValidationResult, ReadmeTarget } from "../types";
-import { checkReadmeFile } from "./check-readme-file";
+import type { FileValidationResult, ReadmeTarget } from "../modules/readme";
+import { checkReadmeFile } from "../modules/readme";
 
 /**
  * Validates multiple README targets in parallel.

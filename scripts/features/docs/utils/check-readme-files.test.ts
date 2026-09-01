@@ -1,8 +1,7 @@
-// scripts/features/docs/src/check-readme-files.test.ts
 import type { DocumentationContract } from "@/docs/types";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { FileValidationResult, ReadmeTarget } from "../types";
-import { checkReadmeFile } from "./check-readme-file";
+import type { FileValidationResult, ReadmeTarget } from "../modules/readme";
+import { checkReadmeFile } from "../modules/readme";
 import { checkReadmeFiles } from "./check-readme-files";
 
 // Mock the single-file validator module dependency

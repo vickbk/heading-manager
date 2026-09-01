@@ -1,6 +1,6 @@
 import { readTextFile } from "@/scripts/core/files";
-import { checkReadmeSections } from "../modules/readme";
-import type { FileValidationResult, ReadmeTarget } from "../types";
+import { checkReadmeSections } from "./check-readme-sections";
+import type { FileValidationResult, ReadmeTarget } from "./types";
 
 /**
  * Validates a single README file against its assigned documentation contract.
