@@ -370,6 +370,52 @@ This allows DOM extraction and hierarchy validation to be tested and used indepe
 
 ---
 
+## Entry Points & Import Subpaths
+
+The package exposes separate entry points for the React adapter, core
+utilities, and Playwright integration.
+
+| Subpath                                    | Target module        | Usage                                                                                 |
+| ------------------------------------------ | -------------------- | ------------------------------------------------------------------------------------- |
+| `react-heading-manager`                    | React adapter        | Render `<Heading>`, `<Main>`, `<Section>`, `<Article>`, hooks, and related components |
+| `react-heading-manager/utils`              | Core + shared engine | DOM parsing, normalized heading audits, and hierarchy checks                          |
+| `react-heading-manager/testing/playwright` | Playwright adapter   | Register and use the custom heading hierarchy matcher                                 |
+
+### Playwright import
+
+The supported Playwright entry point is:
+
+```ts
+import { registerPlaywright } from "react-heading-manager/testing/playwright";
+```
+
+⚠️ Avoid stale imports targeting the older path:
+
+```ts
+react - heading - manager / playwright;
+```
+
+---
+
+## Accessibility
+
+`react-heading-manager` is designed to support accessibility auditing around document structure and heading relationships.
+
+The core audit functionality considers:
+
+- native heading elements
+- ARIA heading roles
+- `aria-level`
+- HTML and ARIA landmark regions
+- heading relationships across nested regions
+
+The package's audit rules are intended to help identify structural issues
+during development and testing.
+
+They should be treated as **auditing heuristics rather than a complete WCAG conformance engine**.
+
+---
+
 ## Diagnostics
 
 When a heading hierarchy violation is detected, the audit engine produces structured diagnostic information.
@@ -455,58 +501,6 @@ The normalized implementation intentionally does not reinterpret or clamp these 
 
 ---
 
-## Entry Points & Import Subpaths
-
-The package exposes separate entry points for the React adapter, core
-utilities, and Playwright integration.
-
-| Subpath                                    | Target module        | Usage                                                                                 |
-| ------------------------------------------ | -------------------- | ------------------------------------------------------------------------------------- |
-| `react-heading-manager`                    | React adapter        | Render `<Heading>`, `<Main>`, `<Section>`, `<Article>`, hooks, and related components |
-| `react-heading-manager/utils`              | Core + shared engine | DOM parsing, normalized heading audits, and hierarchy checks                          |
-| `react-heading-manager/testing/playwright` | Playwright adapter   | Register and use the custom heading hierarchy matcher                                 |
-
-### Playwright import
-
-The supported Playwright entry point is:
-
-```ts
-import { registerPlaywright } from "react-heading-manager/testing/playwright";
-```
-
-⚠️ Avoid stale imports targeting the older path:
-
-```ts
-react - heading - manager / playwright;
-```
-
----
-
-## Architecture & Module Isolation Policy
-
-The package is organized into four layers with a strict dependency direction:
-
-```text
-shared
-   ↓
-core
-   ↓
-adapters
-   ↓
-main
-```
-
-| Layer          | Purpose                              | Can import                 | Must not import                            |
-| -------------- | ------------------------------------ | -------------------------- | ------------------------------------------ |
-| `src/shared`   | Pure DOM primitives and shared types | Nothing higher-level       | `src/core`, `src/adapters`, `src/main`     |
-| `src/core`     | Audit engine and DOM algorithms      | `src/shared`               | `src/adapters`, sibling `src/core` modules |
-| `src/adapters` | React and Playwright integrations    | `src/core`, `src/shared`   | Sibling adapters                           |
-| `src/main`     | Public re-export routers             | `src/adapters`, `src/core` | Business logic                             |
-
-This isolation keeps the runtime surface clean and prevents framework-specific implementations from leaking into the framework-agnostic engine.
-
----
-
 ## TypeScript Support
 
 The package provides typed public APIs throughout the React, core, and testing layers.
@@ -523,25 +517,6 @@ await expect(page).toHaveValidHeadingHierarchy();
 ```
 
 No manual declaration merging is required.
-
----
-
-## Accessibility
-
-`react-heading-manager` is designed to support accessibility auditing around document structure and heading relationships.
-
-The core audit functionality considers:
-
-- native heading elements
-- ARIA heading roles
-- `aria-level`
-- HTML and ARIA landmark regions
-- heading relationships across nested regions
-
-The package's audit rules are intended to help identify structural issues
-during development and testing.
-
-They should be treated as **auditing heuristics rather than a complete WCAG conformance engine**.
 
 ---
 
@@ -569,6 +544,31 @@ Run linting with:
 ```bash
 npm run lint
 ```
+
+---
+
+## Architecture & Module Isolation Policy
+
+The package is organized into four layers with a strict dependency direction:
+
+```text
+shared
+   ↓
+core
+   ↓
+adapters
+   ↓
+main
+```
+
+| Layer          | Purpose                              | Can import                 | Must not import                            |
+| -------------- | ------------------------------------ | -------------------------- | ------------------------------------------ |
+| `src/shared`   | Pure DOM primitives and shared types | Nothing higher-level       | `src/core`, `src/adapters`, `src/main`     |
+| `src/core`     | Audit engine and DOM algorithms      | `src/shared`               | `src/adapters`, sibling `src/core` modules |
+| `src/adapters` | React and Playwright integrations    | `src/core`, `src/shared`   | Sibling adapters                           |
+| `src/main`     | Public re-export routers             | `src/adapters`, `src/core` | Business logic                             |
+
+This isolation keeps the runtime surface clean and prevents framework-specific implementations from leaking into the framework-agnostic engine.
 
 ---
 

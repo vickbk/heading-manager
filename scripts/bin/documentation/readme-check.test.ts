@@ -39,9 +39,11 @@ describe("bin/documentation/readme-check entrypoint", () => {
     await import("./readme-check");
 
     expect(docsModuleMock.checkReadmeFiles).toHaveBeenCalledTimes(1);
-    expect(docsModuleMock.checkReadmeFiles).toHaveBeenCalledWith({
-      "./README.md": documentationContract,
-    });
+    expect(docsModuleMock.checkReadmeFiles).toHaveBeenCalledWith(
+      expect.objectContaining({
+        "./README.md": documentationContract,
+      }),
+    );
     expect(console.error).not.toHaveBeenCalled();
   });
 

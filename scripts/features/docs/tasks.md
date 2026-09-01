@@ -14,7 +14,7 @@ Establish automated guardrails that keep the README, API documentation, examples
 
 - **Steps**:
   - [x] Define the required README sections.
-  - [ ] Create an automated README section validator.
+  - [x] Create an automated README section validator.
   - [ ] Fail CI when a required section is missing.
   - [ ] Add the validator to the documentation check command.
 
