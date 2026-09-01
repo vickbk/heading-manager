@@ -7,9 +7,13 @@ import type { FileValidationResult, ReadmeTarget } from "./types";
 /**
  * Validates a single README file against its assigned documentation contract.
  *
- * @param {ReadmeTarget} target - The file path and contract pair to validate.
- * @returns {Promise<FileValidationResult>} The file-level validation result.
- * @throws {ReadmeValidationError} If the README section validation fails contract checks.
+ * The function returns a FileValidationResult for both success and failure paths:
+ * valid files include a populated result, while invalid reads or validation failures
+ * are captured in the error field instead of being thrown.
+ *
+ * @param target - The file path and contract pair to validate.
+ * @returns A file-level validation result with either the successful validation data
+ * or the captured error value.
  */
 export async function checkReadmeFile({
   path,

@@ -3,9 +3,14 @@ import { formatReadmeValidationError } from "./format/format-readme-validation-e
 import { ReadmeValidationError } from "./readme-validation-error";
 
 /**
- * Recursively unwraps AggregateError instances.
- * Formats ReadmeValidationErrors specifically and delegates all other generic errors
- * to getErrorMessage.
+ * Flattens nested AggregateError values into a depth-first list of formatted messages.
+ *
+ * Each ReadmeValidationError is rendered through its dedicated formatter, while every
+ * other value falls back to getErrorMessage. This preserves the original error tree
+ * ordering while converting the final payload to plain strings for the CLI renderer.
+ *
+ * @param error - The error tree or value to unwrap.
+ * @returns A flattened array of formatted error strings suitable for CLI output.
  */
 export function unwrapReadmeErrorMessages(error: unknown): string[] {
   if (error instanceof AggregateError) {
