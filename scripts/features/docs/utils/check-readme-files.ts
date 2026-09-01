@@ -12,5 +12,5 @@ import { checkReadmeFile } from "./check-readme-file";
 export async function checkReadmeFiles(
   ...targets: ReadmeTarget[]
 ): Promise<FileValidationResult[]> {
-  return Promise.all(targets.map((target) => checkReadmeFile(target)));
+  return await Promise.all(targets.map((target) => checkReadmeFile(target)));
 }
