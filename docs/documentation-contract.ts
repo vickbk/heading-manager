@@ -130,8 +130,8 @@ export const documentationContract: DocumentationContract = {
   ],
 };
 
-export const documentationSections = documentationContract.sections;
-export const requiredDocumentationSectionIds =
-  documentationContract.requiredSectionIds;
-export const recommendedDocumentationSectionIds =
-  documentationContract.recommendedSectionIds;
+// export const documentationSections = documentationContract.sections;
+// export const requiredDocumentationSectionIds =
+//   documentationContract.requiredSectionIds;
+// export const recommendedDocumentationSectionIds =
+//   documentationContract.recommendedSectionIds;
