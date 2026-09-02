@@ -16,7 +16,7 @@ env:
   TOTAL_PCT: 0
 
 jobs:
-  test:
+  test-lint:
     timeout-minutes: 15
     runs-on: ubuntu-latest
 
@@ -40,7 +40,7 @@ jobs:
         run: pnpm typecheck
 
       - name: Run Vitest with coverage
-        run: pnpm test:run --coverage
+        run: pnpm test run --coverage
 
       - name: Run build
         run: pnpm build
@@ -51,7 +51,7 @@ jobs:
         run: pnpm coverage-summary
 
       - name: Post Coverage Comment on PR
-        if: github.event_name == 'pull_request' && !cancelled()
+        if: ${{ github.event_name == 'pull_request' && !cancelled() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}

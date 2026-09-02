@@ -51,7 +51,6 @@
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm typecheck && pnpm build",
     "test": "vitest",
-    "test:run": "vitest run",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "release-note": "tsx ./scripts/bin/extract-release-note.ts",
