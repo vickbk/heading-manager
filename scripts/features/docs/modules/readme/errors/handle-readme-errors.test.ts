@@ -1,7 +1,7 @@
 // scripts/features/docs/utils/orchestration/handle-readme-cli-error.test.ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import * as filesModule from "@/scripts/core/files";
+import * as filesModule from "@/scripts/shared/files";
 import { shutConsole } from "@/tests/setup/console";
 import { HEADER_TEXT, handleReadmeCliError } from "./handle-readme-errors";
 import * as unwrapModule from "./unwrap-readme-errors-messages";

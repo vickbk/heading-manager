@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DocumentationContract } from "@/docs/types";
-import * as filesModule from "@/scripts/core/files";
+import * as filesModule from "@/scripts/shared/files";
 import { checkReadmeFile } from "./check-readme-file";
 import { ReadmeValidationError } from "./errors/readme-validation-error";
 

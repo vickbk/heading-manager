@@ -1,4 +1,4 @@
-import { createTextFileSync } from "@/scripts/core/files";
+import { createTextFileSync } from "@/scripts/shared/files";
 import { unwrapReadmeErrorMessages } from "./unwrap-readme-errors-messages";
 
 /**

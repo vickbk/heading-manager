@@ -3,7 +3,7 @@ import { ReadmeSectionValidationResult } from "../../types";
 import { HEADER_TEXT, handleReadmeCliError } from "../handle-readme-errors";
 import { ReadmeValidationError } from "../readme-validation-error";
 
-import * as filesModule from "@/scripts/core/files";
+import * as filesModule from "@/scripts/shared/files";
 
 function createMockValidationResult(
   overrides: Partial<ReadmeSectionValidationResult> = {},
