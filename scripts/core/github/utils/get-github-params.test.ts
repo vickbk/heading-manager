@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getGithubParams } from "./git-env";
+import { getGithubParams } from "./get-github-params";
 
 describe("getGithubParams", () => {
   const DEFAULT_ENV = {
@@ -27,7 +27,8 @@ describe("getGithubParams", () => {
     vi.stubEnv("GITHUB_EVENT_PATH", DEFAULT_ENV.GITHUB_EVENT_PATH);
     vi.stubEnv("GITHUB_RUN_ID", DEFAULT_ENV.GITHUB_RUN_ID);
 
-    scopedGetGithubParams = (await import("./git-env")).getGithubParams;
+    scopedGetGithubParams = (await import("./get-github-params"))
+      .getGithubParams;
   });
 
   afterEach(() => {
