@@ -40,9 +40,9 @@ describe("postCoverageComment (Runner Entry Point)", () => {
     it("should post a new PR comment when no existing comment is found", async () => {
       vi.spyOn(githubApi, "getGithubParams").mockReturnValue(mockConfig);
       vi.spyOn(reportUtils, "getReport").mockReturnValue(mockReport);
-      vi.spyOn(githubApi, "getComment").mockResolvedValue(null);
-      const commentActionSpy = vi
-        .spyOn(githubApi, "commentAction")
+      vi.spyOn(githubApi, "getCommentWithId").mockResolvedValue(null);
+      const saveCommentSpy = vi
+        .spyOn(githubApi, "saveComment")
         .mockResolvedValue({
           id: 555,
           body: mockReport.commentBody,
@@ -56,13 +56,11 @@ describe("postCoverageComment (Runner Entry Point)", () => {
         "octocat/hello-world",
         "100200300",
       );
-      expect(githubApi.getComment).toHaveBeenCalledWith(
-        mockConfig,
+      expect(githubApi.getCommentWithId).toHaveBeenCalledWith(
         reportUtils.COMMENT_IDENTIFIER,
       );
 
-      expect(commentActionSpy).toHaveBeenCalledWith({
-        config: mockConfig,
+      expect(saveCommentSpy).toHaveBeenCalledWith({
         body: mockReport.commentBody,
         id: null,
       });
@@ -80,9 +78,11 @@ describe("postCoverageComment (Runner Entry Point)", () => {
 
       vi.spyOn(githubApi, "getGithubParams").mockReturnValue(mockConfig);
       vi.spyOn(reportUtils, "getReport").mockReturnValue(mockReport);
-      vi.spyOn(githubApi, "getComment").mockResolvedValue(existingComment);
-      const commentActionSpy = vi
-        .spyOn(githubApi, "commentAction")
+      vi.spyOn(githubApi, "getCommentWithId").mockResolvedValue(
+        existingComment,
+      );
+      const saveCommentSpy = vi
+        .spyOn(githubApi, "saveComment")
         .mockResolvedValue({
           id: 789,
           body: mockReport.commentBody,
@@ -90,8 +90,7 @@ describe("postCoverageComment (Runner Entry Point)", () => {
 
       await postCoverageComment();
 
-      expect(commentActionSpy).toHaveBeenCalledWith({
-        config: mockConfig,
+      expect(saveCommentSpy).toHaveBeenCalledWith({
         body: mockReport.commentBody,
         id: 789,
       });
@@ -109,9 +108,9 @@ describe("postCoverageComment (Runner Entry Point)", () => {
 
       vi.spyOn(githubApi, "getGithubParams").mockReturnValue(mockConfig);
       vi.spyOn(reportUtils, "getReport").mockReturnValue(mockReport);
-      vi.spyOn(githubApi, "getComment").mockResolvedValue(zeroIdComment);
-      const commentActionSpy = vi
-        .spyOn(githubApi, "commentAction")
+      vi.spyOn(githubApi, "getCommentWithId").mockResolvedValue(zeroIdComment);
+      const saveCommentSpy = vi
+        .spyOn(githubApi, "saveComment")
         .mockResolvedValue({
           id: 0,
           body: mockReport.commentBody,
@@ -119,8 +118,7 @@ describe("postCoverageComment (Runner Entry Point)", () => {
 
       await postCoverageComment();
 
-      expect(commentActionSpy).toHaveBeenCalledWith({
-        config: mockConfig,
+      expect(saveCommentSpy).toHaveBeenCalledWith({
         body: mockReport.commentBody,
         id: 0,
       });
