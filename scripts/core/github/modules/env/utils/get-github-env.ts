@@ -6,7 +6,7 @@ export async function getGithubEnv() {
   const params = getGithubRequireds();
 
   const { pull_request } = await readJsonFile<GithubEnvData>({
-    filePath: params.envPath,
+    filePath: params.eventPath,
   });
 
   const prNumber = pull_request?.number;

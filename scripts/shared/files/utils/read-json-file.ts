@@ -12,7 +12,6 @@ export async function readJsonFile<T>(
   const data = await readTextFileAsync(options);
 
   try {
-    console.log(`parsing JSON file: ${options.filePath} with data: ${data}`);
     return JSON.parse(data) as T;
   } catch (err) {
     const targetPath = options.baseDir
