@@ -1,4 +1,4 @@
-name: Vitest Tests & Linting
+name: Vitest Tests & Linting & documentation
 permissions:
   contents: read
   pull-requests: write
@@ -16,7 +16,7 @@ env:
   TOTAL_PCT: 0
 
 jobs:
-  test-lint:
+  test-lint-docs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
 
@@ -45,22 +45,28 @@ jobs:
       - name: Run build
         run: pnpm build
 
-      - name: Generate Coverage Report Summary
-        if: ${{ !cancelled() }}
+      - name: Generate Test Coverage Report Summary
         id: coverage
         run: pnpm coverage-summary
 
       - name: Post Coverage Comment on PR
-        if: ${{ github.event_name == 'pull_request' && !cancelled() }}
+        if: ${{ github.event_name == 'pull_request' && success() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
-        run: pnpm comment
+        run: pnpm test-comment
 
       - name: Upload HTML Coverage Artifact
         uses: actions/upload-artifact@v7
-        if: ${{ !cancelled() }}
         with:
           name: coverage-report
           path: coverage/
           retention-days: 14
+      - name: Verify documentation drifts
+        run: pnpm readme-check
+      - name: Post Documentation Comment on PR
+        if: ${{ github.event_name == 'pull_request' && !success() }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: pnpm readme-comment
