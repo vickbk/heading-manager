@@ -1,3 +1,4 @@
+import { createTextFileSync } from "@/scripts/core/files";
 import { unwrapReadmeErrorMessages } from "./unwrap-readme-errors-messages";
 
 /**
@@ -27,5 +28,12 @@ export function handleReadmeCliError(error: unknown): string {
 
   const body = formattedMessages.join("\n\n" + "-".repeat(50) + "\n\n");
 
-  return `${HEADER_TEXT}\n\n${body}`;
+  const content = `${HEADER_TEXT}\n\n${body}`;
+
+  createTextFileSync({
+    filePath: "readme-validation-error.log",
+    content,
+  });
+
+  return content;
 }

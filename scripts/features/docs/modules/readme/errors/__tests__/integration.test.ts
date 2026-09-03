@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReadmeSectionValidationResult } from "../../types";
 import { HEADER_TEXT, handleReadmeCliError } from "../handle-readme-errors";
 import { ReadmeValidationError } from "../readme-validation-error";
+
+import * as filesModule from "@/scripts/core/files";
 
 function createMockValidationResult(
   overrides: Partial<ReadmeSectionValidationResult> = {},
@@ -17,6 +19,12 @@ function createMockValidationResult(
 }
 
 describe("handleReadmeCliError (Integration)", () => {
+  beforeEach(() => {
+    vi.spyOn(filesModule, "createTextFileSync").mockReturnValue("");
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   describe("Single Error Types", () => {
     it("formats and returns a single ReadmeValidationError with HEADER_TEXT prefix", () => {
       const result = createMockValidationResult({
