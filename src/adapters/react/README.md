@@ -59,7 +59,7 @@ The following APIs are retained for backwards compatibility:
 
 ---
 
-### Heading-Level Context
+## Heading-Level Context
 
 The current context API uses a zero-based normalized heading level:
 
