@@ -8,6 +8,7 @@ export const SKIPPED_MESSAGE =
 
 export async function getCommentBody(): Promise<string> {
   if (config.docs.hasRun !== true) {
+    console.log("document check has run status", config.docs.hasRun);
     return SKIPPED_MESSAGE;
   }
   return (await getErrorLogContent()) ?? SUCCESS_MESSAGE;
