@@ -35,7 +35,7 @@ describe("saveComment", () => {
   });
 
   describe("Comment Creation (POST)", () => {
-    it("should send a POST request to the PR issues comments endpoint when id is null", async () => {
+    it("should send a POST request without identifier prefix when identifier is omitted", async () => {
       const mockResponse = {
         ok: true,
         json: vi.fn().mockResolvedValue(mockCommentPayload),
@@ -88,6 +88,84 @@ describe("saveComment", () => {
         body: JSON.stringify({ body: updatedBody }),
       });
       expect(result).toEqual(updatedPayload);
+    });
+  });
+
+  describe("Identifier Prepending & Normalization", () => {
+    it("should prepend identifier to body when identifier is provided on POST", async () => {
+      const mockResponse = {
+        ok: true,
+        json: vi.fn().mockResolvedValue(mockCommentPayload),
+      };
+      vi.mocked(fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+      const identifier = "<!-- comment-id: readme-comment -->\n";
+      const commentBody = "## Documentation Errors";
+
+      await saveComment({
+        body: commentBody,
+        id: null,
+        identifier,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          body: JSON.stringify({
+            body: "<!-- comment-id: readme-comment -->## Documentation Errors",
+          }),
+        }),
+      );
+    });
+
+    it("should trim surrounding whitespace from identifier before prepending on PATCH", async () => {
+      const commentId = 555;
+      const mockResponse = {
+        ok: true,
+        json: vi.fn().mockResolvedValue(mockCommentPayload),
+      };
+      vi.mocked(fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+      const identifier = "  <!-- comment-id: coverage -->\n\n ";
+      const commentBody = "\n## Coverage Report";
+
+      await saveComment({
+        body: commentBody,
+        id: commentId,
+        identifier,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          body: JSON.stringify({
+            body: "<!-- comment-id: coverage -->\n## Coverage Report",
+          }),
+        }),
+      );
+    });
+
+    it("should treat empty string identifier identical to default parameter", async () => {
+      const mockResponse = {
+        ok: true,
+        json: vi.fn().mockResolvedValue(mockCommentPayload),
+      };
+      vi.mocked(fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+      const commentBody = "Plain comment body";
+
+      await saveComment({
+        body: commentBody,
+        id: null,
+        identifier: "",
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          body: JSON.stringify({ body: "Plain comment body" }),
+        }),
+      );
     });
   });
 

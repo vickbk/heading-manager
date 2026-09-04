@@ -59,6 +59,7 @@ describe("postReadmeComment", () => {
       expect(saveComment).toHaveBeenCalledWith({
         body: ERROR_LOG_CONTENT,
         id: null,
+        identifier: README_COMMENT_IDENTIFIER,
       });
       expect(console.log).toHaveBeenNthCalledWith(
         2,
@@ -81,6 +82,7 @@ describe("postReadmeComment", () => {
       expect(saveComment).toHaveBeenCalledWith({
         body: ERROR_LOG_CONTENT,
         id: mockExistingComment.id,
+        identifier: README_COMMENT_IDENTIFIER,
       });
     });
 
@@ -94,6 +96,7 @@ describe("postReadmeComment", () => {
       expect(saveComment).toHaveBeenCalledWith({
         body: SUCCESS_MESSAGE,
         id: null,
+        identifier: README_COMMENT_IDENTIFIER,
       });
     });
 
@@ -107,6 +110,7 @@ describe("postReadmeComment", () => {
       expect(saveComment).toHaveBeenCalledWith({
         body: SUCCESS_MESSAGE,
         id: mockExistingComment.id,
+        identifier: README_COMMENT_IDENTIFIER,
       });
     });
   });
@@ -124,6 +128,7 @@ describe("postReadmeComment", () => {
       expect(saveComment).toHaveBeenCalledWith({
         body: SKIPPED_MESSAGE,
         id: null,
+        identifier: README_COMMENT_IDENTIFIER,
       });
     });
 
@@ -138,6 +143,7 @@ describe("postReadmeComment", () => {
       expect(saveComment).toHaveBeenCalledWith({
         body: SKIPPED_MESSAGE,
         id: mockExistingComment.id,
+        identifier: README_COMMENT_IDENTIFIER,
       });
     });
   });

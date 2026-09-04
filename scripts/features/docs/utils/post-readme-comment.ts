@@ -15,8 +15,9 @@ export async function postReadmeComment() {
   );
 
   await saveComment({
-    body: content,
+    body: `${content}`,
     id: comment?.id ?? null,
+    identifier: README_COMMENT_IDENTIFIER,
   });
 
   console.log("[Readme Reporter] Comment processed successfully.");
