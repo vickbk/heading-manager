@@ -50,7 +50,7 @@ jobs:
         run: pnpm coverage-summary
 
       - name: Post Coverage Comment on PR
-        if: ${{ github.event_name == 'pull_request' && success() }}
+        if: github.event_name == 'pull_request' && success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}
