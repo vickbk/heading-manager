@@ -43,7 +43,7 @@ export const getConfig = (): Config => {
       package: process.env.PACKAGE,
     },
     docs: {
-      hasRun: process.env.DOCS_HAS_RUN,
+      hasRun: process.env.DOCS_RUN_OUTCOME,
     },
   });
 

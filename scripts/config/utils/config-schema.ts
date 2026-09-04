@@ -59,6 +59,6 @@ export const configSchema = z.object({
     hasRun: z
       .string()
       .optional()
-      .transform((val) => ["true", "1", "TRUE", "T"].includes(val || "")),
+      .transform((val) => ["success", "failure"].includes(val || "")),
   }),
 });
