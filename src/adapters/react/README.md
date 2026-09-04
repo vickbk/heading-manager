@@ -17,7 +17,7 @@ This layer is the only place where React-specific rendering concerns are allowed
 
 ---
 
-## Public API
+### Public API
 
 ```ts
 import {
