@@ -42,6 +42,9 @@ export const getConfig = (): Config => {
       releaseChangelog: process.env.RELEASE_CHANGELOG_PATH,
       package: process.env.PACKAGE,
     },
+    docs: {
+      hasRun: process.env.DOCS_HAS_RUN,
+    },
   });
 
   if (!parsed.success) {

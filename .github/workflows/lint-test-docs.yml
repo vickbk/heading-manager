@@ -63,9 +63,11 @@ jobs:
           path: coverage/
           retention-days: 14
       - name: Verify documentation drifts
+        env:
+          DOCS_HAS_RUN: TRUE
         run: pnpm readme-check
       - name: Post Documentation Comment on PR
-        if: ${{ github.event_name == 'pull_request' && !success() }}
+        if: ${{ github.event_name == 'pull_request' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.number }}

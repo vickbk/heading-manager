@@ -58,7 +58,7 @@
     "coverage-summary": "tsx ./scripts/bin/coverage-summary.ts",
     "test-comment": "tsx ./scripts/bin/post-vitest-coverage.ts",
     "readme-check": "tsx ./scripts/bin/documentation/readme-check.ts",
-    "readme-comment": "tsx ./scripts/bin/documentation/readme-comment.ts"
+    "readme-comment": "tsx ./scripts/bin/documentation/post-readme-comment.ts"
   },
   "keywords": [
     "a11y",

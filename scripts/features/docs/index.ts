@@ -3,3 +3,4 @@
  */
 export { handleReadmeCliError } from "./modules/readme";
 export { checkReadmeFiles } from "./utils/check-readme-files";
+export { postReadmeComment } from "./utils/post-readme-comment";

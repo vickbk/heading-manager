@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as filesModule from "@/scripts/shared/files";
 import { shutConsole } from "@/tests/setup/console";
+import { README_ERROR_LOG_FILE } from "./config";
 import { HEADER_TEXT, handleReadmeCliError } from "./handle-readme-errors";
 import * as unwrapModule from "./unwrap-readme-errors-messages";
 
@@ -26,7 +27,7 @@ describe("handleReadmeCliError", () => {
     expect(result).toBe(`${HEADER_TEXT}\n\nSingle Error Message`);
     expect(filesModule.createTextFileSync).toHaveBeenCalledTimes(1);
     expect(filesModule.createTextFileSync).toHaveBeenCalledWith({
-      filePath: "readme-validation-error.log",
+      filePath: README_ERROR_LOG_FILE,
       content: result,
     });
   });
@@ -42,7 +43,7 @@ describe("handleReadmeCliError", () => {
 
     expect(result).toBe(`${HEADER_TEXT}\n\n${expectedMessage}`);
     expect(filesModule.createTextFileSync).toHaveBeenCalledWith({
-      filePath: "readme-validation-error.log",
+      filePath: README_ERROR_LOG_FILE,
       content: result,
     });
   });
@@ -64,7 +65,7 @@ describe("handleReadmeCliError", () => {
 
     expect(result).toBe(`${HEADER_TEXT}\n\n${expectedBody}`);
     expect(filesModule.createTextFileSync).toHaveBeenCalledWith({
-      filePath: "readme-validation-error.log",
+      filePath: README_ERROR_LOG_FILE,
       content: result,
     });
   });
@@ -89,7 +90,7 @@ describe("handleReadmeCliError", () => {
 
       expect(result.startsWith(HEADER_TEXT)).toBe(true);
       expect(filesModule.createTextFileSync).toHaveBeenCalledWith({
-        filePath: "readme-validation-error.log",
+        filePath: README_ERROR_LOG_FILE,
         content: result,
       });
     });
@@ -113,7 +114,7 @@ describe("handleReadmeCliError", () => {
       expect(parts[0]).toBe("Block A Header\n  - Detail A1\n  - Detail A2");
       expect(parts[1]).toBe("Block B Header\n  - Detail B1");
       expect(filesModule.createTextFileSync).toHaveBeenCalledWith({
-        filePath: "readme-validation-error.log",
+        filePath: README_ERROR_LOG_FILE,
         content: result,
       });
     });
@@ -127,7 +128,7 @@ describe("handleReadmeCliError", () => {
 
       expect(result).toBe(`${HEADER_TEXT}\n\nRaw string rejection message`);
       expect(filesModule.createTextFileSync).toHaveBeenCalledWith({
-        filePath: "readme-validation-error.log",
+        filePath: README_ERROR_LOG_FILE,
         content: result,
       });
     });

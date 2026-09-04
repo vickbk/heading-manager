@@ -1,4 +1,5 @@
 import { createTextFileSync } from "@/scripts/shared/files";
+import { README_ERROR_LOG_FILE } from "./config";
 import { unwrapReadmeErrorMessages } from "./unwrap-readme-errors-messages";
 
 /**
@@ -6,7 +7,6 @@ import { unwrapReadmeErrorMessages } from "./unwrap-readme-errors-messages";
  * The caller uses this text to label the final formatted fatal-error output.
  */
 export const HEADER_TEXT = "❌ [Readme Check] Fatal Error:";
-
 /**
  * Formats any nested README validation error tree into a single CLI-safe string.
  *
@@ -31,7 +31,7 @@ export function handleReadmeCliError(error: unknown): string {
   const content = `${HEADER_TEXT}\n\n${body}`;
 
   createTextFileSync({
-    filePath: "readme-validation-error.log",
+    filePath: README_ERROR_LOG_FILE,
     content,
   });
 

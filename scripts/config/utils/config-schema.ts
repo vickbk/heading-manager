@@ -55,4 +55,10 @@ export const configSchema = z.object({
         normalizePath(path.resolve(process.cwd(), relPath)),
       ),
   }),
+  docs: z.object({
+    hasRun: z
+      .string()
+      .optional()
+      .transform((val) => ["true", "1", "TRUE", "T"].includes(val || "")),
+  }),
 });
