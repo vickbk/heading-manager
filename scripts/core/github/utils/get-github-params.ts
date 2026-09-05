@@ -1,5 +1,5 @@
-import { config } from "@/scripts/config";
 import fs from "node:fs";
+import { getGithubRequireds } from "../modules/env";
 import { GithubParams } from "../types";
 
 /**
@@ -9,13 +9,7 @@ import { GithubParams } from "../types";
  * @throws {Error} When required environment variables are missing, the event file cannot be read, or the payload is not attached to a pull request.
  */
 export function getGithubParams(): GithubParams {
-  const { token, repository, eventPath, runId } = config.github;
-
-  if (!token || !repository || !eventPath) {
-    throw new Error(
-      "[GithubEnv] Missing required environment variables (GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_EVENT_PATH).",
-    );
-  }
+  const { token, repository, eventPath, runId } = getGithubRequireds();
 
   if (!fs.existsSync(eventPath)) {
     throw new Error(

@@ -84,13 +84,14 @@ describe("handleFatalError", () => {
         .fn()
         .mockImplementation((msg: string) => `❌ [CRITICAL FAILURE] -> ${msg}`);
 
-      handleFatalError(new Error("Disk space full"), customFormatter);
+      const err = new Error("Disk space full");
+      handleFatalError(err, customFormatter);
 
       expect(customFormatter).toHaveBeenCalledTimes(1);
-      expect(customFormatter).toHaveBeenCalledWith("Disk space full");
+      expect(customFormatter).toHaveBeenCalledWith(err);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "❌ [CRITICAL FAILURE] -> Disk space full",
+        "❌ [CRITICAL FAILURE] -> Error: Disk space full",
       );
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });

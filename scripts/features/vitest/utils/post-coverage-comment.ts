@@ -1,7 +1,7 @@
 import {
-  commentAction,
-  getComment,
+  getCommentWithId,
   getGithubParams,
+  saveComment,
 } from "@/scripts/core/github";
 import { COMMENT_IDENTIFIER, getReport } from "./report";
 
@@ -14,15 +14,14 @@ import { COMMENT_IDENTIFIER, getReport } from "./report";
 export async function postCoverageComment() {
   const config = getGithubParams();
   const report = getReport(undefined, config.repository, config.runId);
-  const comment = await getComment(config, COMMENT_IDENTIFIER);
+  const comment = await getCommentWithId(COMMENT_IDENTIFIER);
 
   console.log(
     comment
       ? `[Coverage Runner] Updating existing PR comment ID: ${comment.id}`
       : "[Coverage Runner] Posting new PR comment...",
   );
-  await commentAction({
-    config,
+  await saveComment({
     body: report.commentBody,
     id: comment?.id ?? null,
   });

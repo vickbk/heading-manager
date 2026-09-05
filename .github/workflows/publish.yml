@@ -46,10 +46,13 @@ jobs:
         run: pnpm typecheck
 
       - name: Run Vitest
-        run: pnpm test:run
+        run: pnpm test run
 
       - name: Build distribution artifacts
         run: pnpm build
+
+      - name: Verify documentation drifts
+        run: pnpm readme-check
 
       - name: Write tag to environment
         run: pnpm release-tag
