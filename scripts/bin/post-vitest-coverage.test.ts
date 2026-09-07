@@ -1,3 +1,4 @@
+import { shutConsole } from "@/tests/setup/console";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const postCoverageMock = vi.fn();
@@ -7,6 +8,7 @@ describe("post comment coverage Run Task execution", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.resetAllMocks();
+    shutConsole();
 
     vi.spyOn(process, "exit").mockReturnValue(undefined as never);
     vi.mock("@vickbk/ci-tools/vitest", () => ({
