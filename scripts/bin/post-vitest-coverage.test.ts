@@ -2,6 +2,9 @@ import { shutConsole } from "@/tests/setup/console";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const postCoverageMock = vi.fn();
+vi.mock("@vickbk/ci-tools/vitest", () => ({
+  postCoverageComment: postCoverageMock,
+}));
 
 describe("post comment coverage Run Task execution", () => {
   const originalArgv = process.argv;
@@ -11,9 +14,6 @@ describe("post comment coverage Run Task execution", () => {
     shutConsole();
 
     vi.spyOn(process, "exit").mockReturnValue(undefined as never);
-    vi.mock("@vickbk/ci-tools/vitest", () => ({
-      postCoverageComment: postCoverageMock,
-    }));
   });
 
   afterEach(() => {

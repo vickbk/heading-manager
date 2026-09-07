@@ -4,6 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const runSpy = vi.fn();
 const extractReleaseSpy = vi.fn();
 
+vi.mock("@vickbk/ci-tools/core", () => ({
+  runTask: runSpy,
+}));
+vi.mock("@vickbk/ci-tools/releases", () => ({
+  extractReleaseNotes: extractReleaseSpy,
+}));
+
 describe("bin/extract-release-note entrypoint integration", () => {
   const originalArgv = [...process.argv];
 
@@ -14,12 +21,6 @@ describe("bin/extract-release-note entrypoint integration", () => {
     process.argv = [...originalArgv];
 
     vi.spyOn(process, "exit").mockImplementation((() => {}) as never);
-    vi.mock("@vickbk/ci-tools/core", () => ({
-      runTask: runSpy,
-    }));
-    vi.mock("@vickbk/ci-tools/releases", () => ({
-      extractReleaseNotes: extractReleaseSpy,
-    }));
   });
 
   afterEach(() => {

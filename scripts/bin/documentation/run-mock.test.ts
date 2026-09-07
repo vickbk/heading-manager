@@ -14,6 +14,15 @@ vi.mock("@vickbk/ci-tools/docs", () => ({
   postReadmeComment: postReadmeSpy,
 }));
 
+vi.mock("@vickbk/ci-tools/core", async (original) => {
+  const actual = await original<typeof import("@vickbk/ci-tools/core")>();
+
+  runTaskSpy.mockImplementation(actual.runTask);
+  return {
+    runTask: runTaskSpy,
+  };
+});
+
 describe("bin/documentation/readme-check entrypoint", () => {
   const originalArgv = [...process.argv];
 
@@ -61,15 +70,6 @@ describe("bin/documentation/readme-check entrypoint", () => {
       "/workspace/scripts/bin/documentation/readme-check.ts",
     ];
     checkReadmeSpy.mockResolvedValue([]);
-
-    vi.mock("@vickbk/ci-tools/core", async (original) => {
-      const actual = await original<typeof import("@vickbk/ci-tools/core")>();
-
-      runTaskSpy.mockImplementation(actual.runTask);
-      return {
-        runTask: runTaskSpy,
-      };
-    });
 
     await import("./readme-check");
 
