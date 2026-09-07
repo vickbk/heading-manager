@@ -1,5 +1,5 @@
-import { runTask } from "@/scripts/core/errors";
-import { extractReleaseNotes } from "@/scripts/features/releases";
+import { runTask } from "@vickbk/ci-tools/core";
+import { extractReleaseNotes } from "@vickbk/ci-tools/releases";
 
 await runTask(
   "extract-release-note",

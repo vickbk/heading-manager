@@ -1,5 +1,5 @@
-import { runTask } from "@/scripts/core/errors";
-import { writeDistTagToGithubOutput } from "@/scripts/features/releases";
+import { runTask } from "@vickbk/ci-tools/core";
+import { writeDistTagToGithubOutput } from "@vickbk/ci-tools/releases";
 
 await runTask(
   "extract-version-tag",

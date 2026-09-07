@@ -1,23 +1,25 @@
 import process from "node:process";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import * as errorsModule from "@/scripts/core/errors";
-import * as releasesModule from "@/scripts/features/releases";
+const runSpy = vi.fn();
+const extractReleaseSpy = vi.fn();
 
 describe("bin/extract-release-note entrypoint integration", () => {
   const originalArgv = [...process.argv];
-  let scopedReleasesModule = releasesModule;
-  let scopedErrorsModule = errorsModule;
 
   beforeEach(async () => {
-    vi.restoreAllMocks();
     vi.resetModules();
+    vi.resetAllMocks();
 
     process.argv = [...originalArgv];
 
-    scopedReleasesModule = await import("@/scripts/features/releases");
-    scopedErrorsModule = await import("@/scripts/core/errors");
     vi.spyOn(process, "exit").mockImplementation((() => {}) as never);
+    vi.mock("@vickbk/ci-tools/core", () => ({
+      runTask: runSpy,
+    }));
+    vi.mock("@vickbk/ci-tools/releases", () => ({
+      extractReleaseNotes: extractReleaseSpy,
+    }));
   });
 
   afterEach(() => {
@@ -32,46 +34,38 @@ describe("bin/extract-release-note entrypoint integration", () => {
         "1.2.0",
       ];
 
-      const extractSpy = vi
-        .spyOn(scopedReleasesModule, "extractReleaseNotes")
-        .mockReturnValue("/workspace/RELEASE_CHANGELOG.md");
+      extractReleaseSpy.mockReturnValue("/workspace/RELEASE_CHANGELOG.md");
 
-      const runTaskSpy = vi
-        .spyOn(scopedErrorsModule, "runTask")
-        .mockImplementation(async (_name, task) => {
-          await task();
-        });
+      runSpy.mockImplementation(async (_name, task) => {
+        await task();
+      });
 
       await import("./extract-release-note");
 
-      expect(runTaskSpy).toHaveBeenCalledTimes(1);
-      expect(runTaskSpy).toHaveBeenCalledWith(
+      expect(runSpy).toHaveBeenCalledTimes(1);
+      expect(runSpy).toHaveBeenCalledWith(
         "extract-release-note",
         expect.any(Function),
         "❌ [Release Note] Fatal Error",
       );
 
-      expect(extractSpy).toHaveBeenCalledTimes(1);
-      expect(extractSpy).toHaveBeenCalledWith({ versionTag: "1.2.0" });
+      expect(extractReleaseSpy).toHaveBeenCalledTimes(1);
+      expect(extractReleaseSpy).toHaveBeenCalledWith({ versionTag: "1.2.0" });
     });
 
     it("should handle missing CLI arguments by passing undefined versionTag", async () => {
       process.argv = ["node", "/workspace/scripts/bin/extract-release-note.ts"];
 
-      const extractSpy = vi
-        .spyOn(scopedReleasesModule, "extractReleaseNotes")
-        .mockReturnValue("/workspace/RELEASE_CHANGELOG.md");
+      extractReleaseSpy.mockReturnValue("/workspace/RELEASE_CHANGELOG.md");
 
-      vi.spyOn(errorsModule, "runTask").mockImplementation(
-        async (_name, task) => {
-          await task();
-        },
-      );
+      runSpy.mockImplementation(async (_name, task) => {
+        await task();
+      });
 
       await import("./extract-release-note");
 
-      expect(extractSpy).toHaveBeenCalledTimes(1);
-      expect(extractSpy).toHaveBeenCalledWith({ versionTag: undefined });
+      expect(extractReleaseSpy).toHaveBeenCalledTimes(1);
+      expect(extractReleaseSpy).toHaveBeenCalledWith({ versionTag: undefined });
     });
   });
 
@@ -87,26 +81,22 @@ describe("bin/extract-release-note entrypoint integration", () => {
         'Could not find section for version "9.9.9" in CHANGELOG.md',
       );
 
-      vi.spyOn(scopedReleasesModule, "extractReleaseNotes").mockImplementation(
-        () => {
-          throw expectedError;
-        },
-      );
+      extractReleaseSpy.mockImplementation(() => {
+        throw expectedError;
+      });
 
-      const runTaskSpy = vi
-        .spyOn(scopedErrorsModule, "runTask")
-        .mockImplementation(async (_name, task, errorLabel) => {
-          try {
-            await task();
-          } catch (err) {
-            expect(err).toBe(expectedError);
-            expect(errorLabel).toBe("❌ [Release Note] Fatal Error");
-          }
-        });
+      runSpy.mockImplementation(async (_name, task, errorLabel) => {
+        try {
+          await task();
+        } catch (err) {
+          expect(err).toBe(expectedError);
+          expect(errorLabel).toBe("❌ [Release Note] Fatal Error");
+        }
+      });
 
       await import("./extract-release-note");
 
-      expect(runTaskSpy).toHaveBeenCalledTimes(1);
+      expect(runSpy).toHaveBeenCalledTimes(1);
     });
 
     it("should safely handle un-spied runTask execution without terminating Vitest process", async () => {
@@ -116,11 +106,12 @@ describe("bin/extract-release-note entrypoint integration", () => {
         "9.9.9",
       ];
 
-      vi.spyOn(releasesModule, "extractReleaseNotes").mockImplementation(() => {
+      extractReleaseSpy.mockImplementation(() => {
         throw new Error("Fatal script failure");
       });
+      runSpy.mockRestore();
 
-      // Executes actual un-mocked runTask() safely
+      // Executes actual restored runTask() safely
       await expect(import("./extract-release-note")).resolves.not.toThrow();
     });
   });
