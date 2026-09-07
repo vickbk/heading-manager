@@ -3,6 +3,9 @@ import process from "node:process";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const writeDistTagToGithubOutputMock = vi.fn();
+vi.mock("@vickbk/ci-tools/releases", () => ({
+  writeDistTagToGithubOutput: writeDistTagToGithubOutputMock,
+}));
 
 describe("bin/extract-version-tag entrypoint", () => {
   const originalArgv = [...process.argv];
@@ -14,10 +17,6 @@ describe("bin/extract-version-tag entrypoint", () => {
 
     shutConsole();
     vi.spyOn(process, "exit").mockReturnValue("" as never);
-
-    vi.mock("@vickbk/ci-tools/releases", () => ({
-      writeDistTagToGithubOutput: writeDistTagToGithubOutputMock,
-    }));
   });
 
   afterEach(() => {
