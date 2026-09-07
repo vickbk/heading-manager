@@ -1,5 +1,5 @@
-import { runTask } from "@/scripts/core/errors";
-import { postReadmeComment } from "@/scripts/features/docs";
+import { runTask } from "@vickbk/ci-tools/core";
+import { postReadmeComment } from "@vickbk/ci-tools/docs";
 
 await runTask(
   "post-readme-comment",

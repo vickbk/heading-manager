@@ -1,10 +1,8 @@
 /* eslint-disable boundaries/dependencies */
+import { runTask } from "@vickbk/ci-tools/core";
+import { checkReadmeFiles, handleReadmeCliError } from "@vickbk/ci-tools/docs";
+
 import { documentationContract } from "@/docs/documentation-contract";
-import { runTask } from "@/scripts/core/errors";
-import {
-  checkReadmeFiles,
-  handleReadmeCliError,
-} from "@/scripts/features/docs";
 import { adaptersContract } from "@/src/adapters/docs-contract";
 import { playwrightAdapterContract } from "@/src/adapters/playwright/docs-contract";
 import { reactAdapterContract } from "@/src/adapters/react/docs-contract";
