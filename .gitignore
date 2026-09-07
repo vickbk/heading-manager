@@ -18,6 +18,8 @@
 /build
 /dist
 RELEASE_CHANGELOG.md
+/.dump
+/scripts/.dump
 
 # misc
 .DS_Store

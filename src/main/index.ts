@@ -7,4 +7,16 @@
  *
  * @module react-heading-manager
  */
-export * from "@/src/adapters/react";
+export {
+  Article,
+  Header,
+  Heading,
+  HeadingCtx,
+  HeadingFragment,
+  HeadingLevelCtx,
+  Main,
+  Section,
+  createRegion,
+  useHeading,
+  useHeadingLevel,
+} from "@/src/adapters/react";

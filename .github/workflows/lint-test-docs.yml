@@ -1,0 +1,74 @@
+name: Vitest Tests & Linting & documentation
+permissions:
+  contents: read
+  pull-requests: write
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  TOTAL_PCT: 0
+
+jobs:
+  test-lint-docs:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/setup@v1
+        with:
+          version: 11
+          cache: true
+          runtime: node@24
+          cache-dependency-path: "pnpm-lock.yaml"
+          package-json-file: "package.json"
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Run type checking
+        run: pnpm typecheck
+
+      - name: Run Vitest with coverage
+        run: pnpm test run --coverage
+
+      - name: Run build
+        run: pnpm build
+
+      - name: Generate Test Coverage Report Summary
+        id: coverage
+        run: pnpm coverage-summary
+
+      - name: Post Coverage Comment on PR
+        if: github.event_name == 'pull_request' && success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: pnpm test-comment
+
+      - name: Upload HTML Coverage Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+      - name: Verify documentation drifts
+        id: docs-check
+        run: pnpm readme-check
+      - name: Post Documentation Comment on PR
+        if: always() && github.event_name == 'pull_request'
+        env:
+          DOCS_RUN_OUTCOME: ${{ steps.docs-check.outcome }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: pnpm readme-comment

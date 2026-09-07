@@ -74,7 +74,7 @@
 - **Target**: 2026-08-10
 - **Description**: Perform a full build, typecheck, test execution, and npm pack dry-run to ensure the published tarball is ready for distribution.
 - **Steps**:
-  - [x] Run `pnpm clean && pnpm run typecheck` to verify zero TypeScript errors.
-  - [x] Run `pnpm run test:run` to verify all Vitest unit and integration suites pass.
-  - [x] Run `pnpm run build` to generate distribution bundles in `/dist`.
+  - [x] Run `pnpm clean && pnpm typecheck` to verify zero TypeScript errors.
+  - [x] Run `pnpm test run` to verify all Vitest unit and integration suites pass.
+  - [x] Run `pnpm build` to generate distribution bundles in `/dist`.
   - [x] Run `pnpm pack --dry-run` to inspect tarball output and verify file inclusions.

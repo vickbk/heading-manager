@@ -1,10 +1,19 @@
+import { shutConsole } from "@/tests/setup/console";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const postCoverageMock = vi.fn();
+vi.mock("@vickbk/ci-tools/vitest", () => ({
+  postCoverageComment: postCoverageMock,
+}));
 
 describe("post comment coverage Run Task execution", () => {
   const originalArgv = process.argv;
   beforeEach(() => {
     vi.resetModules();
-    vi.clearAllMocks();
+    vi.resetAllMocks();
+    shutConsole();
+
+    vi.spyOn(process, "exit").mockReturnValue(undefined as never);
   });
 
   afterEach(() => {
@@ -19,10 +28,7 @@ describe("post comment coverage Run Task execution", () => {
         return `process.exit: ${code}` as never;
       });
 
-      vi.spyOn(
-        await import("@/scripts/features/vitest"),
-        "postCoverageComment",
-      ).mockImplementation(async () => {
+      postCoverageMock.mockImplementation(async () => {
         throw new Error("Missing GITHUB_TOKEN environment variable");
       });
 
@@ -38,10 +44,6 @@ describe("post comment coverage Run Task execution", () => {
     it("should execute postCoverageComment successfully when process.argv matches", async () => {
       process.argv = ["node", "/workspace/scripts/bin/post-vitest-coverage"];
 
-      vi.spyOn(
-        await import("@/scripts/features/vitest"),
-        "postCoverageComment",
-      ).mockImplementation(async () => {});
       vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
 
       await import("./post-vitest-coverage");
@@ -53,14 +55,9 @@ describe("post comment coverage Run Task execution", () => {
     it("should NOT execute postCoverageComment when process.argv does not match", async () => {
       process.argv = ["node", "/workspace/scripts/other-script.ts"];
 
-      const spiedPoster = vi.spyOn(
-        await import("@/scripts/features/vitest"),
-        "postCoverageComment",
-      );
-
       await import("./post-vitest-coverage");
 
-      expect(spiedPoster).not.toHaveBeenCalled();
+      expect(postCoverageMock).not.toHaveBeenCalled();
     });
   });
 
@@ -68,10 +65,7 @@ describe("post comment coverage Run Task execution", () => {
     it("should catch Error instances, print error log, and call process.exit(1)", async () => {
       process.argv = ["node", "/workspace/scripts/bin/post-vitest-coverage.ts"];
 
-      vi.spyOn(
-        await import("@/scripts/features/vitest"),
-        "postCoverageComment",
-      ).mockImplementation(() => {
+      postCoverageMock.mockImplementation(() => {
         throw new Error("Test Error");
       });
 

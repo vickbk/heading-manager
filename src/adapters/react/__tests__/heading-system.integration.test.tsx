@@ -8,11 +8,10 @@ import { createRegion, Heading, HeadingFragment, Main } from "../index";
 
 // Verification Helpers
 import {
-  checkHeadingOrder,
-  checkHeadingOrderReport,
   checkNormalizedHeadingReport,
   drawRegion,
 } from "@/src/core/audit/utils";
+import { checkNormalizedHeading } from "@/src/main/utils";
 
 // Landmark regions created via createRegion factory
 const Section = createRegion<HTMLElement>("section");
@@ -24,7 +23,7 @@ describe("Heading System Integration Test Suite", () => {
   // 1. HAPPY PATH: FULL PIPELINE INTEGRATION
   // =========================================================================
   describe("Happy Path & Full Pipeline Validation", () => {
-    it("renders a valid sequential hierarchy and passes checkHeadingOrderReport", () => {
+    it("renders a valid sequential hierarchy and passes checkNormalizedHeadingReport", () => {
       render(
         <Main data-testid="root-main">
           <Heading>Main Application Title</Heading>
@@ -51,11 +50,11 @@ describe("Heading System Integration Test Suite", () => {
       expect(mapping.children).toHaveLength(2); // section and aside
 
       // Run assertion report
-      const report = checkHeadingOrderReport(mapping);
+      const report = checkNormalizedHeadingReport({ region: mapping });
 
       expect(report.isValid).toBe(true);
       expect(report.errors).toHaveLength(0);
-      expect(checkHeadingOrder(mapping)).toBe(true);
+      expect(checkNormalizedHeading({ region: mapping })).toBe(true);
     });
 
     it("integrates HeadingFragment seamlessly without breaking drawRegion tree structure", () => {
@@ -82,7 +81,7 @@ describe("Heading System Integration Test Suite", () => {
       expect(mapping.children).toHaveLength(1);
       expect(mapping.children[0].headings).toEqual(["h3"]);
 
-      const report = checkHeadingOrderReport(mapping);
+      const report = checkNormalizedHeadingReport({ region: mapping });
       expect(report.isValid).toBe(true);
     });
   });
@@ -143,7 +142,7 @@ describe("Heading System Integration Test Suite", () => {
     /**
      * FLAW 2: Skipping Heading Levels via HeadingFragment Override
      * When HeadingFragment explicitly sets level={3} (H4) inside an H1 scope,
-     * checkHeadingOrderReport detects the gap (H1 -> H4) and returns detailed errors.
+     * checkNormalizedHeadingReport detects the gap (H1 -> H4) and returns detailed errors.
      */
     it("FLAW 2: Detects level skipping via HeadingFragment override and generates detailed errors", () => {
       render(
@@ -161,7 +160,7 @@ describe("Heading System Integration Test Suite", () => {
 
       const mainEl = screen.getByTestId("root-main");
       const mapping = drawRegion(mainEl);
-      const report = checkHeadingOrderReport(mapping);
+      const report = checkNormalizedHeadingReport({ region: mapping });
 
       expect(report.isValid).toBe(false);
       expect(report.errors).toHaveLength(1);
@@ -202,7 +201,7 @@ describe("Heading System Integration Test Suite", () => {
       expect(mapping.tagName).toBe('div[role="main"]');
       expect(mapping.children[0].tagName).toBe('div[role="navigation"]');
 
-      const report = checkHeadingOrderReport(mapping);
+      const report = checkNormalizedHeadingReport({ region: mapping });
 
       expect(report.isValid).toBe(false);
       expect(report.errors[0].path).toBe(
@@ -229,7 +228,7 @@ describe("Heading System Integration Test Suite", () => {
 
       const mainEl = screen.getByTestId("root-main");
       const mapping = drawRegion(mainEl);
-      const report = checkHeadingOrderReport(mapping);
+      const report = checkNormalizedHeadingReport({ region: mapping });
 
       expect(report.isValid).toBe(false);
       const error = report.errors[0];
@@ -302,7 +301,7 @@ describe("Heading System Integration Test Suite", () => {
 
       const mainEl = screen.getByTestId("root-main");
       const mapping = drawRegion(mainEl);
-      const report = checkHeadingOrderReport(mapping);
+      const report = checkNormalizedHeadingReport({ region: mapping });
 
       expect(report.isValid).toBe(true);
       expect(mapping.children[0].headings).toEqual(["h2"]);
@@ -331,7 +330,7 @@ describe("Heading System Integration Test Suite", () => {
 
       const main = screen.getByTestId("root-element");
       const region = drawRegion(main);
-      const report = checkHeadingOrderReport(region);
+      const report = checkNormalizedHeadingReport({ region });
 
       expect(report.isValid).toBe(true);
       expect(screen.getByRole("heading", { level: 1 }).innerText).toBe(

@@ -35,8 +35,6 @@ import {
 } from "react-heading-manager";
 ```
 
-````
-
 ### Primary exports
 
 - `Main`: root page landmark and heading-level context initializer
@@ -163,8 +161,8 @@ When a component does not specify `h6Clamp`, it inherits the policy from its par
 - `HeadingFragment` advances or explicitly overrides the heading context without creating a DOM wrapper.
 - `createRegion` provides the same heading-level behavior for custom landmark components.
 - `Heading` maps normalized levels `0`–`5` to native `<h1>`–`<h6>` elements.
-- When levels beyond H6 are allowed, `Heading` preserves the normalized level  through an H6 element with an explicit ARIA heading level.
-- Heading hierarchy can be analyzed independently using the normalized  heading-audit APIs in the core layer.
+- When levels beyond H6 are allowed, `Heading` preserves the normalized level through an H6 element with an explicit ARIA heading level.
+- Heading hierarchy can be analyzed independently using the normalized heading-audit APIs in the core layer.
 
 ---
 
@@ -221,4 +219,7 @@ HeadingLevelCtx
 - Prefer `HeadingLevelCtx` and `useHeadingLevel` for new code.
 - Keep `HeadingCtx` and `useHeading` only for backwards compatibility.
 - Prefer explicit provider-based context and typed props over hidden runtime side effects.
-````
+
+```
+
+```

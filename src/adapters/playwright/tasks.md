@@ -39,5 +39,5 @@
 - **Description**: Update README documentation to showcase the explicit initializer pattern and verify the build output via `pnpm pack`.
 - **Steps**:
   - [x] Update `README.md` and `src/__testing__/README.md` with `registerPlaywrightMatchers` setup examples.
-  - [x] Execute full `pnpm run typecheck`, `pnpm run test:run`, and `pnpm build` sequence.
+  - [x] Execute full `pnpm run typecheck`, `pnpm test run`, and `pnpm build` sequence.
   - [x] Perform `pnpm pack --dry-run` to inspect generated `.d.ts` declaration outputs.

@@ -8,7 +8,7 @@ The `src/core/audit` package contains the framework-agnostic heading hierarchy v
 
 This module parses DOM section trees, identifies regions and headings, and evaluates whether their progression is consistent with WCAG-oriented heading sequencing heuristics.
 
-### Dependency policy
+## Dependency policy
 
 | Allowed imports                       | Forbidden imports                                      |
 | ------------------------------------- | ------------------------------------------------------ |
@@ -41,6 +41,7 @@ import {
 ### Legacy compatibility
 
 The audit engine keeps deprecated helpers such as `checkHeadingOrder` and `checkHeadingOrderReport` available for backwards compatibility, but the normalized API is the recommended path.
+Note that these APIs will be removed in the next major release.
 
 ---
 

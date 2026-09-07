@@ -1,5 +1,5 @@
-import { runTask } from "@/scripts/core/errors";
-import { generateCoverageSummary } from "@/scripts/features/vitest";
+import { runTask } from "@vickbk/ci-tools/core";
+import { generateCoverageSummary } from "@vickbk/ci-tools/vitest";
 
 await runTask(
   "coverage-summary",

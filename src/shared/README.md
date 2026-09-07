@@ -44,7 +44,7 @@ src/shared/
 
 ## Sub-Modules
 
-- **[`dom/`](https://www.google.com/search?q=./dom/README.md)**: Pure DOM primitives, WAI-ARIA landmark CSS selectors, and zero-indexed heading depth arithmetic ($H1$–$H6$).
+- **[`dom/`](./dom/README.md)**: Pure DOM primitives, WAI-ARIA landmark CSS selectors, and zero-indexed heading depth arithmetic ($H1$–$H6$).
 
 ---
 
