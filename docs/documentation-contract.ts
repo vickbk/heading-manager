@@ -1,4 +1,4 @@
-import { DocumentationContract } from "./types";
+import { DocumentationContract } from "@vickbk/ci-tools/docs";
 
 export const documentationContract: DocumentationContract = {
   packageName: "react-heading-manager",

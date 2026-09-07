@@ -1,4 +1,4 @@
-import { DocumentationContract } from "@/docs/types";
+import { DocumentationContract } from "@vickbk/ci-tools/docs";
 
 export const regionContract: DocumentationContract = {
   packageName: "src/core/audit/modules/region",

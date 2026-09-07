@@ -1,4 +1,4 @@
-import { DocumentationContract } from "@/docs/types";
+import { DocumentationContract } from "@vickbk/ci-tools/docs";
 
 export const coreContract: DocumentationContract = {
   packageName: "src/core",
