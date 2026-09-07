@@ -3,6 +3,7 @@ import { runTask } from "@vickbk/ci-tools/core";
 import { checkReadmeFiles, handleReadmeCliError } from "@vickbk/ci-tools/docs";
 
 import { documentationContract } from "@/docs/documentation-contract";
+import { scriptsReadmeContract } from "@/scripts/readme-contract";
 import { adaptersContract } from "@/src/adapters/docs-contract";
 import { playwrightAdapterContract } from "@/src/adapters/playwright/docs-contract";
 import { reactAdapterContract } from "@/src/adapters/react/docs-contract";
@@ -11,6 +12,7 @@ import { auditContract } from "@/src/core/audit/docs-contract";
 import { regionContract } from "@/src/core/audit/modules/region/docs-contract";
 import { coreContract } from "@/src/core/docs-contract";
 import { sharedContract } from "@/src/shared/docs-contract";
+import { binReadmeContract } from "../readme-contract";
 
 await runTask(
   "readme-check",
@@ -25,6 +27,8 @@ await runTask(
       "./src/core/README.md": coreContract,
       "./src/core/audit/README.md": auditContract,
       "./src/core/audit/modules/region/README.md": regionContract,
+      "./scripts/README.md": scriptsReadmeContract,
+      "./scripts/bin/README.md": binReadmeContract,
     }),
   handleReadmeCliError,
 );
