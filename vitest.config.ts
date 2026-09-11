@@ -12,7 +12,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "./"),
     },
-    exclude: ["**/node_modules/**", "**/dist/**"],
+    exclude: ["**/node_modules/**", "**/dist/**", "**/.dumps/**"],
     coverage: {
       reporter: ["html", "text", "json", "json-summary"],
     },
