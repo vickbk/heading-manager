@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://img.shields.io/npm/v/react-heading-manager.svg)](https://www.npmjs.com/package/react-heading-manager)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/vickbk/heading-manager/lint-test.yml?branch=main)](https://github.com/vickbk/heading-manager/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/vickbk/heading-manager/lint-test-docs.yml?branch=main)](https://github.com/vickbk/heading-manager/actions)
 [![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/vickbk/heading-manager)
 
 Automatic heading hierarchy management and accessibility auditing for React applications.
